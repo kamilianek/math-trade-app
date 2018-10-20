@@ -1,7 +1,7 @@
 
 const INITIAL_STATE = {
   apiUrl: 'https://mathtrade.api.url.com/api/v1',
-  token: null,
+  token: '9283423jh4g4jh2343jkg23k4234u23rd23',
 };
 
 export default function authReducer(state = INITIAL_STATE, action) {
