@@ -12,12 +12,12 @@ class EnsureLoggedInContainer extends Component {
     const { isLoggedIn, location } = this.props;
     const pathname = location && location.pathname;
 
-    // if (!isLoggedIn) {
-    //   switch (pathname) {
-    //     default:
-    //       return <Redirect to="/login"/>;
-    //   }
-    // }
+    if (!isLoggedIn) {
+      switch (pathname) {
+        default:
+          return <Redirect to="/login"/>;
+      }
+    }
 
     if (this.props.children) {
       console.log('alksdkljasdlkjadslkasjdlkas');

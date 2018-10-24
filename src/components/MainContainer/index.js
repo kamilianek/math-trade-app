@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import SwipeableViews from 'react-swipeable-views';
-import { Redirect, Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
+import actions from '../../actions';
 
 
 const styles = {
@@ -14,48 +15,53 @@ const styles = {
   },
 };
 
-class MainContainer extends React.Component {
-  state = {
-    value: 0,
-  };
+const pathValue = {
+  '/mainpanel': 0,
+  '/': 0,
+  '/account': 1,
+  '/signout': 2,
+};
 
-  handleChange = (event, value, route) => {
-    this.setState({ value });
-    return <Redirect to={route} />;
-  };
+class MainContainer extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      value: 0,
+    };
+  }
 
   render() {
-    const { classes, theme } = this.props;
-    console.log(this.props);
+    const { classes } = this.props;
+    const { pathname } = this.props.location;
+    console.log(pathname);
+
     return (
       <div>
         <Paper className={classes.root}>
           <Tabs
-            value={this.state.value}
-            onChange={this.handleChange}
+            value={pathValue[pathname]}
             indicatorColor="primary"
             textColor="primary"
             centered
           >
             <Tab
-              label="Item One"
+              label="Main Panel"
               component={Link}
               to="mainpanel"
             />
             <Tab
-              label="Item Two"
+              label="Account"
               component={Link}
-              to="secondpanel"
+              to="account"
             />
-            <Tab label="Item Three" />
+            <Tab
+              label="Sign out"
+              component={Link}
+              to="signout"
+            />
           </Tabs>
         </Paper>
-        <SwipeableViews
-          index={this.state.value}
-          onChangeIndex={this.handleChangeIndex}
-        >
-          {React.Children.only(this.props.children)}
-        </SwipeableViews>
       </div>
     );
   }
@@ -65,4 +71,10 @@ MainContainer.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(MainContainer);
+// const mapDispatchToProps = dispatch => ({
+//   updatePath: pathname => dispatch(actions.pathActions.updatePath(pathname)),
+// });
+
+
+
+export default withStyles(styles)(withRouter((connect(null, null)(MainContainer))));
