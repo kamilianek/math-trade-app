@@ -6,6 +6,7 @@ import LoginView from './views/LoginView';
 import MainPanelView from './views/MainPanelView';
 import RegistrationView from './views/RegistrationView';
 import SecondPanel from './views/SecondPanelView';
+import SignOutView from './views/SignOutView';
 
 
 export default class AppRouter extends React.Component {
@@ -15,9 +16,10 @@ export default class AppRouter extends React.Component {
         <div>
           <EnsureLoggedInPath exact path="/" component={MainPanelView} />
           <EnsureLoggedInPath exact path="/mainpanel" component={MainPanelView} />
-          <EnsureLoggedInPath exact path="/secondpanel" component={SecondPanel}/>
+          <EnsureLoggedInPath exact path="/account" component={SecondPanel}/>
           <Route path="/register" component={RegistrationView}/>
           <Route path="/login" component={LoginView}/>
+          <Route path="/signout" component={SignOutView} />
         </div>
       </HashRouter>
     );

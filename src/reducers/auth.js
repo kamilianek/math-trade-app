@@ -1,8 +1,14 @@
-
 const INITIAL_STATE = {
   apiUrl: 'https://mathtrade.api.url.com/api/v1',
-  token: '9283423jh4g4jh2343jkg23k4234u23rd23',
+  token: null, // TODO: null token on initial state
+  tokenData: [],
+  loginData: {
+    username: null,
+  },
 };
+
+const LOGIN_FINISHED = 'LOGIN_FINISHED';
+const SIGN_OUT_FINISHED = 'SIGN_OUT_FINISHED';
 
 export default function authReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
@@ -10,8 +16,10 @@ export default function authReducer(state = INITIAL_STATE, action) {
       return {
         ...state,
         token: action.token,
+        tokenData: action.tokenData,
+        loginData: action.loginData,
       };
-    case 'LOGOUT_FINISHED':
+    case 'SIGN_OUT_FINISHED':
       return {
         ...INITIAL_STATE,
       };
@@ -24,3 +32,8 @@ export default function authReducer(state = INITIAL_STATE, action) {
       return state;
   }
 }
+
+export {
+  LOGIN_FINISHED,
+  SIGN_OUT_FINISHED,
+};
