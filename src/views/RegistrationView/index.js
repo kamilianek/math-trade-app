@@ -35,7 +35,84 @@ const styles = theme => ({
   },
 });
 
+
 class RegistrationView extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      firstName: '',
+      isFirstNameValid: true,
+      lastName: '',
+      isLastNameValid: true,
+      username: '',
+      isUsernameValid: true,
+      email: '',
+      isEmailValid: true,
+      password: '',
+      repeatedPassword: '',
+      isPasswordValid: true,
+      address: '',
+      isAddressValid: true,
+      city: '',
+      isCityValid: true,
+      region: '',
+      zip: '',
+      isZipValid: true,
+      country: '',
+      isCountryValid: true,
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleErrorClose = this.handleErrorClose.bind(this);
+    this.onRegisterSubmit = this.onRegisterSubmit.bind(this);
+  }
+
+  handleChange = (event, name) => {
+    this.setState({
+      [name]: event.target.value,
+    });
+  };
+
+  handleErrorClose = name => (this.state[name] ? null : { [name]: true });
+
+  validateForm = () => {
+    const isFirstNameValid = this.state.firstName.length > 0;
+    const isLastNameValid = this.state.lastName.length > 0;
+    const isUsernameValid = this.state.username.length > 0;
+    const isEmailValid = this.state.email.length > 0;
+    const isPasswordValid = this.state.password.length > 0
+      && this.state.repeatedPassword.length > 0;
+    const isAddressValid = this.state.address.length > 0;
+    const isCityValid = this.state.city.length > 0;
+    const isZipValid = this.state.zip.length > 0;
+    const isCountryValid = this.state.country.length > 0;
+
+    this.setState({
+      isFirstNameValid,
+      isLastNameValid,
+      isUsernameValid,
+      isEmailValid,
+      isPasswordValid,
+      isAddressValid,
+      isCityValid,
+      isZipValid,
+      isCountryValid,
+    });
+
+    return isFirstNameValid && isLastNameValid && isUsernameValid && isEmailValid && isPasswordValid
+      && isAddressValid && isCityValid && isZipValid && isCountryValid;
+  };
+
+  onRegisterSubmit = () => {
+    if (this.validateForm()) {
+      console.log('form is correct');
+      return;
+    }
+
+    console.log('invalid form');
+  };
+
   render() {
     const { classes } = this.props;
     return (
@@ -56,6 +133,11 @@ class RegistrationView extends React.Component {
                 label="First name"
                 fullWidth
                 autoComplete="fname"
+                error={!this.state.isFirstNameValid}
+                onChange={(event) => {
+                  this.handleChange(event, 'firstName');
+                  this.setState(this.handleErrorClose('isFirstNameValid'));
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -66,6 +148,11 @@ class RegistrationView extends React.Component {
                 label="Last name"
                 fullWidth
                 autoComplete="lname"
+                error={!this.state.isLastNameValid}
+                onChange={(event) => {
+                  this.handleChange(event, 'lastName');
+                  this.setState(this.handleErrorClose('isLastNameValid'));
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -76,6 +163,11 @@ class RegistrationView extends React.Component {
                 label="Username"
                 fullWidth
                 autoComplete="uname"
+                error={!this.state.isUsernameValid}
+                onChange={(event) => {
+                  this.handleChange(event, 'username');
+                  this.setState(this.handleErrorClose('isUsernameValid'));
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -86,6 +178,11 @@ class RegistrationView extends React.Component {
                 label="Email address"
                 fullWidth
                 autoComplete="email"
+                error={!this.state.isEmailValid}
+                onChange={(event) => {
+                  this.handleChange(event, 'email');
+                  this.setState(this.handleErrorClose('isEmailValid'));
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -94,8 +191,14 @@ class RegistrationView extends React.Component {
                 id="password1"
                 name="password1"
                 label="Password"
+                type="password"
                 fullWidth
                 autoComplete="pass1"
+                error={!this.state.isPasswordValid}
+                onChange={(event) => {
+                  this.handleChange(event, 'password');
+                  this.setState(this.handleErrorClose('isPasswordValid'));
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -104,17 +207,29 @@ class RegistrationView extends React.Component {
                 id="password2"
                 name="password2"
                 label="Confirm password"
+                type="password"
                 fullWidth
                 autoComplete="pass2"
+                error={!this.state.isPasswordValid}
+                onChange={(event) => {
+                  this.handleChange(event, 'repeatedPassword');
+                  this.setState(this.handleErrorClose('isPasswordValid'));
+                }}
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
-                id="addiress"
-                name="addiress"
+                id="address"
+                name="address"
                 label="Address line"
+                required
                 fullWidth
                 autoComplete="address"
+                error={!this.state.isAddressValid}
+                onChange={(event) => {
+                  this.handleChange(event, 'address');
+                  this.setState(this.handleErrorClose('isAddressValid'));
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -125,10 +240,21 @@ class RegistrationView extends React.Component {
                 label="City"
                 fullWidth
                 autoComplete="city"
+                error={!this.state.isCityValid}
+                onChange={(event) => {
+                  this.handleChange(event, 'city');
+                  this.setState(this.handleErrorClose('isCityValid'));
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField id="state" name="state" label="State/Province/Region" fullWidth />
+              <TextField
+                id="state"
+                name="state"
+                label="State/Province/Region"
+                fullWidth
+                onChange={event => this.handleChange(event, 'region')}
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -138,6 +264,11 @@ class RegistrationView extends React.Component {
                 label="Zip / Postal code"
                 fullWidth
                 autoComplete="postal-code"
+                error={!this.state.isZipValid}
+                onChange={(event) => {
+                  this.handleChange(event, 'zip');
+                  this.setState(this.handleErrorClose('isZipValid'));
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -148,6 +279,11 @@ class RegistrationView extends React.Component {
                 label="Country"
                 fullWidth
                 autoComplete="country"
+                error={!this.state.isCountryValid}
+                onChange={(event) => {
+                  this.handleChange(event, 'country');
+                  this.setState(this.handleErrorClose('isCountryValid'));
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -155,7 +291,7 @@ class RegistrationView extends React.Component {
                 type="submit"
                 variant="contained"
                 color="primary"
-                onClick={() => console.log('Register')}
+                onClick={this.onRegisterSubmit}
               >
                 Register
               </Button>
