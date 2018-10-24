@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { Redirect } from 'react-router-dom';
 
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
@@ -12,6 +15,7 @@ import Icon from '@material-ui/core/Icon';
 import Avatar from '@material-ui/core/Avatar';
 import withStyles from '@material-ui/core/styles/withStyles';
 
+import actions from '../../actions';
 
 const facebookLoginButton = require('./facebook_logo.png');
 
@@ -64,8 +68,83 @@ const styles = theme => ({
 
 
 class LoginView extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      username: '',
+      isUsernameValid: true,
+      password: '',
+      isPasswordValid: true,
+      navigateToRegisterView: false,
+    };
+
+    this.passwordLogin = this.passwordLogin.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.validateForm = this.validateForm.bind(this);
+    this.handleErrorClose = this.handleErrorClose.bind(this);
+  }
+
+  handleChange = (event, name) => {
+    this.setState({
+      [name]: event.target.value,
+    });
+  };
+
+  handleErrorClose = name => (this.state[name] ? null : { [name]: true });
+
+  passwordLogin() {
+    const { loginWithPassword } = this.props;
+    const { username, password } = this.state;
+
+    if (!this.validateForm()) {
+      console.log('invalid form');
+      return;
+    }
+
+    console.log('login with: ', username, ', ', password);
+
+    loginWithPassword(username, password)
+      .then(() => {
+        console.log('successful login with password');
+      })
+      .catch(() => console.log('error while login'));
+  }
+
+  validateForm() {
+    const isUsernameValid = this.state.username.length > 0;
+    const isPasswordValid = this.state.password.length > 0;
+
+    this.setState({
+      isUsernameValid,
+      isPasswordValid,
+    });
+
+    return isUsernameValid && isPasswordValid;
+  }
+
   render() {
-    const { classes } = this.props;
+    const {
+      classes,
+      isLoggedIn,
+    } = this.props;
+
+    const {
+      password,
+      username,
+      isUsernameValid,
+      isPasswordValid,
+      navigateToRegisterView,
+    } = this.state;
+
+    if (isLoggedIn) {
+      return <Redirect to='/' />;
+    }
+
+    if (navigateToRegisterView) {
+      return <Redirect to='/register' />;
+    }
+
     return (
       <div className={classes.mainContainer}>
         <Paper className={classes.paper}>
@@ -76,17 +155,44 @@ class LoginView extends React.Component {
             Sign in
           </Typography>
           <form className={classes.form}>
-            <FormControl margin="normal" required fullWidth>
+            <FormControl
+              margin="normal"
+              required
+              fullWidth
+              error={!isUsernameValid}
+            >
               <InputLabel htmlFor="email">Username/Email</InputLabel>
-              <Input id="email" name="email" autoComplete="email" autoFocus />
+              <Input
+                id="email"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                required
+                value={username}
+                onChange={(event) => {
+                  this.handleChange(event, 'username');
+                  this.setState(() => this.handleErrorClose('isUsernameValid'));
+                }}
+              />
             </FormControl>
-            <FormControl margin="normal" required fullWidth>
+            <FormControl
+              margin="normal"
+              required
+              fullWidth
+              error={!isPasswordValid}
+            >
               <InputLabel htmlFor="password">Password</InputLabel>
               <Input
                 name="password"
                 type="password"
                 id="password"
+                value={password}
+                required
                 autoComplete="current-password"
+                onChange={(event) => {
+                  this.handleChange(event, 'password');
+                  this.setState(() => this.handleErrorClose('isPasswordValid'));
+                }}
               />
             </FormControl>
           </form>
@@ -96,7 +202,7 @@ class LoginView extends React.Component {
             variant="contained"
             color="primary"
             className={classes.submitButton}
-            onClick={() => console.log('Login with password')}
+            onClick={this.passwordLogin}
           >
             Sign in
           </Button>
@@ -122,13 +228,12 @@ class LoginView extends React.Component {
                 type="submit"
                 color="primary"
                 className={classes.registerButton}
-                onClick={() => console.log('login with facebook')}
+                onClick={() => this.setState({ navigateToRegisterView: true })}
               >
                 Register
                 <div
                   className={classes.facebookLoginButton}
                 />
-
               </Button>
             </Grid>
           </Grid>
@@ -142,4 +247,13 @@ LoginView.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(LoginView);
+const mapStateToProps = state => ({
+  isLoggedIn: !!(state.auth && state.auth.token),
+});
+
+const mapDispatchToProps = dispatch => bindActionCreators({
+  loginWithPassword: actions.auth.loginWithPassword,
+}, dispatch);
+
+
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(LoginView));
