@@ -1,15 +1,15 @@
 import React from 'react';
 import MainContainer from '../../components/MainContainer';
 
-class MainPanelView extends React.Component {
+class SecondPanelView extends React.Component {
   render() {
-    console.log('now inside MainPanel');
+    console.log('now inside Second');
     return (
       <MainContainer>
-        <h1>Inside MainPanel</h1>
+        <h1>Inside SeconPanel</h1>
       </MainContainer>
     );
   }
 }
 
-export default MainPanelView;
+export default SecondPanelView;

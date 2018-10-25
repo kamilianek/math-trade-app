@@ -20,6 +20,7 @@ class EnsureLoggedInContainer extends Component {
     }
 
     if (this.props.children) {
+      console.log('alksdkljasdlkjadslkasjdlkas');
       return this.props.children;
     }
 
