@@ -16,6 +16,7 @@ import Avatar from '@material-ui/core/Avatar';
 import withStyles from '@material-ui/core/styles/withStyles';
 
 import actions from '../../actions';
+import AlertMessage from '../../components/AlertMessage';
 
 const facebookLoginButton = require('./facebook_logo.png');
 
@@ -107,6 +108,7 @@ class LoginView extends React.Component {
     loginWithPassword(username, password)
       .then(() => {
         console.log('successful login with password');
+        AlertMessage()
       })
       .catch(() => console.log('error while login'));
   }
