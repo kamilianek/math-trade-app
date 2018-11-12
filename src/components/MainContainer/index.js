@@ -7,7 +7,6 @@ import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { Link, withRouter } from 'react-router-dom';
-import actions from '../../actions';
 
 
 const styles = {
@@ -17,7 +16,7 @@ const styles = {
 };
 
 const pathValue = {
-  '/mainpanel': 0,
+  '/editions': 0,
   '/': 0,
   '/account': 1,
   '/signout': 2,
@@ -49,7 +48,7 @@ class MainContainer extends React.Component {
             <Tab
               label="Main Panel"
               component={Link}
-              to="mainpanel"
+              to="editions"
             />
             <Tab
               label="Account"
@@ -71,11 +70,6 @@ class MainContainer extends React.Component {
 MainContainer.propTypes = {
   classes: PropTypes.object.isRequired,
 };
-
-// const mapDispatchToProps = dispatch => ({
-//   updatePath: pathname => dispatch(actions.pathActions.updatePath(pathname)),
-// });
-
 
 
 export default withStyles(styles)(withRouter((connect(null, null)(MainContainer))));
