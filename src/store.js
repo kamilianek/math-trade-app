@@ -8,6 +8,9 @@ import reducers from './reducers';
 
 const {
   auth,
+  editions,
+  myAssignedProducts,
+  otherAssignedProducts,
 } = reducers;
 
 const rootPersistConfig = {
@@ -24,6 +27,9 @@ const authPersistConfig = {
 
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, auth),
+  editions,
+  myAssignedProducts,
+  otherAssignedProducts,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
