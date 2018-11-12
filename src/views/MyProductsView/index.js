@@ -16,7 +16,7 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import { withAlert } from 'react-alert';
 
 import EditionPanelContainer from '../../components/EditionPanelContainer';
-
+import CustomDialog from '../../components/CustomDialog';
 
 const styles = theme => ({
   rightButtonIcon: {
@@ -126,6 +126,7 @@ class MyProductsView extends React.Component {
       isNewNameValid: true,
       isNewDescriptionValid: true,
       isSelectedAssigned: false,
+      openDialog: false,
     };
 
     this.onItemClick = this.onItemClick.bind(this);
@@ -135,14 +136,23 @@ class MyProductsView extends React.Component {
     this.fileUpload = this.fileUpload.bind(this);
     this.renderHeaderContent = this.renderHeaderContent.bind(this);
     this.handleItemAssignment = this.handleItemAssignment.bind(this);
+    this.handleDialogAgree = this.handleDialogAgree.bind(this);
+    this.handleDialogDisagree = this.handleDialogDisagree.bind(this);
   }
 
   onItemClick(id, dataHeader) {
+    const { isSelectedAssigned } = this.state;
+    const { myAssignedItems, myNotAssignedItems } = this.props;
     if (id || id === 0) {
-      const data = this.props[dataHeader];
+      let data;
+      if (dataHeader) {
+        data = this.props[dataHeader];
+      } else {
+        data = isSelectedAssigned ? myAssignedItems : myNotAssignedItems;
+      }
       const currentItem = data.filter(i => i.id === id)[0];
 
-      this.setState({
+      this.setState(state => ({
         currentItemId: id,
         name: currentItem.name,
         description: currentItem.description,
@@ -151,8 +161,9 @@ class MyProductsView extends React.Component {
         productCreationMode: false,
         isNewNameValid: true,
         isNewDescriptionValid: true,
-        isSelectedAssigned: dataHeader === 'myAssignedItems',
-      });
+        isSelectedAssigned: dataHeader
+          ? dataHeader === 'myAssignedItems' : state.isSelectedAssigned,
+      }));
 
       return;
     }
@@ -204,6 +215,20 @@ class MyProductsView extends React.Component {
 
     console.log('submit changes: ', name, description);
     alert.show('Successfully added product', { type: 'success' });
+  }
+
+  handleDialogAgree() {
+    const { currentItemId } = this.state;
+    this.onItemClick(currentItemId);
+    this.setState({
+      openDialog: false,
+    });
+  }
+
+  handleDialogDisagree() {
+    this.setState({
+      openDialog: false,
+    });
   }
 
   removeImage(uri) {
@@ -314,6 +339,7 @@ class MyProductsView extends React.Component {
       isNewNameValid,
       isNewDescriptionValid,
       isSelectedAssigned,
+      openDialog,
     } = this.state;
 
     const imagesToShow = productCreationMode ? newImages : images;
@@ -449,7 +475,7 @@ class MyProductsView extends React.Component {
                             variant="contained"
                             color="primary"
                             className={classes.backButton}
-                            onClick={() => this.onItemClick(null)}
+                            onClick={() => this.setState({ openDialog: true })}
                           >
                             Cancel
                           </Button> : null}
@@ -469,6 +495,13 @@ class MyProductsView extends React.Component {
             </Paper>
           </Grid>
         </Grid>
+        <CustomDialog
+          handleDisagree={this.handleDialogDisagree}
+          handleAgree={this.handleDialogAgree}
+          title={'Cancel product edition'}
+          textBody={'Are you sure you want to cancel item edition? If you click YES you will loose all unsaved changes.'}
+          openDialog={openDialog}
+        />
       </EditionPanelContainer>
     );
   }
