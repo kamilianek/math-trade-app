@@ -14,9 +14,9 @@ import Typography from '@material-ui/core/Typography';
 import Icon from '@material-ui/core/Icon';
 import Avatar from '@material-ui/core/Avatar';
 import withStyles from '@material-ui/core/styles/withStyles';
+import { withAlert } from 'react-alert';
 
 import actions from '../../actions';
-import AlertMessage from '../../components/AlertMessage';
 
 const facebookLoginButton = require('./facebook_logo.png');
 
@@ -95,7 +95,7 @@ class LoginView extends React.Component {
   handleErrorClose = name => (this.state[name] ? null : { [name]: true });
 
   passwordLogin() {
-    const { loginWithPassword } = this.props;
+    const { loginWithPassword, alert } = this.props;
     const { username, password } = this.state;
 
     if (!this.validateForm()) {
@@ -108,9 +108,12 @@ class LoginView extends React.Component {
     loginWithPassword(username, password)
       .then(() => {
         console.log('successful login with password');
-        AlertMessage()
+        alert.show('Successful login', { type: 'success' });
       })
-      .catch(() => console.log('error while login'));
+      .catch((err) => {
+        console.log('error while login');
+        alert.show(err.message, { type: 'error' });
+      });
   }
 
   validateForm() {
@@ -258,4 +261,6 @@ const mapDispatchToProps = dispatch => bindActionCreators({
 }, dispatch);
 
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(LoginView));
+export default withStyles(styles)(
+  withAlert(connect(mapStateToProps, mapDispatchToProps)(LoginView))
+);
