@@ -5,10 +5,31 @@ const INITIAL_STATE = {
   loginData: {
     username: null,
   },
+  roles: ['admin', 'moderator', 'user'],
+  permissionRequests: {
+    isFetchingSince: null,
+    lastSuccessfulFetch: null,
+    lastFailedFetch: null,
+    requestStatus: 'CLOSED',
+    requestMessage: '',
+    rejectReason: '',
+  },
 };
 
 const LOGIN_FINISHED = 'LOGIN_FINISHED';
 const SIGN_OUT_FINISHED = 'SIGN_OUT_FINISHED';
+
+const userRoles = {
+  ADMIN: 'admin',
+  MODERATOR: 'moderator',
+  USER: 'user',
+};
+const requestPermissionStatus = {
+  CLOSED: 'closed',
+  PENDING: 'pending',
+  REJECTED: 'rejected',
+  ACCEPTED: 'accepted',
+};
 
 export default function authReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
@@ -23,6 +44,34 @@ export default function authReducer(state = INITIAL_STATE, action) {
       return {
         ...INITIAL_STATE,
       };
+    case 'REQUEST_PERMISSION_REQUEST_STATUS':
+      return {
+        ...state,
+        permissionRequests: {
+          ...state.permissionRequests,
+          isFetchingSince: action.timestamp,
+        },
+      };
+    case 'RECEIVE_PERMISSION_REQUEST_STATUS':
+      return {
+        ...state,
+        roles: action.requestStatus === requestPermissionStatus.ACCEPTED
+          ? state.roles.push(userRoles.MODERATOR) : state.roles,
+        permissionRequests: {
+          ...state.permissionRequests,
+          isFetchingSince: null,
+          lastSuccessfulFetch: action.timestamp,
+          rejectReason: action.rejectReason,
+        },
+      };
+    case 'RECEIVE_ERROR_REQUEST_STATUS':
+      return {
+        ...state,
+        permissionRequests: {
+          isFetchingSince: null,
+          lastFailedFetch: action.timestamp,
+        },
+      };
     case 'persist/REHYDRATE':
       return {
         ...state,
@@ -36,4 +85,5 @@ export default function authReducer(state = INITIAL_STATE, action) {
 export {
   LOGIN_FINISHED,
   SIGN_OUT_FINISHED,
+  requestPermissionStatus,
 };
