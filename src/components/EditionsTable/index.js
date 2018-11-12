@@ -1,5 +1,6 @@
 /* eslint-disable object-curly-newline */
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -13,11 +14,13 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Paper from '@material-ui/core/Paper';
 import Icon from '@material-ui/core/Icon';
 import IconButton from '@material-ui/core/IconButton';
+import green from '@material-ui/core/colors/green';
+import amber from '@material-ui/core/colors/amber';
 
 const rows = [
-  { id: 'editionName', numeric: false, disablePadding: false, label: 'Edition Name' },
-  { id: 'participants', numeric: true, disablePadding: false, label: 'Participants' },
-  { id: 'limit', numeric: true, disablePadding: false, label: 'Participants Limit' },
+  { id: 'name', numeric: false, disablePadding: false, label: 'Edition Name' },
+  { id: 'numberOfParticipants', numeric: true, disablePadding: false, label: 'Participants' },
+  { id: 'maxParticipants', numeric: true, disablePadding: false, label: 'Participants Limit' },
   { id: 'status', numeric: false, disablePadding: false, label: 'Status' },
 ];
 
@@ -32,6 +35,7 @@ function desc(a, b, orderBy) {
 }
 
 function stableSort(array, cmp) {
+  console.log('array: ', array);
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
     const order = cmp(a[0], b[0]);
@@ -115,32 +119,36 @@ const styles = theme => ({
   },
 });
 
+const statusColors = {
+  OPENED: green[600],
+  FINISHED: 'grey',
+  PENDING: amber[700],
+};
+
 class EditionsTable extends Component {
   constructor() {
     super();
 
     this.state = {
       order: 'asc',
-      orderBy: 'editionName',
+      orderBy: 'name',
       page: 0,
       rowsNumber: 5,
-      data: [
-        { id: '12h3gj21h3', editionName: 'Abddddc123', participants: 11, limit: 28, status: 'PENDING', editable: false },
-        { id: '12j3sdfiyu', editionName: 'Math99', participants: 4, limit: 16, status: 'FINISHED', editable: false },
-        { id: 'kajhsd1234', editionName: 'Rule1/1', participants: 20, limit: 20, status: 'OPENED', editable: true },
-      ],
     };
 
     this.callSorting = this.callSorting.bind(this);
+    this.changePage = this.changePage.bind(this);
+    this.changeRowsNumber = this.changeRowsNumber.bind(this);
   }
 
   callSorting(event, property) {
-    let order = 'desc';
-    if (this.state.orderBy === property && this.state.order === 'desc') {
-      order = 'asc';
+    const { order, orderBy } = this.state;
+    let newOrder = 'desc';
+    if (orderBy === property && order === 'desc') {
+      newOrder = 'asc';
     }
 
-    this.setState({ order, orderBy: property });
+    this.setState({ order: newOrder, orderBy: property });
   }
 
   changePage(event, page) {
@@ -152,16 +160,19 @@ class EditionsTable extends Component {
   }
 
   render() {
-    const { classes } = this.props;
     const {
-      data,
+      classes,
+      onEditionClicked,
+      editions,
+    } = this.props;
+    const {
       order,
       orderBy,
       rowsNumber,
       page,
     } = this.state;
 
-    const emptyRows = rowsNumber - Math.min(rowsNumber, data.length - page * rowsNumber);
+    const emptyRows = rowsNumber - Math.min(rowsNumber, editions.length - page * rowsNumber);
 
     return (
       <Paper className={classes.root}>
@@ -177,26 +188,28 @@ class EditionsTable extends Component {
             />
             <TableBody>
               {
-                stableSort(data, getSorting(order, orderBy))
+                stableSort(editions, getSorting(order, orderBy))
                   .slice(page * rowsNumber, page * rowsNumber + rowsNumber)
                   .map(row => (
                     <TableRow
                       className={classes.row}
-                      onClick={() => console.log('clicked edition with id: ', row.id)}
+                      onClick={() => onEditionClicked(row.id, row.status)}
                       key={row.id}
                       hover
                     >
-                      <TableCell component="th" scope="row">{row.editionName}</TableCell>
-                      <TableCell numeric>{row.participants}</TableCell>
-                      <TableCell numeric>{row.limit}</TableCell>
-                      <TableCell>{row.status}</TableCell>
+                      <TableCell component="th" scope="row">{row.name}</TableCell>
+                      <TableCell numeric>{row.numberOfParticipants}</TableCell>
+                      <TableCell numeric>{row.maxParticipants}</TableCell>
+                      <TableCell style={{ backgroundColor: statusColors[row.status] }}>
+                        {row.status}
+                      </TableCell>
                       <TableCell>
                         <IconButton
                           key="edit"
                           color="inherit"
                           onClick={() => console.log('edit edition with id: ', row.id)}
                         >
-                          <Icon className={classes.icon}>settings</Icon>
+                          { row.moderator ? <Icon className={classes.icon}>settings</Icon> : null }
                         </IconButton>
                       </TableCell>
                     </TableRow>
@@ -212,7 +225,7 @@ class EditionsTable extends Component {
         </div>
         <TablePagination
           component="div"
-          count={data.length}
+          count={editions.length}
           rowsPerPage={rowsNumber}
           page={page}
           backIconButtonProps={{
@@ -234,4 +247,8 @@ EditionsTable.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(EditionsTable);
+const mapStateToProps = state => ({
+  editions: state.editions.items,
+});
+
+export default withStyles(styles)(connect(mapStateToProps, null)(EditionsTable));
