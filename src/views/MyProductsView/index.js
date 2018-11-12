@@ -66,6 +66,12 @@ const styles = theme => ({
   textField: {
     width: '100%',
   },
+  image: {
+    maxWidth: '100%',
+    height: 'auto',
+    padding: theme.spacing.unit * 3,
+    alignSelf: 'center',
+  },
 });
 
 class MyProductsView extends React.Component {
@@ -318,27 +324,17 @@ class MyProductsView extends React.Component {
                     {description}
                   </Typography>}
                 <div className={classes.gridListContainer}>
-                  <GridList cellHeight={200} className={classes.gridList}>
-                    {imagesToShow.map(image => (
-                      <GridListTile key={image.uri}>
-                        <img src={image.uri} alt={'image'} />
-                        {editMode || productCreationMode ? <GridListTileBar
-                          classes={{
-                            root: classes.titleBar,
-                            title: classes.imageTitle,
-                          }}
-                          actionIcon={
-                            <IconButton
-                              onClick={() => this.removeImage(image.uri)}
-                              color="inherit"
-                            >
-                              <Icon>delete</Icon>
-                            </IconButton>
-                          }
-                        /> : null}
-                      </GridListTile>
-                    ))}
-                  </GridList>
+                  {imagesToShow.map(image => (
+                    <>
+                      <img src={image.uri} alt={'image'} className={classes.image} />
+                      { editMode || productCreationMode ? <IconButton
+                            onClick={() => this.removeImage(image.uri)}
+                            color="inherit"
+                          >
+                            <Icon>delete</Icon>
+                          </IconButton> : null }
+                    </>
+                  ))}
                 </div>
                   <Grid container spacing={24}>
                     <Grid item xs={12} sm={6}>
