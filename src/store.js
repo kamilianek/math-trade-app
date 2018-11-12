@@ -10,6 +10,7 @@ const {
   auth,
   editions,
   myAssignedProducts,
+  myNotAssignedProducts,
   otherAssignedProducts,
 } = reducers;
 
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, auth),
   editions,
   myAssignedProducts,
+  myNotAssignedProducts,
   otherAssignedProducts,
 });
 

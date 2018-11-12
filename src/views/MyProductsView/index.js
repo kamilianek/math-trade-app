@@ -255,6 +255,7 @@ class MyProductsView extends React.Component {
     const {
       classes,
       myAssignedItems,
+      myNotAssignedProducts,
       edition,
     } = this.props;
     const {
@@ -275,7 +276,7 @@ class MyProductsView extends React.Component {
 
 
     const imagesToShow = productCreationMode ? newImages : images;
-    console.log('oewqoewq: ', myAssignedItems);
+    console.log('notAssigned: ', myNotAssignedProducts);
     return (
       <EditionPanelContainer edition={edition} navigationValue="products">
         <Grid container spacing={24}>
@@ -457,6 +458,7 @@ const mapStateToProps = (state, ownProps) => {
   return ({
     edition,
     myAssignedItems: product && product.items,
+    myNotAssignedProducts: state.myNotAssignedProducts.items,
   });
 };
 
