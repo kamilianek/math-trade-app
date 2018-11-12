@@ -125,6 +125,7 @@ class MyProductsView extends React.Component {
       newDescription: '',
       isNewNameValid: true,
       isNewDescriptionValid: true,
+      isSelectedAssigned: false,
     };
 
     this.onItemClick = this.onItemClick.bind(this);
@@ -132,14 +133,14 @@ class MyProductsView extends React.Component {
     this.validateForm = this.validateForm.bind(this);
     this.removeImage = this.removeImage.bind(this);
     this.fileUpload = this.fileUpload.bind(this);
+    this.renderHeaderContent = this.renderHeaderContent.bind(this);
   }
 
-  onItemClick(id) {
+  onItemClick(id, dataHeader) {
     if (id || id === 0) {
-      const { myAssignedItems } = this.props;
-      console.log(myAssignedItems);
-      const currentItem = myAssignedItems.filter(i => i.id === id)[0];
-      console.log(currentItem);
+      const data = this.props[dataHeader];
+      const currentItem = data.filter(i => i.id === id)[0];
+
       this.setState({
         currentItemId: id,
         name: currentItem.name,
@@ -149,6 +150,7 @@ class MyProductsView extends React.Component {
         productCreationMode: false,
         isNewNameValid: true,
         isNewDescriptionValid: true,
+        isSelectedAssigned: dataHeader === 'myAssignedItems',
       });
 
       return;
@@ -251,11 +253,42 @@ class MyProductsView extends React.Component {
       });
   }
 
+  renderHeaderContent(dataHeader, onItemClick) {
+    const { classes } = this.props;
+    const { currentItemId, productCreationMode } = this.state;
+    const data = this.props[dataHeader];
+
+    return (
+      <li className={classes.listSection}>
+        <ul className={classes.ul}>
+          <ListSubheader>{`Products ${dataHeader === 'myAssignedItems' ? 'assigned' : 'not assigned'}: ${data.length}`}</ListSubheader>
+          {
+            data.map(item => (
+              <ListItem
+                button
+                key={item.id}
+                selected={currentItemId === item.id && !productCreationMode}
+                onClick={() => onItemClick(item.id, dataHeader)}
+              >
+                <Checkbox
+                  checked={currentItemId === item.id}
+                  tabIndex={-1}
+                  disableRipple
+                />
+                <ListItemText
+                  primary={`${item.name}`}
+                />
+              </ListItem>
+            ))
+          }
+        </ul>
+      </li>
+    );
+  }
+
   render() {
     const {
       classes,
-      myAssignedItems,
-      myNotAssignedProducts,
       edition,
     } = this.props;
     const {
@@ -274,9 +307,7 @@ class MyProductsView extends React.Component {
       isNewDescriptionValid,
     } = this.state;
 
-
     const imagesToShow = productCreationMode ? newImages : images;
-    console.log('notAssigned: ', myNotAssignedProducts);
     return (
       <EditionPanelContainer edition={edition} navigationValue="products">
         <Grid container spacing={24}>
@@ -290,30 +321,8 @@ class MyProductsView extends React.Component {
                 component="nav"
                 subheader={<li />}
               >
-                <li className={classes.listSection}>
-                  <ul className={classes.ul}>
-                    <ListSubheader>{`Products assigned: ${myAssignedItems.length}`}</ListSubheader>
-                    {
-                      myAssignedItems.map(item => (
-                        <ListItem
-                          button
-                          key={item.id}
-                          selected={currentItemId === item.id && !productCreationMode}
-                          onClick={() => this.onItemClick(item.id)}
-                        >
-                          <Checkbox
-                            checked={currentItemId === item.id}
-                            tabIndex={-1}
-                            disableRipple
-                          />
-                          <ListItemText
-                            primary={`${item.name}`}
-                          />
-                        </ListItem>
-                      ))
-                    }
-                  </ul>
-                </li>
+                { this.renderHeaderContent('myAssignedItems', this.onItemClick)}
+                { this.renderHeaderContent('myNotAssignedItems', this.onItemClick)}
               </List>
               <div className={classes.createProductButton}>
                 <Button
@@ -458,7 +467,7 @@ const mapStateToProps = (state, ownProps) => {
   return ({
     edition,
     myAssignedItems: product && product.items,
-    myNotAssignedProducts: state.myNotAssignedProducts.items,
+    myNotAssignedItems: state.myNotAssignedProducts.items,
   });
 };
 
