@@ -112,7 +112,7 @@ class MyProductsView extends React.Component {
 
     this.state = {
       navigationValue: 0,
-      currentProduct: null,
+      currentItemId: null,
       editMode: false,
       productCreationMode: false,
       name: '',
@@ -134,6 +134,7 @@ class MyProductsView extends React.Component {
     this.removeImage = this.removeImage.bind(this);
     this.fileUpload = this.fileUpload.bind(this);
     this.renderHeaderContent = this.renderHeaderContent.bind(this);
+    this.handleItemAssignment = this.handleItemAssignment.bind(this);
   }
 
   onItemClick(id, dataHeader) {
@@ -202,7 +203,7 @@ class MyProductsView extends React.Component {
     }
 
     console.log('submit changes: ', name, description);
-    alert.show('Successfully modified product', { type: 'success' });
+    alert.show('Successfully added product', { type: 'success' });
   }
 
   removeImage(uri) {
@@ -251,6 +252,13 @@ class MyProductsView extends React.Component {
         };
         reader.readAsDataURL(file);
       });
+  }
+
+  handleItemAssignment(itemId) {
+    const { alert } = this.props;
+    console.log('assignig item with id: ', itemId);
+    this.setState({ currentItemId: null });
+    alert.show('Successfully assigned item to edition', { type: 'success' });
   }
 
   renderHeaderContent(dataHeader, onItemClick) {
@@ -305,6 +313,7 @@ class MyProductsView extends React.Component {
       isDescriptionValid,
       isNewNameValid,
       isNewDescriptionValid,
+      isSelectedAssigned,
     } = this.state;
 
     const imagesToShow = productCreationMode ? newImages : images;
@@ -410,7 +419,6 @@ class MyProductsView extends React.Component {
                         <Icon className={classes.rightButtonIcon}>add_a_photo</Icon>
                         Add photo
                       </Button> : null}
-
                       <input
                         id="fileInput"
                         name="fileInput"
@@ -422,6 +430,14 @@ class MyProductsView extends React.Component {
                         onChange={e => this.fileUpload(e)}
                         accept=".png, .jpg, .jpeg"
                       />
+                      { !(editMode || productCreationMode) && currentItemId && !isSelectedAssigned
+                        ? <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => this.handleItemAssignment(currentItemId)}
+                        >
+                          Assign to edition
+                        </Button> : null}
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <Grid container spacing={8}>
@@ -433,7 +449,7 @@ class MyProductsView extends React.Component {
                             variant="contained"
                             color="primary"
                             className={classes.backButton}
-                            onClick={() => this.onItemClick(currentItemId)}
+                            onClick={() => this.onItemClick(null)}
                           >
                             Cancel
                           </Button> : null}
