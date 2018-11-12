@@ -85,6 +85,12 @@ const styles = theme => ({
     bottom: 0,
     left: 30,
   },
+  createProductButton: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginTop: 15,
+  },
 });
 
 class MyProductsView extends React.Component {
@@ -111,7 +117,6 @@ class MyProductsView extends React.Component {
     };
 
     this.onItemClick = this.onItemClick.bind(this);
-    this.handleNavigationChange = this.handleNavigationChange.bind(this);
     this.submitProductChange = this.submitProductChange.bind(this);
     this.validateForm = this.validateForm.bind(this);
     this.removeImage = this.removeImage.bind(this);
@@ -146,10 +151,6 @@ class MyProductsView extends React.Component {
     });
   }
 
-  handleNavigationChange = (event, value) => {
-    this.setState({ navigationValue: value });
-  };
-
   validateForm() {
     const {
       name,
@@ -160,13 +161,13 @@ class MyProductsView extends React.Component {
     } = this.state;
 
     if (editMode) {
-      const isUsernameValid = name.length > 0;
+      const isNameValid = name.length > 0;
       const isDescriptionValid = description.length > 0;
       this.setState({
-        isUsernameValid,
+        isNameValid,
         isDescriptionValid,
       });
-      return isUsernameValid && isDescriptionValid;
+      return isNameValid && isDescriptionValid;
     }
 
     const isNewNameValid = newName.length > 0;
@@ -188,7 +189,7 @@ class MyProductsView extends React.Component {
     }
 
     console.log('submit changes: ', name, description);
-    alert.show('Successfullty modified product', { type: 'success' });
+    alert.show('Successfully modified product', { type: 'success' });
   }
 
   removeImage(uri) {
@@ -206,12 +207,13 @@ class MyProductsView extends React.Component {
   handleChange = (event, name) => {
     this.setState({
       [name]: event.target.value,
+      [`is${name.charAt(0).toUpperCase() + name.slice(1)}Valid`]: true,
     });
   };
 
   fileUpload(e) {
     e.preventDefault();
-
+    const { alert } = this.props;
     const { productCreationMode } = this.state;
     const newFiles = Array
       .from(e.target.files || []);
@@ -220,14 +222,18 @@ class MyProductsView extends React.Component {
       .forEach((file) => {
         const reader = new FileReader();
         reader.onload = (event) => {
-          if (productCreationMode) {
-            this.setState(state => ({
-              newImages: [...state.newImages, { uri: event.target.result }],
-            }));
+          if (event.loaded <= MyProductsView.MAX_IMAGE_SIZE) {
+            if (productCreationMode) {
+              this.setState(state => ({
+                newImages: [...state.newImages, { uri: event.target.result }],
+              }));
+            } else {
+              this.setState(state => ({
+                images: [...state.images, { uri: event.target.result }],
+              }));
+            }
           } else {
-            this.setState(state => ({
-              images: [...state.images, { uri: event.target.result }],
-            }));
+            alert.show(`Maximum image size is ${MyProductsView.MAX_IMAGE_SIZE / (1024 * 1024)}MB`, { type: 'error' });
           }
         };
         reader.readAsDataURL(file);
@@ -249,6 +255,10 @@ class MyProductsView extends React.Component {
       newName,
       newDescription,
       newImages,
+      isNameValid,
+      isDescriptionValid,
+      isNewNameValid,
+      isNewDescriptionValid,
     } = this.state;
 
 
@@ -287,7 +297,7 @@ class MyProductsView extends React.Component {
                   ))
                 }
               </List>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 15 }}>
+              <div className={classes.createProductButton}>
                 <Button
                   variant="contained"
                   color="primary"
@@ -322,6 +332,8 @@ class MyProductsView extends React.Component {
                     label="Product title"
                     className={classes.textField}
                     margin="normal"
+                    error={(editMode && !isNameValid)
+                      || (productCreationMode && !isNewNameValid)}
                     variant="filled"
                     onChange={event => this.handleChange(event, editMode ? 'name' : 'newName')}
                     value={editMode ? name : newName}
@@ -333,6 +345,8 @@ class MyProductsView extends React.Component {
                     label="Product description"
                     multiline
                     rows="8"
+                    error={(editMode && !isDescriptionValid)
+                      || (productCreationMode && !isNewDescriptionValid)}
                     className={classes.textField}
                     margin="normal"
                     variant="filled"
