@@ -12,6 +12,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import { withAlert } from 'react-alert';
 
 import EditionPanelContainer from '../../components/EditionPanelContainer';
@@ -31,8 +32,11 @@ const styles = theme => ({
     marginRight: theme.spacing.unit * 5,
   },
   productListContainer: {
-    maxHeight: 600,
+    maxHeight: 500,
+    width: '100%',
     overflow: 'auto',
+    position: 'relative',
+    backgroundColor: theme.palette.background.paper,
   },
   productList: {
     marginTop: 30,
@@ -90,6 +94,13 @@ const styles = theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     marginTop: 15,
+  },
+  listSection: {
+    backgroundColor: 'inherit',
+  },
+  ul: {
+    backgroundColor: 'inherit',
+    padding: 0,
   },
 });
 
@@ -244,6 +255,7 @@ class MyProductsView extends React.Component {
     const {
       classes,
       myAssignedItems,
+      edition,
     } = this.props;
     const {
       currentItemId,
@@ -265,7 +277,7 @@ class MyProductsView extends React.Component {
     const imagesToShow = productCreationMode ? newImages : images;
     console.log('oewqoewq: ', myAssignedItems);
     return (
-      <EditionPanelContainer edition={this.props.edition} navigationValue="products">
+      <EditionPanelContainer edition={edition} navigationValue="products">
         <Grid container spacing={24}>
           <Grid item xs={12} sm={4}>
             <Typography className={classes.sectionSubtitle} component="h1" variant="h4">
@@ -275,27 +287,32 @@ class MyProductsView extends React.Component {
               <List
                 className={classes.productListContainer}
                 component="nav"
+                subheader={<li />}
               >
-                {
-                  myAssignedItems.map(item => (
-                    <ListItem
-                      button
-                      key={item.id}
-                      selected={currentItemId === item.id && !productCreationMode}
-                      onClick={() => this.onItemClick(item.id)}
-                    >
-                      <Checkbox
-                        checked={currentItemId === item.id}
-                        tabIndex={-1}
-                        disableRipple
-                      />
-                      <ListItemText
-                        inset
-                        primary={`${item.name}`}
-                      />
-                    </ListItem>
-                  ))
-                }
+                <li className={classes.listSection}>
+                  <ul className={classes.ul}>
+                    <ListSubheader>{`Products assigned: ${myAssignedItems.length}`}</ListSubheader>
+                    {
+                      myAssignedItems.map(item => (
+                        <ListItem
+                          button
+                          key={item.id}
+                          selected={currentItemId === item.id && !productCreationMode}
+                          onClick={() => this.onItemClick(item.id)}
+                        >
+                          <Checkbox
+                            checked={currentItemId === item.id}
+                            tabIndex={-1}
+                            disableRipple
+                          />
+                          <ListItemText
+                            primary={`${item.name}`}
+                          />
+                        </ListItem>
+                      ))
+                    }
+                  </ul>
+                </li>
               </List>
               <div className={classes.createProductButton}>
                 <Button
