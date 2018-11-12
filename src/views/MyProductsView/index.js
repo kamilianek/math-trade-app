@@ -11,6 +11,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
 import { withAlert } from 'react-alert';
 
 import EditionPanelContainer from '../../components/EditionPanelContainer';
@@ -26,6 +27,7 @@ const styles = theme => ({
   },
   sectionSubtitle: {
     margin: theme.spacing.unit * 3,
+    height: 40,
     marginRight: theme.spacing.unit * 5,
   },
   productListContainer: {
@@ -45,6 +47,7 @@ const styles = theme => ({
     justifyContent: 'space-around',
     overflow: 'hidden',
     marginBottom: theme.spacing.unit * 2,
+    marginTop: theme.spacing.unit * 2,
   },
   gridList: {
     height: 400,
@@ -271,6 +274,11 @@ class MyProductsView extends React.Component {
                       selected={currentItemId === item.id && !productCreationMode}
                       onClick={() => this.onItemClick(item.id)}
                     >
+                      <Checkbox
+                        checked={currentItemId === item.id}
+                        tabIndex={-1}
+                        disableRipple
+                      />
                       <ListItemText
                         inset
                         primary={`${item.name}`}
@@ -279,7 +287,7 @@ class MyProductsView extends React.Component {
                   ))
                 }
               </List>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 15 }}>
                 <Button
                   variant="contained"
                   color="primary"
