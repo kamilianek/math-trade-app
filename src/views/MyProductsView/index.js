@@ -1,14 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import { fade } from '@material-ui/core/styles/colorManipulator';
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
 import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -62,6 +58,11 @@ const styles = theme => ({
   titleBar: {
     background:
       'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+    width: 110,
+    position: 'absolute',
+    height: 40,
+    left: 0,
+    bottom: 4,
   },
   textField: {
     width: '100%',
@@ -69,8 +70,17 @@ const styles = theme => ({
   image: {
     maxWidth: '100%',
     height: 'auto',
-    padding: theme.spacing.unit * 3,
     alignSelf: 'center',
+  },
+  deleteButtonContainer: {
+    width: '100%',
+    marginBottom: 10,
+    position: 'relative',
+  },
+  deleteButtonIcon: {
+    position: 'absolute',
+    bottom: 0,
+    left: 30,
   },
 });
 
@@ -325,15 +335,19 @@ class MyProductsView extends React.Component {
                   </Typography>}
                 <div className={classes.gridListContainer}>
                   {imagesToShow.map(image => (
-                    <>
+                    <div className={classes.deleteButtonContainer}>
                       <img src={image.uri} alt={'image'} className={classes.image} />
-                      { editMode || productCreationMode ? <IconButton
+                      { editMode || productCreationMode
+                        ? <div className={classes.titleBar} /> : null }
+                      { editMode || productCreationMode
+                        ? <IconButton
                             onClick={() => this.removeImage(image.uri)}
                             color="inherit"
+                            className={classes.deleteButtonIcon}
                           >
                             <Icon>delete</Icon>
                           </IconButton> : null }
-                    </>
+                    </div>
                   ))}
                 </div>
                   <Grid container spacing={24}>
