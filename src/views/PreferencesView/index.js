@@ -19,6 +19,7 @@ import { withAlert } from 'react-alert';
 import EditionPanelContainer from '../../components/EditionPanelContainer';
 import ProductPreview from '../../components/ProductPreview';
 import CustomDialog from '../../components/CustomDialog';
+import CheckboxList from '../../components/CheckboxList';
 
 const dialogContent = {
   cancelPreferenceEdition: {
@@ -134,6 +135,7 @@ class MyProductsView extends React.Component {
     this.handleDialogAgree = this.handleDialogAgree.bind(this);
     this.handleDialogDisagree = this.handleDialogDisagree.bind(this);
     this.submitSavePreferences = this.submitSavePreferences.bind(this);
+    this.handleToggle = this.handleToggle.bind(this);
   }
 
   handleChange = (event, name) => {
@@ -149,13 +151,14 @@ class MyProductsView extends React.Component {
     this.setState({ [name]: updatedList });
   };
 
-  handleToggle = value => () => {
+  handleToggle(value) {
+    console.log('dupa: ', value);
     const { selectedOtherProductId } = this.state;
     const currentIndex = selectedOtherProductId.indexOf(value);
     const newChecked = [...selectedOtherProductId];
 
     if (currentIndex === -1) {
-      newChecked.push(value);
+      newChecked.push(value.id);
     } else {
       newChecked.splice(currentIndex, 1);
     }
@@ -163,7 +166,7 @@ class MyProductsView extends React.Component {
     this.setState({
       selectedOtherProductId: newChecked,
     });
-  };
+  }
 
   // TODO: set selectedOtherProductId as in store
   handleDialogAgree() {
@@ -196,7 +199,6 @@ class MyProductsView extends React.Component {
     const {
       classes,
     } = this.props;
-    console.log('adssda', this.handleDialogAgree);
     const {
       selectedOtherProductId,
       selectedMyProductId,
@@ -228,40 +230,14 @@ class MyProductsView extends React.Component {
               />
             </div>
             <Paper className={classes.paperContainer}>
-              <List
-                className={classes.productListContainer}
-                component="nav"
-              >
-                {
-                  myAssignedItems.map(item => (
-                    <ListItem
-                      button
-                      dense
-                      key={item.id}
-                      disabled={editMode}
-                      onClick={() => this.setState({ selectedMyProductId: item.id })}
-                    >
-                      <Checkbox
-                        checked={selectedMyProductId === item.id}
-                        tabIndex={-1}
-                        disableRipple
-                      />
-                      <ListItemText
-                        inset
-                        primary={`${item.name}`}
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton
-                          aria-label="Comments"
-                          onClick={() => this.setState({ itemToPreview: item })}
-                        >
-                          <Icon color={itemToPreview && item.id === itemToPreview.id ? 'secondary' : 'inherit'}>open_in_new</Icon>
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))
-                }
-              </List>
+              <CheckboxList
+                data={myAssignedItems}
+                primaryAction={item => this.setState({ selectedMyProductId: item.id })}
+                editMode={editMode}
+                selectedWithPrimaryId={[selectedMyProductId]}
+                secondaryAction={item => this.setState({ itemToPreview: item })}
+                selectedWithSecondaryId={itemToPreview && itemToPreview.id}
+              />
             </Paper>
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -288,36 +264,14 @@ class MyProductsView extends React.Component {
               />
             </div>
             <Paper className={classes.paperContainer}>
-              <List
-                className={classes.productListContainer}
-                component="nav"
-              >
-                {otherAssignedItems.map(value => (
-                  <ListItem
-                    key={value.id}
-                    role={undefined}
-                    dense
-                    button
-                    disabled={!editMode}
-                    onClick={this.handleToggle(value)}
-                  >
-                    <Checkbox
-                      checked={selectedOtherProductId.indexOf(value) !== -1}
-                      tabIndex={-1}
-                      disableRipple
-                    />
-                    <ListItemText primary={value.name} />
-                    <ListItemSecondaryAction>
-                      <IconButton
-                        aria-label="Comments"
-                        onClick={() => this.setState({ itemToPreview: value })}
-                      >
-                        <Icon color={itemToPreview && value.id === itemToPreview.id ? 'secondary' : 'inherit'}>open_in_new</Icon>
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
+              <CheckboxList
+                data={otherAssignedItems}
+                primaryAction={item => this.handleToggle(item)}
+                editMode={!editMode}
+                selectedWithPrimaryId={selectedOtherProductId}
+                secondaryAction={item => this.setState({ itemToPreview: item })}
+                selectedWithSecondaryId={itemToPreview ? itemToPreview.id : null}
+              />
               <Typography className={classes.sectionSubtitle} component="h1" variant="body1">
                 {`Items assigned: ${selectedOtherProductId.length}`}
               </Typography>
@@ -363,7 +317,7 @@ const mapStateToProps = (state, ownProps) => {
   const edition = id ? state.editions.items.filter(e => `${e.id}` === id)[0] : null;
   const otherProduct = state.otherAssignedProducts.productsByEdition[id];
   const myProduct = state.myAssignedProducts.products.filter(prod => `${prod.editionId}` === id)[0];
-  console.log('prod', edition);
+
   return ({
     edition,
     otherAssignedItems: otherProduct && otherProduct.items,
