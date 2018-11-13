@@ -1,24 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import { fade } from '@material-ui/core/styles/colorManipulator';
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
 import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import { withAlert } from 'react-alert';
 
 import EditionPanelContainer from '../../components/EditionPanelContainer';
-
+import CustomDialog from '../../components/CustomDialog';
 
 const styles = theme => ({
   rightButtonIcon: {
@@ -30,11 +28,15 @@ const styles = theme => ({
   },
   sectionSubtitle: {
     margin: theme.spacing.unit * 3,
+    height: 40,
     marginRight: theme.spacing.unit * 5,
   },
   productListContainer: {
-    maxHeight: 600,
+    maxHeight: 500,
+    width: '100%',
     overflow: 'auto',
+    position: 'relative',
+    backgroundColor: theme.palette.background.paper,
   },
   productList: {
     marginTop: 30,
@@ -49,6 +51,7 @@ const styles = theme => ({
     justifyContent: 'space-around',
     overflow: 'hidden',
     marginBottom: theme.spacing.unit * 2,
+    marginTop: theme.spacing.unit * 2,
   },
   gridList: {
     height: 400,
@@ -62,6 +65,11 @@ const styles = theme => ({
   titleBar: {
     background:
       'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+    width: 110,
+    position: 'absolute',
+    height: 40,
+    left: 0,
+    bottom: 4,
   },
   textField: {
     width: '100%',
@@ -69,8 +77,30 @@ const styles = theme => ({
   image: {
     maxWidth: '100%',
     height: 'auto',
-    padding: theme.spacing.unit * 3,
     alignSelf: 'center',
+  },
+  deleteButtonContainer: {
+    width: '100%',
+    marginBottom: 10,
+    position: 'relative',
+  },
+  deleteButtonIcon: {
+    position: 'absolute',
+    bottom: 0,
+    left: 30,
+  },
+  createProductButton: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  listSection: {
+    backgroundColor: 'inherit',
+  },
+  ul: {
+    backgroundColor: 'inherit',
+    padding: 0,
   },
 });
 
@@ -82,7 +112,7 @@ class MyProductsView extends React.Component {
 
     this.state = {
       navigationValue: 0,
-      currentProduct: null,
+      currentItemId: null,
       editMode: false,
       productCreationMode: false,
       name: '',
@@ -95,23 +125,34 @@ class MyProductsView extends React.Component {
       newDescription: '',
       isNewNameValid: true,
       isNewDescriptionValid: true,
+      isSelectedAssigned: false,
+      openDialog: false,
     };
 
     this.onItemClick = this.onItemClick.bind(this);
-    this.handleNavigationChange = this.handleNavigationChange.bind(this);
     this.submitProductChange = this.submitProductChange.bind(this);
     this.validateForm = this.validateForm.bind(this);
     this.removeImage = this.removeImage.bind(this);
     this.fileUpload = this.fileUpload.bind(this);
+    this.renderHeaderContent = this.renderHeaderContent.bind(this);
+    this.handleItemAssignment = this.handleItemAssignment.bind(this);
+    this.handleDialogAgree = this.handleDialogAgree.bind(this);
+    this.handleDialogDisagree = this.handleDialogDisagree.bind(this);
   }
 
-  onItemClick(id) {
+  onItemClick(id, dataHeader) {
+    const { isSelectedAssigned } = this.state;
+    const { myAssignedItems, myNotAssignedItems } = this.props;
     if (id || id === 0) {
-      const { myAssignedItems } = this.props;
-      console.log(myAssignedItems);
-      const currentItem = myAssignedItems.filter(i => i.id === id)[0];
-      console.log(currentItem);
-      this.setState({
+      let data;
+      if (dataHeader) {
+        data = this.props[dataHeader];
+      } else {
+        data = isSelectedAssigned ? myAssignedItems : myNotAssignedItems;
+      }
+      const currentItem = data.filter(i => i.id === id)[0];
+
+      this.setState(state => ({
         currentItemId: id,
         name: currentItem.name,
         description: currentItem.description,
@@ -120,7 +161,9 @@ class MyProductsView extends React.Component {
         productCreationMode: false,
         isNewNameValid: true,
         isNewDescriptionValid: true,
-      });
+        isSelectedAssigned: dataHeader
+          ? dataHeader === 'myAssignedItems' : state.isSelectedAssigned,
+      }));
 
       return;
     }
@@ -133,10 +176,6 @@ class MyProductsView extends React.Component {
     });
   }
 
-  handleNavigationChange = (event, value) => {
-    this.setState({ navigationValue: value });
-  };
-
   validateForm() {
     const {
       name,
@@ -147,13 +186,13 @@ class MyProductsView extends React.Component {
     } = this.state;
 
     if (editMode) {
-      const isUsernameValid = name.length > 0;
+      const isNameValid = name.length > 0;
       const isDescriptionValid = description.length > 0;
       this.setState({
-        isUsernameValid,
+        isNameValid,
         isDescriptionValid,
       });
-      return isUsernameValid && isDescriptionValid;
+      return isNameValid && isDescriptionValid;
     }
 
     const isNewNameValid = newName.length > 0;
@@ -175,7 +214,21 @@ class MyProductsView extends React.Component {
     }
 
     console.log('submit changes: ', name, description);
-    alert.show('Successfullty modified product', { type: 'success' });
+    alert.show('Successfully added product', { type: 'success' });
+  }
+
+  handleDialogAgree() {
+    const { currentItemId } = this.state;
+    this.onItemClick(currentItemId);
+    this.setState({
+      openDialog: false,
+    });
+  }
+
+  handleDialogDisagree() {
+    this.setState({
+      openDialog: false,
+    });
   }
 
   removeImage(uri) {
@@ -193,12 +246,13 @@ class MyProductsView extends React.Component {
   handleChange = (event, name) => {
     this.setState({
       [name]: event.target.value,
+      [`is${name.charAt(0).toUpperCase() + name.slice(1)}Valid`]: true,
     });
   };
 
   fileUpload(e) {
     e.preventDefault();
-
+    const { alert } = this.props;
     const { productCreationMode } = this.state;
     const newFiles = Array
       .from(e.target.files || []);
@@ -207,24 +261,68 @@ class MyProductsView extends React.Component {
       .forEach((file) => {
         const reader = new FileReader();
         reader.onload = (event) => {
-          if (productCreationMode) {
-            this.setState(state => ({
-              newImages: [...state.newImages, { uri: event.target.result }],
-            }));
+          if (event.loaded <= MyProductsView.MAX_IMAGE_SIZE) {
+            if (productCreationMode) {
+              this.setState(state => ({
+                newImages: [...state.newImages, { uri: event.target.result }],
+              }));
+            } else {
+              this.setState(state => ({
+                images: [...state.images, { uri: event.target.result }],
+              }));
+            }
           } else {
-            this.setState(state => ({
-              images: [...state.images, { uri: event.target.result }],
-            }));
+            alert.show(`Maximum image size is ${MyProductsView.MAX_IMAGE_SIZE / (1024 * 1024)}MB`, { type: 'error' });
           }
         };
         reader.readAsDataURL(file);
       });
   }
 
+  handleItemAssignment(itemId) {
+    const { alert } = this.props;
+    console.log('assignig item with id: ', itemId);
+    this.setState({ currentItemId: null });
+    alert.show('Successfully assigned item to edition', { type: 'success' });
+  }
+
+  renderHeaderContent(dataHeader, onItemClick) {
+    const { classes } = this.props;
+    const { currentItemId, productCreationMode } = this.state;
+    const data = this.props[dataHeader];
+
+    return (
+      <li className={classes.listSection}>
+        <ul className={classes.ul}>
+          <ListSubheader>{`Products ${dataHeader === 'myAssignedItems' ? 'assigned' : 'not assigned'}: ${data.length}`}</ListSubheader>
+          {
+            data.map(item => (
+              <ListItem
+                button
+                key={item.id}
+                selected={currentItemId === item.id && !productCreationMode}
+                onClick={() => onItemClick(item.id, dataHeader)}
+              >
+                <Checkbox
+                  checked={currentItemId === item.id}
+                  tabIndex={-1}
+                  disableRipple
+                />
+                <ListItemText
+                  primary={`${item.name}`}
+                />
+              </ListItem>
+            ))
+          }
+        </ul>
+      </li>
+    );
+  }
+
   render() {
     const {
       classes,
-      myAssignedItems,
+      edition,
     } = this.props;
     const {
       currentItemId,
@@ -236,13 +334,17 @@ class MyProductsView extends React.Component {
       newName,
       newDescription,
       newImages,
+      isNameValid,
+      isDescriptionValid,
+      isNewNameValid,
+      isNewDescriptionValid,
+      isSelectedAssigned,
+      openDialog,
     } = this.state;
 
-
     const imagesToShow = productCreationMode ? newImages : images;
-    console.log('oewqoewq: ', myAssignedItems);
     return (
-      <EditionPanelContainer edition={this.props.edition} navigationValue="products">
+      <EditionPanelContainer edition={edition} navigationValue="products">
         <Grid container spacing={24}>
           <Grid item xs={12} sm={4}>
             <Typography className={classes.sectionSubtitle} component="h1" variant="h4">
@@ -252,24 +354,12 @@ class MyProductsView extends React.Component {
               <List
                 className={classes.productListContainer}
                 component="nav"
+                subheader={<li />}
               >
-                {
-                  myAssignedItems.map(item => (
-                    <ListItem
-                      button
-                      key={item.id}
-                      selected={currentItemId === item.id && !productCreationMode}
-                      onClick={() => this.onItemClick(item.id)}
-                    >
-                      <ListItemText
-                        inset
-                        primary={`${item.name}`}
-                      />
-                    </ListItem>
-                  ))
-                }
+                { this.renderHeaderContent('myAssignedItems', this.onItemClick)}
+                { this.renderHeaderContent('myNotAssignedItems', this.onItemClick)}
               </List>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div className={classes.createProductButton}>
                 <Button
                   variant="contained"
                   color="primary"
@@ -304,6 +394,8 @@ class MyProductsView extends React.Component {
                     label="Product title"
                     className={classes.textField}
                     margin="normal"
+                    error={(editMode && !isNameValid)
+                      || (productCreationMode && !isNewNameValid)}
                     variant="filled"
                     onChange={event => this.handleChange(event, editMode ? 'name' : 'newName')}
                     value={editMode ? name : newName}
@@ -315,6 +407,8 @@ class MyProductsView extends React.Component {
                     label="Product description"
                     multiline
                     rows="8"
+                    error={(editMode && !isDescriptionValid)
+                      || (productCreationMode && !isNewDescriptionValid)}
                     className={classes.textField}
                     margin="normal"
                     variant="filled"
@@ -325,15 +419,19 @@ class MyProductsView extends React.Component {
                   </Typography>}
                 <div className={classes.gridListContainer}>
                   {imagesToShow.map(image => (
-                    <>
+                    <div className={classes.deleteButtonContainer}>
                       <img src={image.uri} alt={'image'} className={classes.image} />
-                      { editMode || productCreationMode ? <IconButton
+                      { editMode || productCreationMode
+                        ? <div className={classes.titleBar} /> : null }
+                      { editMode || productCreationMode
+                        ? <IconButton
                             onClick={() => this.removeImage(image.uri)}
                             color="inherit"
+                            className={classes.deleteButtonIcon}
                           >
                             <Icon>delete</Icon>
                           </IconButton> : null }
-                    </>
+                    </div>
                   ))}
                 </div>
                   <Grid container spacing={24}>
@@ -347,7 +445,6 @@ class MyProductsView extends React.Component {
                         <Icon className={classes.rightButtonIcon}>add_a_photo</Icon>
                         Add photo
                       </Button> : null}
-
                       <input
                         id="fileInput"
                         name="fileInput"
@@ -359,6 +456,14 @@ class MyProductsView extends React.Component {
                         onChange={e => this.fileUpload(e)}
                         accept=".png, .jpg, .jpeg"
                       />
+                      { !(editMode || productCreationMode) && currentItemId && !isSelectedAssigned
+                        ? <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => this.handleItemAssignment(currentItemId)}
+                        >
+                          Assign to edition
+                        </Button> : null}
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <Grid container spacing={8}>
@@ -370,7 +475,7 @@ class MyProductsView extends React.Component {
                             variant="contained"
                             color="primary"
                             className={classes.backButton}
-                            onClick={() => this.onItemClick(currentItemId)}
+                            onClick={() => this.setState({ openDialog: true })}
                           >
                             Cancel
                           </Button> : null}
@@ -390,6 +495,13 @@ class MyProductsView extends React.Component {
             </Paper>
           </Grid>
         </Grid>
+        <CustomDialog
+          handleDisagree={this.handleDialogDisagree}
+          handleAgree={this.handleDialogAgree}
+          title={'Cancel product edition'}
+          textBody={'Are you sure you want to cancel item edition? If you click YES you will loose all unsaved changes.'}
+          openDialog={openDialog}
+        />
       </EditionPanelContainer>
     );
   }
@@ -404,6 +516,7 @@ const mapStateToProps = (state, ownProps) => {
   return ({
     edition,
     myAssignedItems: product && product.items,
+    myNotAssignedItems: state.myNotAssignedProducts.items,
   });
 };
 
