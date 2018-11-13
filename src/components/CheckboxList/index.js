@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -10,7 +9,7 @@ import Icon from '@material-ui/core/Icon';
 import Checkbox from '@material-ui/core/Checkbox';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 
-const styles = theme => ({
+const styles = () => ({
   productListContainer: {
     height: 600,
     overflow: 'auto',
@@ -72,9 +71,9 @@ class CheckboxList extends Component {
 CheckboxList.propTypes = {
   data: PropTypes.array.isRequired,
   secondaryAction: PropTypes.func,
-  selectedWithSecondaryId: PropTypes.number,
+  selectedWithSecondaryId: PropTypes.array,
   primaryAction: PropTypes.func,
-  selectedWithPrimaryId: PropTypes.number,
+  selectedWithPrimaryId: PropTypes.array,
   editMode: PropTypes.bool,
 };
 
