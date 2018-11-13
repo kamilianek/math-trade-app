@@ -361,7 +361,7 @@ const mapStateToProps = (state, ownProps) => {
   console.log('>>>', state);
   const id = ownProps.match.params.editionId;
   const edition = id ? state.editions.items.filter(e => `${e.id}` === id)[0] : null;
-  const otherProduct = state.otherAssignedProducts.products.filter(prod => `${prod.editionId}` === id)[0];
+  const otherProduct = state.otherAssignedProducts.productsByEdition[id];
   const myProduct = state.myAssignedProducts.products.filter(prod => `${prod.editionId}` === id)[0];
   console.log('prod', edition);
   return ({
