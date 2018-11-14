@@ -13,6 +13,7 @@ const {
   myNotAssignedProducts,
   otherAssignedProducts,
   definedGroups,
+  preferences,
 } = reducers;
 
 const rootPersistConfig = {
@@ -34,6 +35,7 @@ const rootReducer = combineReducers({
   myNotAssignedProducts,
   otherAssignedProducts,
   definedGroups,
+  preferences,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
