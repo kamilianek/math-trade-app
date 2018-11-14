@@ -39,7 +39,9 @@ class ProductPreview extends Component {
             <Typography className={classes.sectionSubtitle}>
               {item.description}
             </Typography>
-            { item.images.map(image => (<img className={classes.image} src={image.uri} />)) }
+            { (item.images || []).map(image => (
+              <img className={classes.image} src={image.uri} />
+            )) }
             </> : null
           }
         </Paper>

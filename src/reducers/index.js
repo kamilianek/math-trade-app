@@ -4,6 +4,7 @@ import myAssignedProductsReducer from './myAssignedProducts';
 import myNotAssignedProductsReducer from './myNotAssignedProducts';
 import otherAssignedProductsReducer from './otherAssignedProducts';
 import definedGroupsReducer from './definedGroups';
+import preferencesReducer from './preferences';
 
 export default {
   auth: authReducer,
@@ -12,4 +13,5 @@ export default {
   myNotAssignedProducts: myNotAssignedProductsReducer,
   otherAssignedProducts: otherAssignedProductsReducer,
   definedGroups: definedGroupsReducer,
+  preferences: preferencesReducer,
 };

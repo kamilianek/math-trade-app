@@ -14,6 +14,7 @@ import ProductPreview from '../../components/ProductPreview';
 import CustomDialog from '../../components/CustomDialog';
 import CheckboxList from '../../components/CheckboxList';
 import SearchBar from '../../components/SerachBar';
+import MultiheaderCheckboxList from '../../components/MultiheaderCheckboxList';
 
 const dialogContent = {
   cancelPreferenceEdition: {
@@ -74,13 +75,27 @@ class MyProductsView extends React.Component {
   constructor(props) {
     super(props);
 
-    const { myAssignedItems, otherAssignedItems } = this.props;
-
-    this.state = {
-      selectedMyProductId: myAssignedItems && myAssignedItems[0].id,
-      selectedOtherProductId: [],
+    const {
       myAssignedItems,
       otherAssignedItems,
+      preferences,
+      myDefinedGroups,
+    } = this.props;
+    let preferenceForItem = null;
+
+    if (myAssignedItems && myAssignedItems[0]) {
+      preferenceForItem = preferences.filter(pref => pref.haveProductId === myAssignedItems[0].id);
+    }
+
+    this.state = {
+      selectedMyProduct: myAssignedItems && myAssignedItems[0],
+      selectedOtherProductIds: preferenceForItem && preferenceForItem[0].wantedProductsIds,
+      selectedGroupIds: preferenceForItem && preferenceForItem[0]
+        && preferenceForItem[0].wantedDefinedGroupsIds,
+      preferences,
+      myAssignedItems,
+      otherAssignedItems,
+      myDefinedGroups,
       itemToPreview: null,
       editMode: false,
       openDialog: false,
@@ -119,35 +134,47 @@ class MyProductsView extends React.Component {
     });
   };
 
-  handleSearchBarChange = (event, name) => {
+  handleSearchBarChange = (event, section1, section2) => {
     const phrase = event.target.value.toUpperCase();
-    const updatedList = this.props[name].filter(item => item.name.toUpperCase().includes(phrase));
+    const updatedList1 = this.props[section1]
+      .filter(item => item.name.toUpperCase().includes(phrase));
+    const updatedList2 = this.props[section2]
+      .filter(item => item.name.toUpperCase().includes(phrase));
 
-    this.setState({ [name]: updatedList });
+    this.setState({
+      [section1]: updatedList1,
+      [section2]: updatedList2,
+    });
   };
 
-  handleToggle(value) {
-    console.log('dupa: ', value);
-    const { selectedOtherProductId } = this.state;
-    const currentIndex = selectedOtherProductId.indexOf(value.id);
-    const newChecked = [...selectedOtherProductId];
+  handleToggle(item, name) {
+    console.log('toggle: ', item, name);
+    const currentIndex = this.state[name].indexOf(item.id);
+    const newChecked = [...this.state[name]];
 
     if (currentIndex === -1) {
-      newChecked.push(value.id);
+      newChecked.push(item.id);
     } else {
       newChecked.splice(currentIndex, 1);
     }
 
-    this.setState({
-      selectedOtherProductId: newChecked,
-    });
+    this.setState({ [name]: newChecked });
   }
 
-  // TODO: set selectedOtherProductId as in store
   handleDialogAgree() {
+    const { selectedMyProduct } = this.state;
+    const { preferences } = this.props;
+
+    const preferenceForItem = preferences.filter(
+      pref => pref.haveProductId === selectedMyProduct.id,
+    );
+
     this.setState({
       openDialog: false,
-      selectedOtherProductId: [],
+      selectedOtherProductIds: preferenceForItem.length > 0
+        ? preferenceForItem[0].wantedProductsIds : [],
+      selectedGroupIds: preferenceForItem.length > 0
+        ? preferenceForItem[0].wantedDefinedGroupsIds : [],
       editMode: false,
     });
   }
@@ -160,11 +187,19 @@ class MyProductsView extends React.Component {
 
   // TODO: submit preferences and update in store
   submitSavePreferences() {
-    const { alert } = this.props;
+    const { alert, preferences } = this.props;
+    const { selectedMyProduct } = this.state;
+
+    const preferenceForItem = preferences.filter(
+      pref => pref.haveProductId === selectedMyProduct.id,
+    );
+
+    console.log('pref: ', preferenceForItem);
 
     this.setState({
+      selectedOtherProductIds: preferenceForItem[0].wantedProductsIds,
+      selectedGroupIds: preferenceForItem[0].wantedDefinedGroupsIds,
       editMode: false,
-      selectedOtherProductId: [],
     });
 
     alert.show('Successfully modified preferences', { type: 'success' });
@@ -175,15 +210,18 @@ class MyProductsView extends React.Component {
       classes,
     } = this.props;
     const {
-      selectedOtherProductId,
-      selectedMyProductId,
+      selectedOtherProductIds,
+      selectedGroupIds,
+      selectedMyProduct,
       otherAssignedItems,
       myAssignedItems,
+      myDefinedGroups,
       itemToPreview,
       editMode,
       openDialog,
+      preferences,
     } = this.state;
-
+    console.log('myDefinedGroups: ', myDefinedGroups);
     return (
       <EditionPanelContainer edition={this.props.edition} navigationValue="preferences">
         <Grid container spacing={24}>
@@ -195,9 +233,18 @@ class MyProductsView extends React.Component {
               <SearchBar onChange={event => this.handleSearchBarChange(event, 'myAssignedItems')} />
               <CheckboxList
                 data={myAssignedItems}
-                primaryAction={item => this.setState({ selectedMyProductId: item.id })}
+                primaryAction={(item) => {
+                  const pref = preferences.filter(
+                    i => i.haveProductId === item.id,
+                  );
+                  this.setState({
+                    selectedMyProduct: item,
+                    selectedGroupIds: (pref.length > 0 && pref[0].wantedDefinedGroupsIds) || [],
+                    selectedOtherProductIds: (pref.length > 0 && pref[0].wantedProductsIds) || [],
+                  });
+                }}
                 editMode={editMode}
-                selectedWithPrimaryId={[selectedMyProductId]}
+                selectedWithPrimaryId={[selectedMyProduct.id]}
                 secondaryAction={item => this.setState({ itemToPreview: item })}
                 selectedWithSecondaryId={itemToPreview && itemToPreview.id}
               />
@@ -214,17 +261,23 @@ class MyProductsView extends React.Component {
               </IconButton>
             </Typography>
             <Paper className={classes.paperContainer}>
-              <SearchBar onChange={event => this.handleSearchBarChange(event, 'otherAssignedItems')} />
-              <CheckboxList
-                data={otherAssignedItems}
-                primaryAction={item => this.handleToggle(item)}
-                editMode={!editMode}
-                selectedWithPrimaryId={selectedOtherProductId}
+              <SearchBar onChange={event => this.handleSearchBarChange(event, 'otherAssignedItems', 'myDefinedGroups')} />
+              <MultiheaderCheckboxList
+                data={[otherAssignedItems, myDefinedGroups]}
+                disabled={!editMode}
+                titles={['Other items: ', 'My defined groups: ']}
+                currentSelected={[selectedOtherProductIds, selectedGroupIds]}
+                onItemClick={[
+                  item => this.handleToggle(item, 'selectedOtherProductIds'),
+                  item => this.handleToggle(item, 'selectedGroupIds'),
+                ]}
                 secondaryAction={item => this.setState({ itemToPreview: item })}
-                selectedWithSecondaryId={itemToPreview ? itemToPreview.id : null}
+                selectedWithSecondaryId={itemToPreview && itemToPreview.id}
               />
               <Typography className={classes.sectionSubtitle} component="h1" variant="body1">
-                {`Items assigned: ${selectedOtherProductId.length}`}
+                {`Items assigned: ${
+                  (selectedOtherProductIds || []).length + (selectedGroupIds || []).length
+                }`}
               </Typography>
               <Grid item xs={12} sm={6}>
                 {editMode ? <Button
@@ -267,12 +320,16 @@ const mapStateToProps = (state, ownProps) => {
   const id = ownProps.match.params.editionId;
   const edition = id ? state.editions.items.filter(e => `${e.id}` === id)[0] : null;
   const otherProduct = state.otherAssignedProducts.productsByEdition[id];
+  const preferenceByEdition = state.preferences.preferencesByEdition[id];
   const myProduct = state.myAssignedProducts.products.filter(prod => `${prod.editionId}` === id)[0];
+  const definedGroups = state.definedGroups.definedGroupsByEdition[id];
 
   return ({
     edition,
-    otherAssignedItems: otherProduct && otherProduct.items,
-    myAssignedItems: myProduct && myProduct.items,
+    otherAssignedItems: (otherProduct && otherProduct.items) || [],
+    myAssignedItems: (myProduct && myProduct.items) || [],
+    preferences: (preferenceByEdition && preferenceByEdition.preferences) || [],
+    myDefinedGroups: (definedGroups && definedGroups.groups) || [],
   });
 };
 
