@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
+import { withAlert } from 'react-alert';
 import { withStyles } from '@material-ui/core/styles';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
@@ -11,9 +12,9 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Icon from '@material-ui/core/Icon';
 import TextField from '@material-ui/core/TextField';
-
+import { bindActionCreators } from 'redux';
 import actions from '../../actions';
-import {bindActionCreators} from "redux";
+
 
 const styles = theme => ({
   expansionPanel: {
@@ -66,18 +67,30 @@ class RequestExpansionPanel extends Component {
     this.state = {
       isExpanded: false,
       requestMessage: '',
+      isRequestMessageValid: true,
     };
 
     this.toggleExpansionPanel = this.toggleExpansionPanel.bind(this);
+    this.onSubmitRequest = this.onSubmitRequest.bind(this);
   }
 
   toggleExpansionPanel() {
     this.setState(state => ({ isExpanded: !state.isExpanded }));
   }
 
+  onSubmitRequest() {
+    const { requestMessage } = this.state;
+
+    if (requestMessage.length < 1) {
+      this.setState({
+        isRequestMessageValid: false,
+      });
+    }
+  }
+
   render() {
     const { classes } = this.props;
-    const { isExpanded, requestMessage } = this.state;
+    const { isExpanded, requestMessage, isRequestMessageValid } = this.state;
 
     return (
       <div className={classes.expansionPanel}>
@@ -102,10 +115,14 @@ class RequestExpansionPanel extends Component {
                 label="Your answer"
                 multiline
                 rows="8"
+                error={!isRequestMessageValid}
                 className={classes.textField}
                 margin="normal"
                 variant="filled"
-                onChange={event => this.setState({ requestMessage: event.target.value })}
+                onChange={event => this.setState({
+                  requestMessage: event.target.value,
+                  isRequestMessageValid: true,
+                })}
                 value={requestMessage}
               />
             </div>
@@ -127,7 +144,7 @@ class RequestExpansionPanel extends Component {
             <Button
               size="small"
               color="primary"
-              onClick={() => console.log('Request permissions with message: ', requestMessage)}
+              onClick={this.onSubmitRequest}
             >
               Submit message
             </Button>
@@ -149,5 +166,7 @@ const mapDispatchToProps = dispatch => bindActionCreators({
 
 
 export default withStyles(styles)(
-  connect(mapStateToProps, mapDispatchToProps)(RequestExpansionPanel)
+  withAlert(
+    connect(mapStateToProps, mapDispatchToProps)(RequestExpansionPanel),
+  ),
 );
