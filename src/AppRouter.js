@@ -9,6 +9,7 @@ import SecondPanel from './views/SecondPanelView';
 import SignOutView from './views/SignOutView';
 import MyProductsView from './views/MyProductsView';
 import PreferencesView from './views/PreferencesView';
+import DefinedGroupsView from './views/DefinedGroupsView';
 
 
 export default class AppRouter extends React.Component {
@@ -19,10 +20,11 @@ export default class AppRouter extends React.Component {
           <EnsureLoggedInPath exact path="/" component={MainPanelView} />
           <EnsureLoggedInPath exact path="/editions" component={MainPanelView} />
           <EnsureLoggedInPath exact path="/editions/:editionId/products" component={MyProductsView} />
-          <EnsureLoggedInPath exact path="/editions/:editionId/preferences" component={PreferencesView}/>
-          <EnsureLoggedInPath exact path="/account" component={SecondPanel}/>
-          <Route path="/register" component={RegistrationView}/>
-          <Route path="/login" component={LoginView}/>
+          <EnsureLoggedInPath exact path="/editions/:editionId/preferences" component={PreferencesView} />
+          <EnsureLoggedInPath exact path="/editions/:editionId/definedGroups" component={DefinedGroupsView} />
+          <EnsureLoggedInPath exact path="/account" component={SecondPanel} />
+          <Route path="/register" component={RegistrationView} />
+          <Route path="/login" component={LoginView} />
           <Route path="/signout" component={SignOutView} />
         </div>
       </HashRouter>
