@@ -191,8 +191,8 @@ class MyProductsView extends React.Component {
             <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
               My products
             </Typography>
-            <SearchBar onChange={event => this.handleSearchBarChange(event, 'myAssignedItems')} />
             <Paper className={classes.paperContainer}>
+              <SearchBar onChange={event => this.handleSearchBarChange(event, 'myAssignedItems')} />
               <CheckboxList
                 data={myAssignedItems}
                 primaryAction={item => this.setState({ selectedMyProductId: item.id })}
@@ -213,8 +213,8 @@ class MyProductsView extends React.Component {
                 <Icon>edit</Icon>
               </IconButton>
             </Typography>
-            <SearchBar onChange={event => this.handleSearchBarChange(event, 'otherAssignedItems')} />
             <Paper className={classes.paperContainer}>
+              <SearchBar onChange={event => this.handleSearchBarChange(event, 'otherAssignedItems')} />
               <CheckboxList
                 data={otherAssignedItems}
                 primaryAction={item => this.handleToggle(item)}
