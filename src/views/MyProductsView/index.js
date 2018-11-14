@@ -6,17 +6,13 @@ import Icon from '@material-ui/core/Icon';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
-import Checkbox from '@material-ui/core/Checkbox';
-import ListSubheader from '@material-ui/core/ListSubheader';
 import { withAlert } from 'react-alert';
 
 import EditionPanelContainer from '../../components/EditionPanelContainer';
 import CustomDialog from '../../components/CustomDialog';
+import MultiheaderCheckboxList from '../../components/MultiheaderCheckboxList';
 
 const styles = theme => ({
   rightButtonIcon: {
@@ -30,13 +26,6 @@ const styles = theme => ({
     margin: theme.spacing.unit * 3,
     height: 40,
     marginRight: theme.spacing.unit * 5,
-  },
-  productListContainer: {
-    maxHeight: 500,
-    width: '100%',
-    overflow: 'auto',
-    position: 'relative',
-    backgroundColor: theme.palette.background.paper,
   },
   productList: {
     marginTop: 30,
@@ -67,7 +56,7 @@ const styles = theme => ({
       'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
     width: 110,
     position: 'absolute',
-    height: 40,
+    height: 30,
     left: 0,
     bottom: 4,
   },
@@ -134,7 +123,6 @@ class MyProductsView extends React.Component {
     this.validateForm = this.validateForm.bind(this);
     this.removeImage = this.removeImage.bind(this);
     this.fileUpload = this.fileUpload.bind(this);
-    this.renderHeaderContent = this.renderHeaderContent.bind(this);
     this.handleItemAssignment = this.handleItemAssignment.bind(this);
     this.handleDialogAgree = this.handleDialogAgree.bind(this);
     this.handleDialogDisagree = this.handleDialogDisagree.bind(this);
@@ -286,44 +274,14 @@ class MyProductsView extends React.Component {
     alert.show('Successfully assigned item to edition', { type: 'success' });
   }
 
-  renderHeaderContent(dataHeader, onItemClick) {
-    const { classes } = this.props;
-    const { currentItemId, productCreationMode } = this.state;
-    const data = this.props[dataHeader];
-
-    return (
-      <li className={classes.listSection}>
-        <ul className={classes.ul}>
-          <ListSubheader>{`Products ${dataHeader === 'myAssignedItems' ? 'assigned' : 'not assigned'}: ${data.length}`}</ListSubheader>
-          {
-            data.map(item => (
-              <ListItem
-                button
-                key={item.id}
-                selected={currentItemId === item.id && !productCreationMode}
-                onClick={() => onItemClick(item.id, dataHeader)}
-              >
-                <Checkbox
-                  checked={currentItemId === item.id}
-                  tabIndex={-1}
-                  disableRipple
-                />
-                <ListItemText
-                  primary={`${item.name}`}
-                />
-              </ListItem>
-            ))
-          }
-        </ul>
-      </li>
-    );
-  }
-
   render() {
     const {
       classes,
       edition,
+      myAssignedItems,
+      myNotAssignedItems,
     } = this.props;
+
     const {
       currentItemId,
       editMode,
@@ -347,18 +305,19 @@ class MyProductsView extends React.Component {
       <EditionPanelContainer edition={edition} navigationValue="products">
         <Grid container spacing={24}>
           <Grid item xs={12} sm={4}>
-            <Typography className={classes.sectionSubtitle} component="h1" variant="h4">
+            <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
               My products
             </Typography>
             <Paper className={classes.paperContainer}>
-              <List
-                className={classes.productListContainer}
-                component="nav"
-                subheader={<li />}
-              >
-                { this.renderHeaderContent('myAssignedItems', this.onItemClick)}
-                { this.renderHeaderContent('myNotAssignedItems', this.onItemClick)}
-              </List>
+              <MultiheaderCheckboxList
+                data={[myAssignedItems, myNotAssignedItems]}
+                titles={['Assigned: ', 'Not assigned: ']}
+                currentSelected={[[currentItemId], [currentItemId]]}
+                onItemClick={[
+                  item => this.onItemClick(item.id, 'myAssignedItems'),
+                  item => this.onItemClick(item.id, 'myNotAssignedItems'),
+                ]}
+              />
               <div className={classes.createProductButton}>
                 <Button
                   variant="contained"
@@ -374,7 +333,7 @@ class MyProductsView extends React.Component {
             </Paper>
           </Grid>
           <Grid item xs={12} sm={8}>
-            <Typography className={classes.sectionSubtitle} component="h1" variant="h4">
+            <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
               Product
               <IconButton
                 onClick={() => this.setState({

@@ -3,6 +3,7 @@ import editionsReducer from './editions';
 import myAssignedProductsReducer from './myAssignedProducts';
 import myNotAssignedProductsReducer from './myNotAssignedProducts';
 import otherAssignedProductsReducer from './otherAssignedProducts';
+import definedGroupsReducer from './definedGroups';
 
 export default {
   auth: authReducer,
@@ -10,4 +11,5 @@ export default {
   myAssignedProducts: myAssignedProductsReducer,
   myNotAssignedProducts: myNotAssignedProductsReducer,
   otherAssignedProducts: otherAssignedProductsReducer,
+  definedGroups: definedGroupsReducer,
 };
