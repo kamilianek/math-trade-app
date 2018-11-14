@@ -71,7 +71,7 @@ class CheckboxList extends Component {
 CheckboxList.propTypes = {
   data: PropTypes.array.isRequired,
   secondaryAction: PropTypes.func,
-  selectedWithSecondaryId: PropTypes.array,
+  selectedWithSecondaryId: PropTypes.number,
   primaryAction: PropTypes.func,
   selectedWithPrimaryId: PropTypes.array,
   editMode: PropTypes.bool,
