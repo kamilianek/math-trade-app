@@ -6,7 +6,6 @@ import { Redirect, Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { withAlert } from 'react-alert';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
@@ -60,7 +59,7 @@ const styles = theme => ({
 const navigationValues = {
   products: 0,
   preferences: 1,
-  groups: 2,
+  definedGroups: 2,
 };
 
 class EditionPanelContainer extends Component {
@@ -107,7 +106,7 @@ class EditionPanelContainer extends Component {
           >
             <BottomNavigationAction label="Products" component={Link} to={'products'} />
             <BottomNavigationAction label="Preferences" component={Link} to={'preferences'} />
-            <BottomNavigationAction label="Groups" />
+            <BottomNavigationAction label="Groups" component={Link} to={'definedGroups'} />
           </BottomNavigation>
         </div>
         { this.props.children }
@@ -118,7 +117,7 @@ class EditionPanelContainer extends Component {
 
 EditionPanelContainer.propTypes = {
   classes: PropTypes.object.isRequired,
-  navigationValue: PropTypes.oneOf(['products', 'preferences', 'groups']),
+  navigationValue: PropTypes.oneOf(['products', 'preferences', 'definedGroups']),
 };
 
 
