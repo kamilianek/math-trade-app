@@ -1,25 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import { fade } from '@material-ui/core/styles/colorManipulator';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Icon from '@material-ui/core/Icon';
-import Checkbox from '@material-ui/core/Checkbox';
-import InputBase from '@material-ui/core/InputBase';
 import { withAlert } from 'react-alert';
 
 import EditionPanelContainer from '../../components/EditionPanelContainer';
 import ProductPreview from '../../components/ProductPreview';
 import CustomDialog from '../../components/CustomDialog';
 import CheckboxList from '../../components/CheckboxList';
+import SearchBar from '../../components/SerachBar';
 
 const dialogContent = {
   cancelPreferenceEdition: {
@@ -38,7 +32,7 @@ const styles = theme => ({
   sectionSubtitle: {
     margin: theme.spacing.unit * 3,
     marginRight: theme.spacing.unit * 5,
-    height: 40,
+    height: 30,
   },
   productListContainer: {
     height: 600,
@@ -74,46 +68,6 @@ const styles = theme => ({
   textField: {
     width: '100%',
   },
-  search: {
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: fade('#BDBDBD', 0.15),
-    '&:hover': {
-      backgroundColor: fade('#BDBDBD', 0.25),
-    },
-    marginRight: theme.spacing.unit * 2,
-    marginBottom: theme.spacing.unit * 2,
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing.unit * 3,
-      width: 'auto',
-    },
-  },
-  searchIcon: {
-    width: theme.spacing.unit * 9,
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  inputRoot: {
-    color: 'inherit',
-    width: '100%',
-  },
-  inputInput: {
-    paddingTop: theme.spacing.unit,
-    paddingRight: theme.spacing.unit,
-    paddingBottom: theme.spacing.unit,
-    paddingLeft: theme.spacing.unit * 10,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: 200,
-    },
-  },
 });
 
 class MyProductsView extends React.Component {
@@ -138,6 +92,27 @@ class MyProductsView extends React.Component {
     this.handleToggle = this.handleToggle.bind(this);
   }
 
+  // TODO: remove it later
+  componentWillReceiveProps(nextProps) {
+    if (this.props.myAssignedItems !== nextProps.myAssignedItems) {
+      this.setState({ myAssignedItems: nextProps.myAssignedItems });
+    }
+    if (this.props.otherAssignedItems !== nextProps.otherAssignedItems) {
+      this.setState({ otherAssignedItems: nextProps.otherAssignedItems });
+    }
+  }
+
+  // static getDerivedStateFromProps(props, state) {
+  //   console.log('>>> ', props, state);
+  //   if (props.myAssignedItems !== state.myAssignedItems) {
+  //     return {
+  //       myAssignedItems: props.myAssignedItems,
+  //       otherAssignedItems: props.otherAssignedItems
+  //     };
+  //   }
+  //   return null;
+  // }
+
   handleChange = (event, name) => {
     this.setState({
       [name]: event.target.value,
@@ -154,7 +129,7 @@ class MyProductsView extends React.Component {
   handleToggle(value) {
     console.log('dupa: ', value);
     const { selectedOtherProductId } = this.state;
-    const currentIndex = selectedOtherProductId.indexOf(value);
+    const currentIndex = selectedOtherProductId.indexOf(value.id);
     const newChecked = [...selectedOtherProductId];
 
     if (currentIndex === -1) {
@@ -213,22 +188,10 @@ class MyProductsView extends React.Component {
       <EditionPanelContainer edition={this.props.edition} navigationValue="preferences">
         <Grid container spacing={24}>
           <Grid item xs={12} sm={6}>
-            <Typography className={classes.sectionSubtitle} component="h1" variant="h4">
+            <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
               My products
             </Typography>
-            <div className={classes.search}>
-              <div className={classes.searchIcon}>
-                <Icon>search</Icon>
-              </div>
-              <InputBase
-                placeholder="Search…"
-                classes={{
-                  root: classes.inputRoot,
-                  input: classes.inputInput,
-                }}
-                onChange={event => this.handleSearchBarChange(event, 'myAssignedItems')}
-              />
-            </div>
+            <SearchBar onChange={event => this.handleSearchBarChange(event, 'myAssignedItems')} />
             <Paper className={classes.paperContainer}>
               <CheckboxList
                 data={myAssignedItems}
@@ -241,7 +204,7 @@ class MyProductsView extends React.Component {
             </Paper>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Typography className={classes.sectionSubtitle} component="h1" variant="h4">
+            <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
               Other products
               <IconButton
                 onClick={() => this.setState({ editMode: true })}
@@ -250,19 +213,7 @@ class MyProductsView extends React.Component {
                 <Icon>edit</Icon>
               </IconButton>
             </Typography>
-            <div className={classes.search}>
-              <div className={classes.searchIcon}>
-                <Icon>search</Icon>
-              </div>
-              <InputBase
-                placeholder="Search…"
-                classes={{
-                  root: classes.inputRoot,
-                  input: classes.inputInput,
-                }}
-                onChange={event => this.handleSearchBarChange(event, 'otherAssignedItems')}
-              />
-            </div>
+            <SearchBar onChange={event => this.handleSearchBarChange(event, 'otherAssignedItems')} />
             <Paper className={classes.paperContainer}>
               <CheckboxList
                 data={otherAssignedItems}
