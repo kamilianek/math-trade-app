@@ -14,8 +14,9 @@ const styles = theme => ({
     '&:hover': {
       backgroundColor: fade('#BDBDBD', 0.25),
     },
-    marginRight: theme.spacing.unit * 2,
+    marginRight: theme.spacing.unit * 4,
     marginBottom: theme.spacing.unit * 2,
+    marginTop: theme.spacing.unit * 2,
     marginLeft: 0,
     width: '100%',
     [theme.breakpoints.up('sm')]: {

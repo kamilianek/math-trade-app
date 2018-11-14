@@ -12,7 +12,7 @@ import Button from '@material-ui/core/Button';
 
 import EditionPanelContainer from '../../components/EditionPanelContainer';
 import CheckboxList from '../../components/CheckboxList';
-
+import SearchBar from '../../components/SerachBar';
 import MultiheaderCheckboxList from '../../components/MultiheaderCheckboxList';
 import CustomDialog from '../../components/CustomDialog';
 
@@ -66,11 +66,17 @@ class DefinedGroupsView extends Component {
     this.submitSaveDefinedGroup = this.submitSaveDefinedGroup.bind(this);
   }
 
-  handleSearchBarChange = (event, name) => {
+  handleSearchBarChange = (event, section1, section2) => {
     const phrase = event.target.value.toUpperCase();
-    const updatedList = this.props[name].filter(item => item.name.toUpperCase().includes(phrase));
+    const updatedList1 = this.props[section1]
+      .filter(item => item.name.toUpperCase().includes(phrase));
+    const updatedList2 = this.props[section2]
+      .filter(item => item.name.toUpperCase().includes(phrase));
 
-    this.setState({ [name]: updatedList });
+    this.setState({
+      [section1]: updatedList1,
+      [section2]: updatedList2,
+    });
   };
 
   handleDialogAgree() {
@@ -139,7 +145,7 @@ class DefinedGroupsView extends Component {
             </Typography>
             <Paper className={classes.paperContainer}>
               <CheckboxList
-                data={myDefinedGroups}
+                data={this.props.myDefinedGroups}
                 primaryAction={item => this.setState({
                   selectedMyGroup: item,
                   selectedProductIds: item.productsIds,
@@ -163,6 +169,7 @@ class DefinedGroupsView extends Component {
               </IconButton>
             </Typography>
             <Paper className={classes.paperContainer}>
+              <SearchBar onChange={event => this.handleSearchBarChange(event, 'otherAssignedItems', 'myDefinedGroups')} />
               <MultiheaderCheckboxList
                 data={[otherAssignedItems, myDefinedGroups]}
                 disabled={!editMode}
