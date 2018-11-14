@@ -19,9 +19,11 @@ import amber from '@material-ui/core/colors/amber';
 
 const rows = [
   { id: 'name', numeric: false, disablePadding: false, label: 'Edition Name' },
+  { id: 'participant', numeric: false, disablePadding: false, label: 'Assigned' },
   { id: 'numberOfParticipants', numeric: true, disablePadding: false, label: 'Participants' },
   { id: 'maxParticipants', numeric: true, disablePadding: false, label: 'Participants Limit' },
   { id: 'status', numeric: false, disablePadding: false, label: 'Status' },
+  { id: 'moderator', numeric: false, disablePadding: false, label: 'Edit' },
 ];
 
 function desc(a, b, orderBy) {
@@ -84,11 +86,6 @@ class EditionsTableHeader extends Component {
                   </Tooltip>
               </TableCell>
           ), this)}
-          <TableCell
-            key="edit"
-          >
-            Edit
-          </TableCell>
         </TableRow>
       </TableHead>
     );
@@ -193,24 +190,48 @@ class EditionsTable extends Component {
                   .map(row => (
                     <TableRow
                       className={classes.row}
-                      onClick={() => onEditionClicked(row.id, row.status)}
                       key={row.id}
                       hover
                     >
-                      <TableCell component="th" scope="row">{row.name}</TableCell>
-                      <TableCell numeric>{row.numberOfParticipants}</TableCell>
-                      <TableCell numeric>{row.maxParticipants}</TableCell>
-                      <TableCell style={{ backgroundColor: statusColors[row.status] }}>
+                      <TableCell
+                        onClick={() => onEditionClicked(row.id, row.status)}
+                        component="th"
+                        scope="row"
+                      >
+                        {row.name}
+                      </TableCell>
+                      <TableCell
+                        onClick={() => onEditionClicked(row.id, row.status)}
+                      >
+                        { row.participant ? <Icon>how_to_reg</Icon> : null}
+                      </TableCell>
+                      <TableCell
+                        onClick={() => onEditionClicked(row.id, row.status)}
+                        numeric
+                      >
+                        {row.numberOfParticipants}
+                      </TableCell>
+                      <TableCell
+                        onClick={() => onEditionClicked(row.id, row.status)}
+                        numeric
+                      >
+                        {row.maxParticipants}
+                      </TableCell>
+                      <TableCell
+                        onClick={() => onEditionClicked(row.id, row.status)}
+                        style={{ backgroundColor: statusColors[row.status] }}
+                      >
                         {row.status}
                       </TableCell>
                       <TableCell>
-                        <IconButton
-                          key="edit"
-                          color="inherit"
-                          onClick={() => console.log('edit edition with id: ', row.id)}
-                        >
-                          { row.moderator ? <Icon className={classes.icon}>settings</Icon> : null }
-                        </IconButton>
+                        {row.moderator
+                          ? <IconButton
+                            key="edit"
+                            color="inherit"
+                            onClick={() => console.log('edit edition with id: ', row.id)}
+                          >
+                            <Icon className={classes.icon}>settings</Icon>
+                          </IconButton> : null }
                       </TableCell>
                     </TableRow>
                   ))
