@@ -321,7 +321,7 @@ const mapStateToProps = (state, ownProps) => {
   const edition = id ? state.editions.items.filter(e => `${e.id}` === id)[0] : null;
   const otherProduct = state.otherAssignedProducts.productsByEdition[id];
   const preferenceByEdition = state.preferences.preferencesByEdition[id];
-  const myProduct = state.myAssignedProducts.products.filter(prod => `${prod.editionId}` === id)[0];
+  const myProduct = state.myAssignedProducts.productsByEdition[id];
   const definedGroups = state.definedGroups.definedGroupsByEdition[id];
 
   return ({

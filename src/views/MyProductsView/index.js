@@ -470,12 +470,12 @@ const mapStateToProps = (state, ownProps) => {
   console.log('>>>', state);
   const id = ownProps.match.params.editionId;
   const edition = id ? state.editions.items.filter(e => `${e.id}` === id)[0] : null;
-  const product = state.myAssignedProducts.products.filter(prod => `${prod.editionId}` === id)[0];
+  const product = state.myAssignedProducts.productsByEdition[id];
   console.log('prod', edition);
   return ({
     edition,
-    myAssignedItems: product && product.items,
-    myNotAssignedItems: state.myNotAssignedProducts.items,
+    myAssignedItems: (product && product.items) || [],
+    myNotAssignedItems: state.myNotAssignedProducts.items || [],
   });
 };
 
