@@ -9,10 +9,13 @@ import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import { withAlert } from 'react-alert';
+import { bindActionCreators } from 'redux';
 
 import EditionPanelContainer from '../../components/EditionPanelContainer';
 import CustomDialog from '../../components/CustomDialog';
 import MultiheaderCheckboxList from '../../components/MultiheaderCheckboxList';
+
+import actions from '../../actions';
 
 const styles = theme => ({
   rightButtonIcon: {
@@ -128,6 +131,15 @@ class MyProductsView extends React.Component {
     this.handleDialogDisagree = this.handleDialogDisagree.bind(this);
   }
 
+  componentDidMount() {
+    const {
+      fetchMyAssignedProductsIfNeeded,
+      alert,
+    } = this.props;
+    fetchMyAssignedProductsIfNeeded()
+      .catch(() => alert.show('Cannot load your products', { type: 'error' }));
+  }
+
   onItemClick(id, dataHeader) {
     const { isSelectedAssigned } = this.state;
     const { myAssignedItems, myNotAssignedItems } = this.props;
@@ -193,16 +205,42 @@ class MyProductsView extends React.Component {
   }
 
   submitProductChange() {
-    const { alert } = this.props;
-    const { name, description } = this.state;
+    const { alert, createProduct, updateMyAssignedProduct } = this.props;
+    const {
+      name,
+      newName,
+      description,
+      newDescription,
+      productCreationMode,
+      images,
+      newImages,
+      editMode,
+      currentItemId,
+    } = this.state;
 
     if (!this.validateForm()) {
       console.log('invalid form');
       return;
     }
 
-    console.log('submit changes: ', name, description);
-    alert.show('Successfully added product', { type: 'success' });
+    if (productCreationMode) {
+      createProduct(newName, newDescription, newImages)
+        .then(() => alert.show('Successfully created product', { type: 'success' }))
+        .catch(error => alert.show(`Cannot add product: ${error.message}`, { type: 'error' }));
+    }
+
+    console.log(productCreationMode, editMode, images);
+
+    if (editMode) {
+      updateMyAssignedProduct(currentItemId, name, description, images)
+        .then(() => alert.show('Successfully updated product', { type: 'success' }))
+        .catch(error => alert.show(`Cannot update product: ${error.message}`, { type: 'error' }));
+    }
+
+    this.setState({
+      productCreationMode: false,
+      editMode: false,
+    });
   }
 
   handleDialogAgree() {
@@ -269,7 +307,6 @@ class MyProductsView extends React.Component {
 
   handleItemAssignment(itemId) {
     const { alert } = this.props;
-    console.log('assignig item with id: ', itemId);
     this.setState({ currentItemId: null });
     alert.show('Successfully assigned item to edition', { type: 'success' });
   }
@@ -471,7 +508,7 @@ const mapStateToProps = (state, ownProps) => {
   const id = ownProps.match.params.editionId;
   const edition = id ? state.editions.items.filter(e => `${e.id}` === id)[0] : null;
   const product = state.myAssignedProducts.productsByEdition[id];
-  console.log('prod', edition);
+
   return ({
     edition,
     myAssignedItems: (product && product.items) || [],
@@ -479,4 +516,23 @@ const mapStateToProps = (state, ownProps) => {
   });
 };
 
-export default withStyles(styles)(withAlert(connect(mapStateToProps, null)(MyProductsView)));
+const mapDispatchToProps = (dispatch, ownProps) => {
+  const id = ownProps.match.params.editionId;
+  return bindActionCreators({
+    fetchMyAssignedProductsIfNeeded: () => (
+      actions.myProducts.fetchMyAssignedProductsIfNeeded(id)
+    ),
+    createProduct: (name, description, images) => (
+      actions.myProducts.createProduct(id, name, description, images)
+    ),
+    updateMyAssignedProduct: (currentItemId, name, description, images) => (
+      actions.myProducts.updateMyAssignedProduct(
+        id, currentItemId, name, description, images,
+      )
+    ),
+  }, dispatch);
+};
+
+export default withStyles(styles)(
+  withAlert(connect(mapStateToProps, mapDispatchToProps)(MyProductsView)),
+);

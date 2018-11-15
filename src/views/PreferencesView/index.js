@@ -89,9 +89,10 @@ class MyProductsView extends React.Component {
 
     this.state = {
       selectedMyProduct: myAssignedItems && myAssignedItems[0],
-      selectedOtherProductIds: preferenceForItem && preferenceForItem[0].wantedProductsIds,
-      selectedGroupIds: preferenceForItem && preferenceForItem[0]
-        && preferenceForItem[0].wantedDefinedGroupsIds,
+      selectedOtherProductIds: (preferenceForItem && preferenceForItem[0]
+        && preferenceForItem[0].wantedProductsIds) || [],
+      selectedGroupIds: (preferenceForItem && preferenceForItem[0]
+        && preferenceForItem[0].wantedDefinedGroupsIds) || [],
       preferences,
       myAssignedItems,
       otherAssignedItems,
@@ -148,7 +149,6 @@ class MyProductsView extends React.Component {
   };
 
   handleToggle(item, name) {
-    console.log('toggle: ', item, name);
     const currentIndex = this.state[name].indexOf(item.id);
     const newChecked = [...this.state[name]];
 
@@ -194,8 +194,6 @@ class MyProductsView extends React.Component {
       pref => pref.haveProductId === selectedMyProduct.id,
     );
 
-    console.log('pref: ', preferenceForItem);
-
     this.setState({
       selectedOtherProductIds: preferenceForItem[0].wantedProductsIds,
       selectedGroupIds: preferenceForItem[0].wantedDefinedGroupsIds,
@@ -221,7 +219,7 @@ class MyProductsView extends React.Component {
       openDialog,
       preferences,
     } = this.state;
-    console.log('myDefinedGroups: ', myDefinedGroups);
+
     return (
       <EditionPanelContainer edition={this.props.edition} navigationValue="preferences">
         <Grid container spacing={24}>
@@ -316,7 +314,7 @@ class MyProductsView extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  console.log('>>>', state);
+
   const id = ownProps.match.params.editionId;
   const edition = id ? state.editions.items.filter(e => `${e.id}` === id)[0] : null;
   const otherProduct = state.otherAssignedProducts.productsByEdition[id];
