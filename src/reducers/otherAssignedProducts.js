@@ -7,89 +7,7 @@ const INITIAL_STATE = {
       didInvalidate: false,
       items: [
         {
-          id: 3,
-          editionId: 3,
-          name: 'Catan',
-          description: 'Game is almost new - used maybe 2 times.',
-          userId: 1,
-          images: [
-            { uri: 'http://placekitten.com/g/200/300' },
-            { uri: 'http://placekitten.com/g/200/300' },
-            { uri: 'http://placekitten.com/g/200/300' },
-            { uri: 'http://placekitten.com/g/200/300' },
-            { uri: 'http://placekitten.com/g/200/300' },
-          ],
-        },
-        {
-          id: 4,
-          editionId: 3,
-          name: 'Carcassone',
-          description: 'Game is new - used maybe 5 times',
-          userId: 1,
-          images: [
-            { uri: 'http://placekitten.com/g/200/300' },
-          ],
-        },
-        {
-          id: 5,
-          name: 'Carcassone',
-          editionId: 3,
-          description: 'Don\'t have box',
-          userId: 1,
-          images: [
-            { uri: 'http://placekitten.com/g/200/300' },
-          ],
-        },
-        {
-          id: 6,
-          editionId: 3,
-          name: 'Catan',
-          description: 'Game is almost new - used maybe 2 times.',
-          userId: 1,
-          images: [
-            { uri: 'http://placekitten.com/g/200/300' },
-            { uri: 'http://placekitten.com/g/200/300' },
-            { uri: 'http://placekitten.com/g/200/300' },
-            { uri: 'http://placekitten.com/g/200/300' },
-            { uri: 'http://placekitten.com/g/200/300' },
-          ],
-        },
-        {
-          id: 7,
-          editionId: 3,
-          name: 'Netus',
-          description: 'senectus et netus',
-          userId: 1,
-          images: [
-            { uri: 'http://placekitten.com/g/200/300' },
-          ],
-        },
-        {
-          id: 8,
-          name: 'morbi',
-          editionId: 3,
-          description: 'Don\'t have box',
-          userId: 1,
-          images: [
-            { uri: 'http://placekitten.com/g/200/300' },
-          ],
-        },
-        {
-          id: 9,
-          editionId: 3,
-          name: 'tristique',
-          description: 'lobortis ultrices dui. Donec eget augue leo. ',
-          userId: 1,
-          images: [
-            { uri: 'http://placekitten.com/g/200/300' },
-            { uri: 'http://placekitten.com/g/200/300' },
-            { uri: 'http://placekitten.com/g/200/300' },
-            { uri: 'http://placekitten.com/g/200/300' },
-            { uri: 'http://placekitten.com/g/200/300' },
-          ],
-        },
-        {
-          id: 10,
+          id: 1000,
           editionId: 3,
           name: 'habitant',
           description: 'lobortis ultrices dui, varius condimentum erat efficitur ut. Donec eget augue leo. ',
@@ -99,7 +17,7 @@ const INITIAL_STATE = {
           ],
         },
         {
-          id: 11,
+          id: 1001,
           name: 'senectus',
           editionId: 3,
           description: 'lobortis ultrices dui. ',
@@ -109,7 +27,7 @@ const INITIAL_STATE = {
           ],
         },
         {
-          id: 12,
+          id: 1002,
           editionId: 3,
           name: 'Catan',
           description: 'Game is almost new - used maybe 2 times.',
@@ -123,7 +41,7 @@ const INITIAL_STATE = {
           ],
         },
         {
-          id: 13,
+          id: 1003,
           editionId: 3,
           name: 'Carcassone',
           description: 'Game is new - used maybe 5 times',
@@ -133,7 +51,7 @@ const INITIAL_STATE = {
           ],
         },
         {
-          id: 14,
+          id: 1004,
           name: 'Carcassone',
           editionId: 3,
           description: 'Don\'t have box',
@@ -143,7 +61,7 @@ const INITIAL_STATE = {
           ],
         },
         {
-          id: 15,
+          id: 1005,
           editionId: 3,
           name: 'Catan',
           description: 'Game is almost new - used maybe 2 times.',
@@ -157,7 +75,7 @@ const INITIAL_STATE = {
           ],
         },
         {
-          id: 16,
+          id: 1006,
           editionId: 3,
           name: 'Netus',
           description: 'senectus et netus',
@@ -167,7 +85,7 @@ const INITIAL_STATE = {
           ],
         },
         {
-          id: 17,
+          id: 1007,
           name: 'morbi',
           editionId: 3,
           description: 'Don\'t have box',
@@ -177,7 +95,7 @@ const INITIAL_STATE = {
           ],
         },
         {
-          id: 18,
+          id: 1008,
           editionId: 3,
           name: 'tristique',
           description: 'lobortis ultrices dui. Donec eget augue leo. ',

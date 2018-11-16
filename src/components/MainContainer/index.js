@@ -34,7 +34,6 @@ class MainContainer extends React.Component {
   render() {
     const { classes } = this.props;
     const { pathname } = this.props.location;
-    console.log(pathname);
 
     return (
       <div>

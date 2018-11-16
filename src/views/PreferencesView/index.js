@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
@@ -15,6 +16,9 @@ import CustomDialog from '../../components/CustomDialog';
 import CheckboxList from '../../components/CheckboxList';
 import SearchBar from '../../components/SerachBar';
 import MultiheaderCheckboxList from '../../components/MultiheaderCheckboxList';
+
+import actions from '../../actions';
+
 
 const dialogContent = {
   cancelPreferenceEdition: {
@@ -108,26 +112,34 @@ class MyProductsView extends React.Component {
     this.handleToggle = this.handleToggle.bind(this);
   }
 
-  // TODO: remove it later
-  componentWillReceiveProps(nextProps) {
-    if (this.props.myAssignedItems !== nextProps.myAssignedItems) {
-      this.setState({ myAssignedItems: nextProps.myAssignedItems });
-    }
-    if (this.props.otherAssignedItems !== nextProps.otherAssignedItems) {
-      this.setState({ otherAssignedItems: nextProps.otherAssignedItems });
-    }
+  componentDidMount() {
+    const {
+      fetchPreferencesIfNeeded,
+      alert,
+    } = this.props;
+
+    fetchPreferencesIfNeeded()
+      .catch(() => alert.show('Cannot load preferences', { type: 'error' }));
   }
 
-  // static getDerivedStateFromProps(props, state) {
-  //   console.log('>>> ', props, state);
-  //   if (props.myAssignedItems !== state.myAssignedItems) {
-  //     return {
-  //       myAssignedItems: props.myAssignedItems,
-  //       otherAssignedItems: props.otherAssignedItems
-  //     };
-  //   }
-  //   return null;
-  // }
+  static getDerivedStateFromProps(props, state) {
+    if (props.preferences !== state.preferences) {
+      let preferenceForItem = null;
+      if (state.myAssignedItems && state.selectedMyProduct) {
+        preferenceForItem = props.preferences.filter(
+          pref => pref.haveProductId === state.selectedMyProduct.id,
+        );
+      }
+      return {
+        preferences: props.preferences,
+        selectedOtherProductIds: (preferenceForItem && preferenceForItem[0]
+          && preferenceForItem[0].wantedProductsIds) || [],
+        selectedGroupIds: (preferenceForItem && preferenceForItem[0]
+          && preferenceForItem[0].wantedDefinedGroupsIds) || [],
+      };
+    }
+    return null;
+  }
 
   handleChange = (event, name) => {
     this.setState({
@@ -187,20 +199,23 @@ class MyProductsView extends React.Component {
 
   // TODO: submit preferences and update in store
   submitSavePreferences() {
-    const { alert, preferences } = this.props;
-    const { selectedMyProduct } = this.state;
+    const {
+      alert,
+      updatePreference,
+    } = this.props;
 
-    const preferenceForItem = preferences.filter(
-      pref => pref.haveProductId === selectedMyProduct.id,
-    );
+    const {
+      selectedOtherProductIds,
+      selectedGroupIds,
+      selectedMyProduct,
+    } = this.state;
 
-    this.setState({
-      selectedOtherProductIds: preferenceForItem[0].wantedProductsIds,
-      selectedGroupIds: preferenceForItem[0].wantedDefinedGroupsIds,
-      editMode: false,
-    });
-
-    alert.show('Successfully modified preferences', { type: 'success' });
+    updatePreference(selectedMyProduct.id, selectedOtherProductIds, selectedGroupIds)
+      .then(() => {
+        this.setState({ editMode: false });
+        alert.show('Successfully modify preference', { type: 'success' });
+      })
+      .catch(error => alert.show(`Cannot modify preference: ${error.message}`, { type: 'error' }));
   }
 
   render() {
@@ -320,7 +335,7 @@ const mapStateToProps = (state, ownProps) => {
   const preferenceByEdition = state.preferences.preferencesByEdition[id];
   const myProduct = state.myAssignedProducts.productsByEdition[id];
   const definedGroups = state.definedGroups.definedGroupsByEdition[id];
-
+  console.log('>>>', state);
   return ({
     edition,
     otherAssignedItems: (otherProduct && otherProduct.items) || [],
@@ -330,4 +345,18 @@ const mapStateToProps = (state, ownProps) => {
   });
 };
 
-export default withStyles(styles)(withAlert(connect(mapStateToProps, null)(MyProductsView)));
+const mapDispatchToProps = (dispatch, ownProps) => {
+  const id = ownProps.match.params.editionId;
+  return bindActionCreators({
+    fetchPreferencesIfNeeded: () => (
+      actions.preferences.fetchPreferencesIfNeeded(id)
+    ),
+    updatePreference: (productId, wantedProductsIds, wantedDefinedGroupsIds) => (
+      actions.preferences.updatePreference(id, productId, wantedProductsIds, wantedDefinedGroupsIds)
+    ),
+  }, dispatch);
+};
+
+export default withStyles(styles)(
+  withAlert(connect(mapStateToProps, mapDispatchToProps)(MyProductsView)),
+);

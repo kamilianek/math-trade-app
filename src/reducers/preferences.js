@@ -26,9 +26,10 @@ const INITIAL_STATE = {
 };
 
 export const RECEIVE_ERROR_PREFERENCES = 'RECEIVE_ERROR_PREFERENCES';
+export const RECEIVE_PREFERENCES = 'RECEIVE_PREFERENCES';
 export const REQUEST_PREFERENCES = 'REQUEST_PREFERENCES';
 export const INVALIDATE_PREFERENCES = 'INVALIDATE_PREFERENCES';
-export const RECEIVE_PREFERENCES = 'RECEIVE_PREFERENCES';
+export const UPDATE_PREFERENCE_FOR_PRODUCT = 'UPDATE_PREFERENCE_FOR_PRODUCT';
 
 
 export default function preferencesReducer(state = INITIAL_STATE, action) {
@@ -64,7 +65,7 @@ export default function preferencesReducer(state = INITIAL_STATE, action) {
             ...state.preferencesByEdition[action.editionId],
             isFetchingSince: null,
             didInvalidate: false,
-            groups: action.preferences,
+            preferences: action.preferences,
             lastSuccessfulFetch: action.timestamp,
           },
         },
@@ -78,6 +79,22 @@ export default function preferencesReducer(state = INITIAL_STATE, action) {
             ...state.preferencesByEdition[action.editionId],
             isFetchingSince: null,
             lastFailedFetch: action.timestamp,
+          },
+        },
+      };
+    // TODO: will be changed after API integration - will receive action.preference
+    case UPDATE_PREFERENCE_FOR_PRODUCT:
+      return {
+        ...state,
+        preferencesByEdition: {
+          ...state.preferencesByEdition,
+          [action.editionId]: {
+            ...state.preferencesByEdition[action.editionId],
+            preferences: [
+              ...state.preferencesByEdition[action.editionId].preferences
+                .filter(pref => (pref.haveProductId !== action.preference.haveProductId)),
+              action.preference,
+            ],
           },
         },
       };
