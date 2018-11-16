@@ -3,7 +3,7 @@ import {
   RECEIVE_PREFERENCES,
   REQUEST_PREFERENCES,
   INVALIDATE_PREFERENCES,
-  UPDATE_PREFERENCE_FOR_PRODUCT
+  UPDATE_PREFERENCE_FOR_PRODUCT,
 } from '../reducers/preferences';
 
 const VALIDATE_TIME = 1000 * 60 * 5;
@@ -95,8 +95,8 @@ function shouldFetchPreferences(preferences) {
 }
 
 export function fetchPreferencesIfNeeded(editionId) {
-  return (dispatch) => {
-    if (shouldFetchPreferences(editionId)) {
+  return (dispatch, getState) => {
+    if (shouldFetchPreferences(getState().preferences.preferencesByEdition[editionId])) {
       return dispatch(fetchPreferences(editionId));
     }
 
