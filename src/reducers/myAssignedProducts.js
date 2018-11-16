@@ -75,13 +75,6 @@ export default function myAssignedProductsReducer(state = INITIAL_STATE, action)
         },
       };
     case UPDATE_MY_ASSIGNED_PRODUCT:
-      console.log(action.editionId, action.item);
-      state.productsByEdition[action.editionId].items
-        .map((item) => {
-          console.log(item);
-          console.log(item.id === action.item.id);
-          return item;
-        });
       return {
         ...state,
         productsByEdition: {

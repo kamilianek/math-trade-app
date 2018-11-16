@@ -108,7 +108,7 @@ class MyProductsView extends React.Component {
 
     this.state = {
       navigationValue: 0,
-      currentItemId: null,
+      currentItem: null,
       editMode: false,
       productCreationMode: false,
       name: '',
@@ -146,23 +146,13 @@ class MyProductsView extends React.Component {
       .catch(() => alert.show('Cannot load your products', { type: 'error' }));
   }
 
-  onItemClick(id, dataHeader) {
-    const { isSelectedAssigned } = this.state;
-    const { myAssignedItems, myNotAssignedItems } = this.props;
-    if (id || id === 0) {
-      let data;
-      if (dataHeader) {
-        data = this.props[dataHeader];
-      } else {
-        data = isSelectedAssigned ? myAssignedItems : myNotAssignedItems;
-      }
-      const currentItem = data.filter(i => i.id === id)[0];
-
+  onItemClick(item, dataHeader) {
+    if (item.id || item.id === 0) {
       this.setState(state => ({
-        currentItemId: id,
-        name: currentItem.name,
-        description: currentItem.description,
-        images: currentItem.images,
+        currentItem: item,
+        name: item.name,
+        description: item.description,
+        images: item.images,
         editMode: false,
         productCreationMode: false,
         isNewNameValid: true,
@@ -211,7 +201,13 @@ class MyProductsView extends React.Component {
   }
 
   submitProductChange() {
-    const { alert, createProduct, updateMyAssignedProduct } = this.props;
+    const {
+      alert,
+      createProduct,
+      updateMyAssignedProduct,
+      updateMyNotAssignedProduct,
+    } = this.props;
+
     const {
       name,
       newName,
@@ -221,7 +217,7 @@ class MyProductsView extends React.Component {
       images,
       newImages,
       editMode,
-      currentItemId,
+      currentItem,
     } = this.state;
 
     if (!this.validateForm()) {
@@ -238,9 +234,15 @@ class MyProductsView extends React.Component {
     console.log(productCreationMode, editMode, images);
 
     if (editMode) {
-      updateMyAssignedProduct(currentItemId, name, description, images)
-        .then(() => alert.show('Successfully updated product', { type: 'success' }))
-        .catch(error => alert.show(`Cannot update product: ${error.message}`, { type: 'error' }));
+      if (currentItem.editionId) { // assigned product edition
+        updateMyAssignedProduct(currentItem.id, name, description, images)
+          .then(() => alert.show('Successfully updated product', { type: 'success' }))
+          .catch(error => alert.show(`Cannot update product: ${error.message}`, { type: 'error' }));
+      } else { // not assigned product edition
+        updateMyNotAssignedProduct(currentItem.id, name, description, images)
+          .then(() => alert.show('Successfully updated product', { type: 'success' }))
+          .catch(error => alert.show(`Cannot update product: ${error.message}`, { type: 'error' }));
+      }
     }
 
     this.setState({
@@ -250,8 +252,8 @@ class MyProductsView extends React.Component {
   }
 
   handleDialogAgree() {
-    const { currentItemId } = this.state;
-    this.onItemClick(currentItemId);
+    const { currentItem } = this.state;
+    this.onItemClick(currentItem);
     this.setState({
       openDialog: false,
     });
@@ -311,14 +313,15 @@ class MyProductsView extends React.Component {
       });
   }
 
-  handleItemAssignment(itemId) {
+  handleItemAssignment(item) {
     const {
       alert,
       assignProductToEdition,
     } = this.props;
 
-    assignProductToEdition(itemId)
+    assignProductToEdition(item.id)
       .then(() => {
+        this.setState({ isSelectedAssigned: true });
         alert.show('Successfully assigned item to edition', { type: 'success' });
       })
       .catch(error => alert.show(`Cannot assign item to edition: ${error.message}`, { type: 'success' }));
@@ -333,7 +336,7 @@ class MyProductsView extends React.Component {
     } = this.props;
 
     const {
-      currentItemId,
+      currentItem,
       editMode,
       productCreationMode,
       images,
@@ -362,10 +365,12 @@ class MyProductsView extends React.Component {
               <MultiheaderCheckboxList
                 data={[myAssignedItems, myNotAssignedItems]}
                 titles={['Assigned: ', 'Not assigned: ']}
-                currentSelected={[[currentItemId], [currentItemId]]}
+                currentSelected={[
+                  currentItem ? [currentItem.id] : [], currentItem ? [currentItem.id] : [],
+                ]}
                 onItemClick={[
-                  item => this.onItemClick(item.id, 'myAssignedItems'),
-                  item => this.onItemClick(item.id, 'myNotAssignedItems'),
+                  item => this.onItemClick(item, 'myAssignedItems'),
+                  item => this.onItemClick(item, 'myNotAssignedItems'),
                 ]}
               />
               <div className={classes.createProductButton}>
@@ -397,7 +402,7 @@ class MyProductsView extends React.Component {
             </Typography>
             <Paper className={classes.paperContainer}>
               {
-                currentItemId || productCreationMode ? <>
+                (currentItem && currentItem.id) || productCreationMode ? <>
                   {editMode || productCreationMode ? <TextField
                     id="productTitle"
                     label="Product title"
@@ -465,11 +470,12 @@ class MyProductsView extends React.Component {
                         onChange={e => this.fileUpload(e)}
                         accept=".png, .jpg, .jpeg"
                       />
-                      { !(editMode || productCreationMode) && currentItemId && !isSelectedAssigned
+                      { !(editMode || productCreationMode)
+                        && currentItem && currentItem.id && !isSelectedAssigned
                         ? <Button
                           variant="contained"
                           color="primary"
-                          onClick={() => this.handleItemAssignment(currentItemId)}
+                          onClick={() => this.handleItemAssignment(currentItem)}
                         >
                           Assign to edition
                         </Button> : null}
@@ -544,6 +550,11 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     updateMyAssignedProduct: (currentItemId, name, description, images) => (
       actions.myProducts.updateMyAssignedProduct(
         id, currentItemId, name, description, images,
+      )
+    ),
+    updateMyNotAssignedProduct: (currentItemId, name, description, images) => (
+      actions.myNotAssignedProducts.updateMyNotAssignedProduct(
+        currentItemId, name, description, images,
       )
     ),
     assignProductToEdition: currentItemId => (

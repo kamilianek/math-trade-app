@@ -314,7 +314,6 @@ class MyProductsView extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-
   const id = ownProps.match.params.editionId;
   const edition = id ? state.editions.items.filter(e => `${e.id}` === id)[0] : null;
   const otherProduct = state.otherAssignedProducts.productsByEdition[id];

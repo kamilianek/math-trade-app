@@ -21,6 +21,7 @@ const myAssignedProducts = [
     name: 'Fetched product1',
     description: 'This products was fetched',
     userId: 1,
+    editionId: 3,
     images: [
       { uri: 'http://placekitten.com/g/620/600' },
       { uri: 'http://placekitten.com/g/450/800' },
@@ -31,6 +32,7 @@ const myAssignedProducts = [
     name: 'Fetched product2',
     description: 'This products was fetched',
     userId: 1,
+    editionId: 3,
     images: [
       { uri: 'http://placekitten.com/g/220/300' },
       { uri: 'http://placekitten.com/g/120/300' },
@@ -44,6 +46,7 @@ const myAssignedProducts = [
     name: 'Lorem ipsum dolor sit amet',
     description: 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum dictum ipsum eu elit iaculis, ut pellentesque velit sollicitudin. Donec gravida quis tellus vitae lacinia. Fusce ultricies eget erat commodo consequat.',
     userId: 1,
+    editionId: 3,
     images: [
       { uri: 'http://placekitten.com/g/1100/800' },
       { uri: 'http://placekitten.com/g/120/300' },
@@ -54,6 +57,7 @@ const myAssignedProducts = [
     name: 'In ultricies id leo ut fringilla',
     description: 'Mauris lobortis ultrices dui, varius condimentum erat efficitur ut. Donec eget augue leo. Suspendisse accumsan venenatis maximus.',
     userId: 1,
+    editionId: 3,
     images: [
       { uri: 'http://placekitten.com/g/500/500' },
     ],
@@ -148,6 +152,7 @@ export function createProduct(editionId, name, description, images) {
         id: Math.floor(Math.random() * 1000000),
         userId: 1,
         name,
+        editionId,
         description,
         images,
       },
@@ -158,7 +163,6 @@ export function createProduct(editionId, name, description, images) {
 export function updateMyAssignedProduct(editionId, id, name, description, images) {
   return async (dispatch) => {
     // const item = await api.myProducts.updateProduct()
-    console.log('passed: ', editionId, id, name, description, images);
     dispatch({
       type: UPDATE_MY_ASSIGNED_PRODUCT,
       editionId,
@@ -166,6 +170,7 @@ export function updateMyAssignedProduct(editionId, id, name, description, images
         id,
         userId: 1,
         name,
+        editionId,
         description,
         images,
       },
@@ -190,7 +195,10 @@ export function assignProductToEdition(editionId, itemId) {
     dispatch({
       type: CREATE_MY_ASSIGNED_PRODUCT,
       editionId,
-      item,
+      item: {
+        ...item,
+        editionId,
+      },
     });
 
     dispatch(removeMyNotAssignedProduct(itemId));

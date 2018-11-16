@@ -104,6 +104,11 @@ export default function myNotAssignedProductsReducer(state = INITIAL_STATE, acti
         isFetchingSince: null,
         lastFailedFetch: action.timestamp,
       };
+    case UPDATE_MY_NOT_ASSIGNED_PRODUCT:
+      return {
+        ...state,
+        items: state.items.map(item => ((item.id === action.item.id) ? action.item : item)),
+      };
     case REMOVE_MY_NOT_ASSIGNED_PRODUCT:
       return {
         ...state,

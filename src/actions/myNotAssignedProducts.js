@@ -113,7 +113,24 @@ export function fetchMyNotAssignedProductsIfNeeded() {
   };
 }
 
+export function updateMyNotAssignedProduct(id, name, description, images) {
+  return async (dispatch) => {
+    // const item = await api.myProducts.updateNotAssignedProduct()
+    dispatch({
+      type: UPDATE_MY_NOT_ASSIGNED_PRODUCT,
+      item: {
+        id,
+        userId: 1,
+        name,
+        description,
+        images,
+      },
+    });
+  };
+}
+
 
 export default {
   fetchMyNotAssignedProductsIfNeeded,
+  updateMyNotAssignedProduct,
 };
