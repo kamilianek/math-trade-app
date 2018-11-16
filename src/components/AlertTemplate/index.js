@@ -56,7 +56,6 @@ class AlertTemplate extends Component {
       close,
     } = this.props;
     const variant = options.type;
-    console.log('propsy: ', this.props);
     return (
       <SnackbarContent
         className={classNames(classes[variant], classes.mainContainer)}

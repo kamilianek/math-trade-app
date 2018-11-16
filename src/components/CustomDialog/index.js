@@ -21,7 +21,7 @@ class CustomDialog extends Component {
       textBody,
       openDialog,
     } = this.props;
-    console.log(this.props);
+
     return (
       <Dialog
         open={openDialog}

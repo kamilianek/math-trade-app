@@ -9,10 +9,13 @@ import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import { withAlert } from 'react-alert';
+import { bindActionCreators } from 'redux';
 
 import EditionPanelContainer from '../../components/EditionPanelContainer';
 import CustomDialog from '../../components/CustomDialog';
 import MultiheaderCheckboxList from '../../components/MultiheaderCheckboxList';
+
+import actions from '../../actions';
 
 const styles = theme => ({
   rightButtonIcon: {
@@ -26,6 +29,10 @@ const styles = theme => ({
     margin: theme.spacing.unit * 3,
     height: 40,
     marginRight: theme.spacing.unit * 5,
+  },
+  description: {
+    margin: theme.spacing.unit * 3,
+    marginBottom: theme.spacing.unit * 10,
   },
   productList: {
     marginTop: 30,
@@ -101,7 +108,7 @@ class MyProductsView extends React.Component {
 
     this.state = {
       navigationValue: 0,
-      currentItemId: null,
+      currentItem: null,
       editMode: false,
       productCreationMode: false,
       name: '',
@@ -128,23 +135,24 @@ class MyProductsView extends React.Component {
     this.handleDialogDisagree = this.handleDialogDisagree.bind(this);
   }
 
-  onItemClick(id, dataHeader) {
-    const { isSelectedAssigned } = this.state;
-    const { myAssignedItems, myNotAssignedItems } = this.props;
-    if (id || id === 0) {
-      let data;
-      if (dataHeader) {
-        data = this.props[dataHeader];
-      } else {
-        data = isSelectedAssigned ? myAssignedItems : myNotAssignedItems;
-      }
-      const currentItem = data.filter(i => i.id === id)[0];
+  componentDidMount() {
+    const {
+      fetchMyAssignedProductsIfNeeded,
+      fetchMyNotAssignedProductsIfNeeded,
+      alert,
+    } = this.props;
+    fetchMyAssignedProductsIfNeeded()
+      .then(() => fetchMyNotAssignedProductsIfNeeded())
+      .catch(() => alert.show('Cannot load your products', { type: 'error' }));
+  }
 
+  onItemClick(item, dataHeader) {
+    if (item.id || item.id === 0) {
       this.setState(state => ({
-        currentItemId: id,
-        name: currentItem.name,
-        description: currentItem.description,
-        images: currentItem.images,
+        currentItem: item,
+        name: item.name,
+        description: item.description,
+        images: item.images,
         editMode: false,
         productCreationMode: false,
         isNewNameValid: true,
@@ -193,21 +201,59 @@ class MyProductsView extends React.Component {
   }
 
   submitProductChange() {
-    const { alert } = this.props;
-    const { name, description } = this.state;
+    const {
+      alert,
+      createProduct,
+      updateMyAssignedProduct,
+      updateMyNotAssignedProduct,
+    } = this.props;
+
+    const {
+      name,
+      newName,
+      description,
+      newDescription,
+      productCreationMode,
+      images,
+      newImages,
+      editMode,
+      currentItem,
+    } = this.state;
 
     if (!this.validateForm()) {
       console.log('invalid form');
       return;
     }
 
-    console.log('submit changes: ', name, description);
-    alert.show('Successfully added product', { type: 'success' });
+    if (productCreationMode) {
+      createProduct(newName, newDescription, newImages)
+        .then(() => alert.show('Successfully created product', { type: 'success' }))
+        .catch(error => alert.show(`Cannot add product: ${error.message}`, { type: 'error' }));
+    }
+
+    console.log(productCreationMode, editMode, images);
+
+    if (editMode) {
+      if (currentItem.editionId) { // assigned product edition
+        updateMyAssignedProduct(currentItem.id, name, description, images)
+          .then(() => alert.show('Successfully updated product', { type: 'success' }))
+          .catch(error => alert.show(`Cannot update product: ${error.message}`, { type: 'error' }));
+      } else { // not assigned product edition
+        updateMyNotAssignedProduct(currentItem.id, name, description, images)
+          .then(() => alert.show('Successfully updated product', { type: 'success' }))
+          .catch(error => alert.show(`Cannot update product: ${error.message}`, { type: 'error' }));
+      }
+    }
+
+    this.setState({
+      productCreationMode: false,
+      editMode: false,
+    });
   }
 
   handleDialogAgree() {
-    const { currentItemId } = this.state;
-    this.onItemClick(currentItemId);
+    const { currentItem } = this.state;
+    this.onItemClick(currentItem);
     this.setState({
       openDialog: false,
     });
@@ -267,11 +313,18 @@ class MyProductsView extends React.Component {
       });
   }
 
-  handleItemAssignment(itemId) {
-    const { alert } = this.props;
-    console.log('assignig item with id: ', itemId);
-    this.setState({ currentItemId: null });
-    alert.show('Successfully assigned item to edition', { type: 'success' });
+  handleItemAssignment(item) {
+    const {
+      alert,
+      assignProductToEdition,
+    } = this.props;
+
+    assignProductToEdition(item.id)
+      .then(() => {
+        this.setState({ isSelectedAssigned: true });
+        alert.show('Successfully assigned item to edition', { type: 'success' });
+      })
+      .catch(error => alert.show(`Cannot assign item to edition: ${error.message}`, { type: 'success' }));
   }
 
   render() {
@@ -283,7 +336,7 @@ class MyProductsView extends React.Component {
     } = this.props;
 
     const {
-      currentItemId,
+      currentItem,
       editMode,
       productCreationMode,
       images,
@@ -312,10 +365,12 @@ class MyProductsView extends React.Component {
               <MultiheaderCheckboxList
                 data={[myAssignedItems, myNotAssignedItems]}
                 titles={['Assigned: ', 'Not assigned: ']}
-                currentSelected={[[currentItemId], [currentItemId]]}
+                currentSelected={[
+                  currentItem ? [currentItem.id] : [], currentItem ? [currentItem.id] : [],
+                ]}
                 onItemClick={[
-                  item => this.onItemClick(item.id, 'myAssignedItems'),
-                  item => this.onItemClick(item.id, 'myNotAssignedItems'),
+                  item => this.onItemClick(item, 'myAssignedItems'),
+                  item => this.onItemClick(item, 'myNotAssignedItems'),
                 ]}
               />
               <div className={classes.createProductButton}>
@@ -347,7 +402,7 @@ class MyProductsView extends React.Component {
             </Typography>
             <Paper className={classes.paperContainer}>
               {
-                currentItemId || productCreationMode ? <>
+                (currentItem && currentItem.id) || productCreationMode ? <>
                   {editMode || productCreationMode ? <TextField
                     id="productTitle"
                     label="Product title"
@@ -373,7 +428,7 @@ class MyProductsView extends React.Component {
                     variant="filled"
                     onChange={event => this.handleChange(event, editMode ? 'description' : 'newDescription')}
                     value={editMode ? description : newDescription}
-                  /> : <Typography className={classes.sectionSubtitle}>
+                  /> : <Typography className={classes.description}>
                     {description}
                   </Typography>}
                 <div className={classes.gridListContainer}>
@@ -415,11 +470,12 @@ class MyProductsView extends React.Component {
                         onChange={e => this.fileUpload(e)}
                         accept=".png, .jpg, .jpeg"
                       />
-                      { !(editMode || productCreationMode) && currentItemId && !isSelectedAssigned
+                      { !(editMode || productCreationMode)
+                        && currentItem && currentItem.id && !isSelectedAssigned
                         ? <Button
                           variant="contained"
                           color="primary"
-                          onClick={() => this.handleItemAssignment(currentItemId)}
+                          onClick={() => this.handleItemAssignment(currentItem)}
                         >
                           Assign to edition
                         </Button> : null}
@@ -470,13 +526,45 @@ const mapStateToProps = (state, ownProps) => {
   console.log('>>>', state);
   const id = ownProps.match.params.editionId;
   const edition = id ? state.editions.items.filter(e => `${e.id}` === id)[0] : null;
-  const product = state.myAssignedProducts.products.filter(prod => `${prod.editionId}` === id)[0];
-  console.log('prod', edition);
+  const product = state.myAssignedProducts.productsByEdition[id];
+
   return ({
     edition,
-    myAssignedItems: product && product.items,
-    myNotAssignedItems: state.myNotAssignedProducts.items,
+    myAssignedItems: (product && product.items) || [],
+    myNotAssignedItems: state.myNotAssignedProducts.items || [],
   });
 };
 
-export default withStyles(styles)(withAlert(connect(mapStateToProps, null)(MyProductsView)));
+const mapDispatchToProps = (dispatch, ownProps) => {
+  const id = ownProps.match.params.editionId;
+  return bindActionCreators({
+    fetchMyAssignedProductsIfNeeded: () => (
+      actions.myProducts.fetchMyAssignedProductsIfNeeded(id)
+    ),
+    fetchMyNotAssignedProductsIfNeeded: () => (
+      actions.myNotAssignedProducts.fetchMyNotAssignedProductsIfNeeded(id)
+    ),
+    createProduct: (name, description, images) => (
+      actions.myProducts.createProduct(id, name, description, images)
+    ),
+    updateMyAssignedProduct: (currentItemId, name, description, images) => (
+      actions.myProducts.updateMyAssignedProduct(
+        id, currentItemId, name, description, images,
+      )
+    ),
+    updateMyNotAssignedProduct: (currentItemId, name, description, images) => (
+      actions.myNotAssignedProducts.updateMyNotAssignedProduct(
+        currentItemId, name, description, images,
+      )
+    ),
+    assignProductToEdition: currentItemId => (
+      actions.myProducts.assignProductToEdition(
+        id, currentItemId,
+      )
+    ),
+  }, dispatch);
+};
+
+export default withStyles(styles)(
+  withAlert(connect(mapStateToProps, mapDispatchToProps)(MyProductsView)),
+);

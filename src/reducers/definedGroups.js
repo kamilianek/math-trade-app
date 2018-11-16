@@ -7,13 +7,13 @@ const INITIAL_STATE = {
       didInvalidate: false,
       groups: [
         {
-          id: 3,
+          id: 10000,
           name: 'Group345',
           productsIds: [3, 4, 5],
           groupIds: [],
         },
         {
-          id: 4,
+          id: 10001,
           name: 'Group567',
           productsIds: [5, 6, 7],
           groupIds: [3],
