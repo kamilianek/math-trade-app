@@ -8,6 +8,10 @@ import {
   UPDATE_MY_ASSIGNED_PRODUCT,
 } from '../reducers/myAssignedProducts';
 
+import {
+  REMOVE_MY_NOT_ASSIGNED_PRODUCT,
+} from '../reducers/myNotAssignedProducts';
+
 const VALIDATE_TIME = 1000 * 60 * 10;
 const FETCHING_TIMEOUT = 1000 * 32;
 
@@ -169,12 +173,33 @@ export function updateMyAssignedProduct(editionId, id, name, description, images
   };
 }
 
-export function assignProductToEdition() {
+function removeMyNotAssignedProduct(itemId) {
+  return {
+    type: REMOVE_MY_NOT_ASSIGNED_PRODUCT,
+    itemId,
+  };
+}
 
+export function assignProductToEdition(editionId, itemId) {
+  return async (dispatch, getState) => {
+    // const items = await api.myProducts.assignProductToEdition(editionId, productId)
+
+    // TODO: replace getState with returned value!!
+    const item = getState().myNotAssignedProducts.items.filter(i => i.id === itemId)[0];
+
+    dispatch({
+      type: CREATE_MY_ASSIGNED_PRODUCT,
+      editionId,
+      item,
+    });
+
+    dispatch(removeMyNotAssignedProduct(itemId));
+  };
 }
 
 export default {
   fetchMyAssignedProductsIfNeeded,
   createProduct,
   updateMyAssignedProduct,
+  assignProductToEdition,
 };

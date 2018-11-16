@@ -30,6 +30,10 @@ const styles = theme => ({
     height: 40,
     marginRight: theme.spacing.unit * 5,
   },
+  description: {
+    margin: theme.spacing.unit * 3,
+    marginBottom: theme.spacing.unit * 10,
+  },
   productList: {
     marginTop: 30,
   },
@@ -134,9 +138,11 @@ class MyProductsView extends React.Component {
   componentDidMount() {
     const {
       fetchMyAssignedProductsIfNeeded,
+      fetchMyNotAssignedProductsIfNeeded,
       alert,
     } = this.props;
     fetchMyAssignedProductsIfNeeded()
+      .then(() => fetchMyNotAssignedProductsIfNeeded())
       .catch(() => alert.show('Cannot load your products', { type: 'error' }));
   }
 
@@ -306,9 +312,16 @@ class MyProductsView extends React.Component {
   }
 
   handleItemAssignment(itemId) {
-    const { alert } = this.props;
-    this.setState({ currentItemId: null });
-    alert.show('Successfully assigned item to edition', { type: 'success' });
+    const {
+      alert,
+      assignProductToEdition,
+    } = this.props;
+
+    assignProductToEdition(itemId)
+      .then(() => {
+        alert.show('Successfully assigned item to edition', { type: 'success' });
+      })
+      .catch(error => alert.show(`Cannot assign item to edition: ${error.message}`, { type: 'success' }));
   }
 
   render() {
@@ -410,7 +423,7 @@ class MyProductsView extends React.Component {
                     variant="filled"
                     onChange={event => this.handleChange(event, editMode ? 'description' : 'newDescription')}
                     value={editMode ? description : newDescription}
-                  /> : <Typography className={classes.sectionSubtitle}>
+                  /> : <Typography className={classes.description}>
                     {description}
                   </Typography>}
                 <div className={classes.gridListContainer}>
@@ -522,12 +535,20 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     fetchMyAssignedProductsIfNeeded: () => (
       actions.myProducts.fetchMyAssignedProductsIfNeeded(id)
     ),
+    fetchMyNotAssignedProductsIfNeeded: () => (
+      actions.myNotAssignedProducts.fetchMyNotAssignedProductsIfNeeded(id)
+    ),
     createProduct: (name, description, images) => (
       actions.myProducts.createProduct(id, name, description, images)
     ),
     updateMyAssignedProduct: (currentItemId, name, description, images) => (
       actions.myProducts.updateMyAssignedProduct(
         id, currentItemId, name, description, images,
+      )
+    ),
+    assignProductToEdition: currentItemId => (
+      actions.myProducts.assignProductToEdition(
+        id, currentItemId,
       )
     ),
   }, dispatch);
