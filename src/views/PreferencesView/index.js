@@ -75,7 +75,7 @@ const styles = theme => ({
   },
 });
 
-class MyProductsView extends React.Component {
+class PreferencesView extends React.Component {
   constructor(props) {
     super(props);
 
@@ -93,6 +93,8 @@ class MyProductsView extends React.Component {
 
     this.state = {
       selectedMyProduct: myAssignedItems && myAssignedItems[0],
+      myProductsSearchMode: false,
+      otherProductsSearchMode: false,
       selectedOtherProductIds: (preferenceForItem && preferenceForItem[0]
         && preferenceForItem[0].wantedProductsIds) || [],
       selectedGroupIds: (preferenceForItem && preferenceForItem[0]
@@ -114,11 +116,23 @@ class MyProductsView extends React.Component {
 
   componentDidMount() {
     const {
-      fetchPreferencesIfNeeded,
+      fetchPreferences,
+      fetchOtherAssignedProducts,
+      fetchMyAssignedProducts,
+      fetchDefinedGroups,
       alert,
     } = this.props;
 
-    fetchPreferencesIfNeeded()
+    fetchOtherAssignedProducts()
+      .catch(() => alert.show('Cannot load your products', { type: 'error' }));
+
+    fetchMyAssignedProducts()
+      .catch(() => alert.show('Cannot load other products', { type: 'error' }));
+
+    fetchDefinedGroups()
+      .catch(() => alert.show('Cannot load defined groups', { type: 'error' }));
+
+    fetchPreferences()
       .catch(() => alert.show('Cannot load preferences', { type: 'error' }));
   }
 
@@ -151,12 +165,21 @@ class MyProductsView extends React.Component {
     const phrase = event.target.value.toUpperCase();
     const updatedList1 = this.props[section1]
       .filter(item => item.name.toUpperCase().includes(phrase));
-    const updatedList2 = this.props[section2]
-      .filter(item => item.name.toUpperCase().includes(phrase));
+
+    if (section2) {
+      const updatedList2 = this.props[section2]
+        .filter(item => item.name.toUpperCase().includes(phrase));
+      this.setState({
+        [section1]: updatedList1,
+        [section2]: updatedList2,
+        otherProductsSearchMode: phrase.length !== 0,
+      });
+      return;
+    }
 
     this.setState({
       [section1]: updatedList1,
-      [section2]: updatedList2,
+      myProductsSearchMode: phrase.length !== 0,
     });
   };
 
@@ -197,7 +220,6 @@ class MyProductsView extends React.Component {
     });
   }
 
-  // TODO: submit preferences and update in store
   submitSavePreferences() {
     const {
       alert,
@@ -233,6 +255,8 @@ class MyProductsView extends React.Component {
       editMode,
       openDialog,
       preferences,
+      otherProductsSearchMode,
+      myProductsSearchMode,
     } = this.state;
 
     return (
@@ -245,7 +269,7 @@ class MyProductsView extends React.Component {
             <Paper className={classes.paperContainer}>
               <SearchBar onChange={event => this.handleSearchBarChange(event, 'myAssignedItems')} />
               <CheckboxList
-                data={myAssignedItems}
+                data={myProductsSearchMode ? myAssignedItems : this.props.myAssignedItems}
                 primaryAction={(item) => {
                   const pref = preferences.filter(
                     i => i.haveProductId === item.id,
@@ -257,7 +281,7 @@ class MyProductsView extends React.Component {
                   });
                 }}
                 editMode={editMode}
-                selectedWithPrimaryId={[selectedMyProduct.id]}
+                selectedWithPrimaryId={selectedMyProduct ? [selectedMyProduct.id] : []}
                 secondaryAction={item => this.setState({ itemToPreview: item })}
                 selectedWithSecondaryId={itemToPreview && itemToPreview.id}
               />
@@ -276,7 +300,9 @@ class MyProductsView extends React.Component {
             <Paper className={classes.paperContainer}>
               <SearchBar onChange={event => this.handleSearchBarChange(event, 'otherAssignedItems', 'myDefinedGroups')} />
               <MultiheaderCheckboxList
-                data={[otherAssignedItems, myDefinedGroups]}
+                data={otherProductsSearchMode
+                  ? [otherAssignedItems, myDefinedGroups]
+                  : [this.props.otherAssignedItems, this.props.myDefinedGroups]}
                 disabled={!editMode}
                 titles={['Other items: ', 'My defined groups: ']}
                 currentSelected={[selectedOtherProductIds, selectedGroupIds]}
@@ -335,7 +361,7 @@ const mapStateToProps = (state, ownProps) => {
   const preferenceByEdition = state.preferences.preferencesByEdition[id];
   const myProduct = state.myAssignedProducts.productsByEdition[id];
   const definedGroups = state.definedGroups.definedGroupsByEdition[id];
-  console.log('>>>', state);
+
   return ({
     edition,
     otherAssignedItems: (otherProduct && otherProduct.items) || [],
@@ -348,8 +374,17 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
   const id = ownProps.match.params.editionId;
   return bindActionCreators({
-    fetchPreferencesIfNeeded: () => (
+    fetchPreferences: () => (
       actions.preferences.fetchPreferencesIfNeeded(id)
+    ),
+    fetchOtherAssignedProducts: () => (
+      actions.otherAssignedProducts.fetchOtherAssignedProductsIfNeeded(id)
+    ),
+    fetchMyAssignedProducts: () => (
+      actions.myProducts.fetchMyAssignedProductsIfNeeded(id)
+    ),
+    fetchDefinedGroups: () => (
+      actions.definedGroups.fetchDefinedGroupsIfNeeded(id)
     ),
     updatePreference: (productId, wantedProductsIds, wantedDefinedGroupsIds) => (
       actions.preferences.updatePreference(id, productId, wantedProductsIds, wantedDefinedGroupsIds)
@@ -358,5 +393,5 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 };
 
 export default withStyles(styles)(
-  withAlert(connect(mapStateToProps, mapDispatchToProps)(MyProductsView)),
+  withAlert(connect(mapStateToProps, mapDispatchToProps)(PreferencesView)),
 );
