@@ -15,14 +15,14 @@ const myDefinedGroups = [
   {
     id: 10000,
     name: 'Group345',
-    productsIds: [3, 4, 5],
+    productsIds: [1003, 1004, 1005],
     groupIds: [],
   },
   {
     id: 10001,
     name: 'Group567',
-    productsIds: [5, 6, 7],
-    groupIds: [3],
+    productsIds: [1005, 1006, 1007],
+    groupIds: [10000],
   },
 ];
 

@@ -100,6 +100,7 @@ const styles = theme => ({
   },
 });
 
+
 class MyProductsView extends React.Component {
   static MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 

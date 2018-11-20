@@ -75,7 +75,7 @@ export default function definedGroupsReducer(state = INITIAL_STATE, action) {
     case EDIT_DEFINED_GROUP:
     case UPDATE_DEFINED_GROUP_CONTENT:
       return {
-        definedGroupsReducer: {
+        definedGroupsByEdition: {
           ...state.definedGroupsByEdition,
           [action.editionId]: {
             ...state.definedGroupsByEdition[action.editionId],

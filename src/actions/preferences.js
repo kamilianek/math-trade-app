@@ -14,7 +14,7 @@ const editionPreferences = [
     id: 1,
     userId: 1,
     haveProductId: 1,
-    wantedProductsIds: [1000, 1003, 1006],
+    wantedProductsIds: [1000, 1003, 1004],
     wantedDefinedGroupsIds: [10000],
   },
   {

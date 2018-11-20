@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 const styles = theme => ({
@@ -23,8 +24,13 @@ const styles = theme => ({
 
 class ProductPreview extends Component {
   render() {
-    const { item, classes } = this.props;
-    console.log(item);
+    const {
+      item,
+      classes,
+      wantedProductsNames,
+      wantedGroupsNames,
+    } = this.props;
+    console.log(wantedProductsNames);
     return (
       <>
         <Typography className={classes.sectionSubtitle} component="h1" variant="h4">
@@ -42,6 +48,16 @@ class ProductPreview extends Component {
             { (item.images || []).map(image => (
               <img className={classes.image} src={image.uri} />
             )) }
+            {
+              <Typography className={classes.sectionSubtitle} component="h1" variant="subtitle1">
+                Products in defined group:
+              </Typography>
+            }
+            {
+              [wantedProductsNames || []].map(prod => <Typography className={classes.sectionSubtitle} component="h1" variant="subtitle1">
+                {prod.name}
+              </Typography>)
+            }
             </> : null
           }
         </Paper>
@@ -54,5 +70,6 @@ ProductPreview.propTypes = {
   classes: PropTypes.object.isRequired,
   item: PropTypes.object,
 };
+
 
 export default withStyles(styles)(ProductPreview);
