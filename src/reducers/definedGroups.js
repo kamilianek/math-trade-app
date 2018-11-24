@@ -1,26 +1,5 @@
 const INITIAL_STATE = {
-  definedGroupsByEdition: {
-    3: {
-      isFetchingSince: null,
-      lastSuccessfulFetch: null,
-      lastFailedFetch: null,
-      didInvalidate: false,
-      groups: [
-        {
-          id: 10000,
-          name: 'Group345',
-          productsIds: [3, 4, 5],
-          groupIds: [],
-        },
-        {
-          id: 10001,
-          name: 'Group567',
-          productsIds: [5, 6, 7],
-          groupIds: [3],
-        },
-      ],
-    },
-  },
+  definedGroupsByEdition: { },
 };
 
 
@@ -28,6 +7,9 @@ export const RECEIVE_ERROR_DEFINED_GROUPS = 'RECEIVE_ERROR_DEFINED_GROUPS';
 export const REQUEST_DEFINED_GROUPS = 'REQUEST_DEFINED_GROUPS';
 export const INVALIDATE_DEFINED_GROUPS = 'INVALIDATE_DEFINED_GROUPS';
 export const RECEIVE_DEFINED_GROUPS = 'RECEIVE_DEFINED_GROUPS';
+export const CREATE_DEFINED_GROUP = 'CREATE_DEFINED_GROUP';
+export const EDIT_DEFINED_GROUP = 'EDIT_DEFINED_GROUP';
+export const UPDATE_DEFINED_GROUP_CONTENT = 'UPDATE_DEFINED_GROUP_CONTENT';
 
 export default function definedGroupsReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
@@ -76,6 +58,29 @@ export default function definedGroupsReducer(state = INITIAL_STATE, action) {
             ...state.definedGroupsByEdition[action.editionId],
             isFetchingSince: null,
             lastFailedFetch: action.timestamp,
+          },
+        },
+      };
+    case CREATE_DEFINED_GROUP:
+      return {
+        ...state,
+        definedGroupsByEdition: {
+          ...state.definedGroupsByEdition,
+          [action.editionId]: {
+            ...state.definedGroupsByEdition[action.editionId],
+            groups: [...state.definedGroupsByEdition[action.editionId].groups, action.group],
+          },
+        },
+      };
+    case EDIT_DEFINED_GROUP:
+    case UPDATE_DEFINED_GROUP_CONTENT:
+      return {
+        definedGroupsByEdition: {
+          ...state.definedGroupsByEdition,
+          [action.editionId]: {
+            ...state.definedGroupsByEdition[action.editionId],
+            groups: state.definedGroupsByEdition[action.editionId].groups
+              .map(group => (group.id === action.group.id ? action.group : group)),
           },
         },
       };

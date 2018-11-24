@@ -1,8 +1,6 @@
 import {
   LOGIN_FINISHED,
   SIGN_OUT_FINISHED,
-  REQUEST_PERMISSION_REQUEST_STATUS,
-  RECEIVE_PERMISSION_REQUEST_STATUS,
 } from '../reducers/auth';
 
 
@@ -30,6 +28,7 @@ export function loginWithPassword(username, password) {
     // return dispatch(settings.fetchSettings());
   };
 }
+
 
 export default {
   signOut,

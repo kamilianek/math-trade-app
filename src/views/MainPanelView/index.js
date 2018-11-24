@@ -2,6 +2,9 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 import { withAlert } from 'react-alert';
 import { withStyles } from '@material-ui/core/styles';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import Icon from '@material-ui/core/Icon';
@@ -10,6 +13,10 @@ import MainContainer from '../../components/MainContainer';
 import EditionsTable from '../../components/EditionsTable';
 
 import RequestExpansionPanel from '../../components/RequestExpansionPanel';
+import CreateEditionDialog from '../../components/CreateEditionDialog';
+
+import actions from '../../actions';
+
 
 const messages = {
   REQUEST_PERM: {
@@ -48,6 +55,7 @@ const styles = theme => ({
   },
 });
 
+
 class MainPanelView extends React.Component {
   constructor() {
     super();
@@ -55,24 +63,70 @@ class MainPanelView extends React.Component {
     this.state = {
       open: false,
       chosenEditionId: null,
+      editionCreationMode: false,
+      chosenToEditEditionId: null,
     };
 
     this.setEditionToRedirect = this.setEditionToRedirect.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.editionCreationDialogDisagree = this.editionCreationDialogDisagree.bind(this);
+    this.editionCreationDialogAgree = this.editionCreationDialogAgree.bind(this);
+    this.onEditionEdit = this.onEditionEdit.bind(this);
   }
+
+  componentDidMount() {
+    const { fetchPermissionRequestStatusIfNeeded } = this.props;
+
+    fetchPermissionRequestStatusIfNeeded()
+      .catch(() => {});
+  }
+
+  handleChange = (event, name) => {
+    this.setState({
+      [name]: event.target.value,
+    });
+  };
 
   setEditionToRedirect(id, status) {
     const { alert } = this.props;
-    if (status === 'PENDING') {
-      alert.show('Cannot open pending edition. Please wait for results.', { type: 'inform' });
+    if (status === 'CLOSED') {
+      alert.show('Cannot open closed edition. Please wait for results.', { type: 'inform' });
       return;
     }
 
     this.setState({ chosenEditionId: id });
   }
 
+  editionCreationDialogDisagree() {
+    this.setState({
+      editionCreationMode: false,
+      chosenToEditEditionId: null,
+    });
+  }
+
+  editionCreationDialogAgree() {
+    this.setState({
+      editionCreationMode: false,
+      chosenToEditEditionId: null,
+    });
+  }
+
+  onEditionEdit(id) {
+    this.setState({
+      chosenToEditEditionId: id,
+    });
+  }
+
   render() {
-    const { classes } = this.props;
-    const { chosenEditionId } = this.state;
+    const {
+      classes,
+      isModerator,
+    } = this.props;
+    const {
+      chosenEditionId,
+      editionCreationMode,
+      chosenToEditEditionId,
+    } = this.state;
     console.log('now inside MainPanel');
 
     if (chosenEditionId) {
@@ -91,24 +145,44 @@ class MainPanelView extends React.Component {
           <Typography component="h1" variant="h2">
             Editions list
           </Typography>
-          <EditionsTable onEditionClicked={this.setEditionToRedirect} />
-          <div className={classes.addEditionButtonContainer}>
+          <EditionsTable
+            onEditionClicked={this.setEditionToRedirect}
+            onEdit={this.onEditionEdit}
+          />
+          {isModerator ? <div className={classes.addEditionButtonContainer}>
             <Button
               variant="contained"
               color="primary"
               className={classes.addEditionButton}
-              onClick={() => console.log('creating edition')}
+              onClick={() => this.setState({ editionCreationMode: true })}
             >
               Add Edition
               <Icon className={classes.rightButtonIcon}>add</Icon>
             </Button>
-          </div>
-          <Divider />
-          <RequestExpansionPanel />
+          </div> : null}
+          {!isModerator ? <RequestExpansionPanel /> : null}
         </div>
+        <CreateEditionDialog
+          creationMode={editionCreationMode}
+          chosenEditionId={chosenToEditEditionId}
+          onAgree={this.editionCreationDialogAgree}
+          onDisagree={this.editionCreationDialogDisagree}
+        />
       </>
     );
   }
 }
 
-export default withStyles(styles)(withAlert(MainPanelView));
+const mapStateToProps = state => ({
+  isModerator: state.auth.roles.includes('moderator') || state.auth.roles.includes('admin'),
+});
+
+const mapDispatchToProps = dispatch => bindActionCreators({
+  fetchPermissionRequestStatusIfNeeded:
+    actions.permissionRequest.fetchPermissionRequestStatusIfNeeded,
+}, dispatch);
+
+
+export default withStyles(styles)(
+  withAlert(connect(mapStateToProps, mapDispatchToProps)(MainPanelView)),
+);

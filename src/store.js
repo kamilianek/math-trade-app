@@ -14,6 +14,7 @@ const {
   otherAssignedProducts,
   definedGroups,
   preferences,
+  permissionRequest,
 } = reducers;
 
 const rootPersistConfig = {
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   otherAssignedProducts,
   definedGroups,
   preferences,
+  permissionRequest,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);

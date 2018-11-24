@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 const styles = theme => ({
   sectionSubtitle: {
     margin: theme.spacing.unit * 3,
+    height: 30,
     marginRight: theme.spacing.unit * 5,
   },
   paperContainer: {
@@ -23,12 +24,17 @@ const styles = theme => ({
 
 class ProductPreview extends Component {
   render() {
-    const { item, classes } = this.props;
-    console.log(item);
+    const {
+      item,
+      classes,
+      wantedProductsNames,
+      wantedGroupsNames,
+    } = this.props;
+    console.log(wantedProductsNames);
     return (
       <>
-        <Typography className={classes.sectionSubtitle} component="h1" variant="h4">
-          Product preview
+        <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
+          Item preview
         </Typography>
         <Paper className={classes.paperContainer}>
           { item
@@ -54,5 +60,6 @@ ProductPreview.propTypes = {
   classes: PropTypes.object.isRequired,
   item: PropTypes.object,
 };
+
 
 export default withStyles(styles)(ProductPreview);
