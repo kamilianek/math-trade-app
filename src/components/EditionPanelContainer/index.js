@@ -3,9 +3,11 @@
  */
 import React, { Component } from 'react';
 import { Redirect, Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withAlert } from 'react-alert';
 import PropTypes from 'prop-types';
+import { bindActionCreators } from 'redux';
 
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
@@ -13,6 +15,8 @@ import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
+
+import actions from '../../actions';
 
 const styles = theme => ({
   mainContainer: {
@@ -40,6 +44,10 @@ const styles = theme => ({
   backButton: {
     marginRight: theme.spacing.unit,
     marginBottom: theme.spacing.unit * 10,
+  },
+  joinButton: {
+    marginTop: theme.spacing.unit * 2,
+    marginBottom: theme.spacing.unit * 2,
   },
   editionNavigationContainer: {
     display: 'flex',
@@ -70,6 +78,16 @@ class EditionPanelContainer extends Component {
       navigationValue: 0,
       goBack: false,
     };
+
+    this.handleJoiningEdition = this.handleJoiningEdition.bind(this);
+  }
+
+  handleJoiningEdition() {
+    const { joinEdition, alert } = this.props;
+
+    joinEdition()
+      .then(() => alert.show('Successfully joined edition', { type: 'success' }))
+      .catch(error => alert.show(error.message, { type: 'error' }));
   }
 
   render() {
@@ -96,6 +114,15 @@ class EditionPanelContainer extends Component {
         <Typography className={classes.title} component="h1" variant="h2">
           {edition ? `Edition ${edition.name}` : 'Edition not found :('}
         </Typography>
+        {!(edition && edition.participant) ? <Button
+          variant="contained"
+          color="secondary"
+          className={classes.joinButton}
+          onClick={this.handleJoiningEdition}
+        >
+          <Icon className={classes.rightButtonIcon}>input</Icon>
+          Join Edition
+        </Button> : null}
         <Divider />
         <div className={classes.editionNavigationContainer}>
           <BottomNavigation
@@ -120,5 +147,13 @@ EditionPanelContainer.propTypes = {
   navigationValue: PropTypes.oneOf(['products', 'preferences', 'definedGroups']),
 };
 
+const mapDispatchToProps = (dispatch, ownProps) => bindActionCreators({
+  joinEdition: () => (
+    actions.editions.joinEdition(ownProps.edition.id)
+  ),
+}, dispatch);
 
-export default withStyles(styles)(withAlert(EditionPanelContainer));
+
+export default withStyles(styles)(
+  withAlert(connect(null, mapDispatchToProps)(EditionPanelContainer))
+);

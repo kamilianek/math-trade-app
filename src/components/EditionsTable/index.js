@@ -2,7 +2,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { withAlert } from 'react-alert';
 import { withStyles } from '@material-ui/core/styles';
+import { bindActionCreators } from 'redux';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -14,8 +16,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Paper from '@material-ui/core/Paper';
 import Icon from '@material-ui/core/Icon';
 import IconButton from '@material-ui/core/IconButton';
-import green from '@material-ui/core/colors/green';
-import amber from '@material-ui/core/colors/amber';
+
+import actions from '../../actions';
 
 const rows = [
   { id: 'name', numeric: false, disablePadding: false, label: 'Edition Name' },
@@ -116,9 +118,9 @@ const styles = theme => ({
 });
 
 const statusColors = {
-  OPENED: green[600],
+  OPENED: '#bedd9a',
   FINISHED: 'grey',
-  PENDING: amber[700],
+  CLOSED: '#ffdd72',
 };
 
 class EditionsTable extends Component {
@@ -135,6 +137,16 @@ class EditionsTable extends Component {
     this.callSorting = this.callSorting.bind(this);
     this.changePage = this.changePage.bind(this);
     this.changeRowsNumber = this.changeRowsNumber.bind(this);
+  }
+
+  componentDidMount() {
+    const {
+      fetchEditionsIfNeeded,
+      alert,
+    } = this.props;
+
+    fetchEditionsIfNeeded()
+      .catch(() => alert('Cannot fetch editions', { type: 'error' }));
   }
 
   callSorting(event, property) {
@@ -160,6 +172,7 @@ class EditionsTable extends Component {
       classes,
       onEditionClicked,
       editions,
+      onEdit,
     } = this.props;
     const {
       order,
@@ -227,7 +240,7 @@ class EditionsTable extends Component {
                           ? <IconButton
                             key="edit"
                             color="inherit"
-                            onClick={() => console.log('edit edition with id: ', row.id)}
+                            onClick={() => onEdit(row.id)}
                           >
                             <Icon className={classes.icon}>settings</Icon>
                           </IconButton> : null }
@@ -265,10 +278,20 @@ class EditionsTable extends Component {
 
 EditionsTable.propTypes = {
   classes: PropTypes.object.isRequired,
+  onEdit: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
   editions: state.editions.items,
 });
 
-export default withStyles(styles)(connect(mapStateToProps, null)(EditionsTable));
+const mapDispatchToProps = dispatch => bindActionCreators({
+  fetchEditionsIfNeeded: () => (
+    actions.editions.fetchEditionsIfNeeded()
+  ),
+}, dispatch);
+
+
+export default withAlert(
+  withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(EditionsTable)),
+);

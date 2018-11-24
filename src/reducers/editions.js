@@ -2,52 +2,7 @@
  * Created by kamilianek on 05.11.18.
  */
 const INITIAL_STATE = {
-  items: [
-    {
-      name: 'Mathandel 621',
-      description: 'this edition is very cool',
-      endDate: '2019-11-03',
-      maxParticipants: 12,
-      numberOfParticipants: 1,
-      id: 2,
-      moderator: true,
-      participant: false,
-      status: 'PENDING',
-    },
-    {
-      name: 'Mathandel 2',
-      description: 'this edition is very cool',
-      endDate: '2019-11-22',
-      maxParticipants: 1,
-      numberOfParticipants: 1,
-      id: 3,
-      moderator: true,
-      participant: true,
-      status: 'OPENED',
-    },
-    {
-      name: 'Mathandel 222',
-      description: 'this edition is very cool',
-      endDate: '2019-11-22',
-      maxParticipants: 100,
-      numberOfParticipants: 67,
-      id: 4,
-      moderator: false,
-      participant: false,
-      status: 'PENDING',
-    },
-    {
-      name: 'Mathandel 222',
-      description: 'this edition is very cool',
-      endDate: '2019-11-22',
-      maxParticipants: 100,
-      numberOfParticipants: 47,
-      id: 5,
-      moderator: false,
-      participant: true,
-      status: 'PENDING',
-    },
-  ],
+  items: [],
   isFetchingSince: null,
   lastSuccessfulFetch: null,
   lastFailedFetch: null,
@@ -59,7 +14,9 @@ export const REQUEST_EDITIONS = 'REQUEST_EDITIONS';
 export const INVALIDATE_EDITIONS = 'INVALIDATE_EDITIONS';
 export const RECEIVE_EDITIONS = 'RECEIVE_EDITIONS';
 export const CREATE_EDITION = 'CREATE_EDITION';
-
+export const EDIT_EDITION = 'EDIT_EDITION';
+export const CLOSE_EDITION = 'CLOSE_EDITION';
+export const JOIN_EDITION = 'JOIN_EDITION';
 
 export default function editionsReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
@@ -91,6 +48,31 @@ export default function editionsReducer(state = INITIAL_STATE, action) {
         ...state,
         isFetchingSince: null,
         lastFailedFetch: action.timestamp,
+      };
+    case EDIT_EDITION:
+      return {
+        ...state,
+        items: [
+          ...state.items.filter(edition => edition.id !== action.edition.id),
+          action.edition,
+        ],
+      };
+    case CLOSE_EDITION:
+      return {
+        ...state,
+        items: state.items.map(edition => (edition.id === action.id ? {
+          ...edition,
+          status: 'CLOSED',
+        } : edition)),
+      };
+    case JOIN_EDITION:
+      return {
+        ...state,
+        items: state.items.map(edition => (edition.id === action.id ? {
+          ...edition,
+          participant: true,
+          numberOfParticipants: edition.numberOfParticipants + 1,
+        } : edition)),
       };
     default:
       return state;
