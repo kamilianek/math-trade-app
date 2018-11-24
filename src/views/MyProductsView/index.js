@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
@@ -148,7 +149,7 @@ class MyProductsView extends React.Component {
   }
 
   onItemClick(item, dataHeader) {
-    if (item.id || item.id === 0) {
+    if (item && (item.id || item.id === 0)) {
       this.setState(state => ({
         currentItem: item,
         name: item.name,
@@ -254,6 +255,7 @@ class MyProductsView extends React.Component {
 
   handleDialogAgree() {
     const { currentItem } = this.state;
+
     this.onItemClick(currentItem);
     this.setState({
       openDialog: false,
@@ -334,6 +336,7 @@ class MyProductsView extends React.Component {
       edition,
       myAssignedItems,
       myNotAssignedItems,
+      isParticipant,
     } = this.props;
 
     const {
@@ -355,6 +358,11 @@ class MyProductsView extends React.Component {
     } = this.state;
 
     const imagesToShow = productCreationMode ? newImages : images;
+
+    if (!isParticipant) {
+      return (<Redirect to={`/editions/${edition.id}/preferences`} />);
+    }
+
     return (
       <EditionPanelContainer edition={edition} navigationValue="products">
         <Grid container spacing={24}>
@@ -533,11 +541,13 @@ const mapStateToProps = (state, ownProps) => {
     edition,
     myAssignedItems: (product && product.items) || [],
     myNotAssignedItems: state.myNotAssignedProducts.items || [],
+    isParticipant: !!(edition && edition.participant),
   });
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   const id = ownProps.match.params.editionId;
+
   return bindActionCreators({
     fetchMyAssignedProductsIfNeeded: () => (
       actions.myProducts.fetchMyAssignedProductsIfNeeded(id)

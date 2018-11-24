@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 const styles = theme => ({
   sectionSubtitle: {
     margin: theme.spacing.unit * 3,
+    height: 30,
     marginRight: theme.spacing.unit * 5,
   },
   paperContainer: {
@@ -33,8 +33,8 @@ class ProductPreview extends Component {
     console.log(wantedProductsNames);
     return (
       <>
-        <Typography className={classes.sectionSubtitle} component="h1" variant="h4">
-          Product preview
+        <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
+          Item preview
         </Typography>
         <Paper className={classes.paperContainer}>
           { item
@@ -48,16 +48,6 @@ class ProductPreview extends Component {
             { (item.images || []).map(image => (
               <img className={classes.image} src={image.uri} />
             )) }
-            {
-              <Typography className={classes.sectionSubtitle} component="h1" variant="subtitle1">
-                Products in defined group:
-              </Typography>
-            }
-            {
-              [wantedProductsNames || []].map(prod => <Typography className={classes.sectionSubtitle} component="h1" variant="subtitle1">
-                {prod.name}
-              </Typography>)
-            }
             </> : null
           }
         </Paper>

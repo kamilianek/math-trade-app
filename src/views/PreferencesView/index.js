@@ -124,10 +124,10 @@ class PreferencesView extends React.Component {
     } = this.props;
 
     fetchOtherAssignedProducts()
-      .catch(() => alert.show('Cannot load your products', { type: 'error' }));
+      .catch(() => alert.show('Cannot load your items', { type: 'error' }));
 
     fetchMyAssignedProducts()
-      .catch(() => alert.show('Cannot load other products', { type: 'error' }));
+      .catch(() => alert.show('Cannot load other items', { type: 'error' }));
 
     fetchDefinedGroups()
       .catch(() => alert.show('Cannot load defined groups', { type: 'error' }));
@@ -243,6 +243,7 @@ class PreferencesView extends React.Component {
   render() {
     const {
       classes,
+      isParticipant,
     } = this.props;
     const {
       selectedOtherProductIds,
@@ -259,12 +260,13 @@ class PreferencesView extends React.Component {
       myProductsSearchMode,
     } = this.state;
 
+
     return (
       <EditionPanelContainer edition={this.props.edition} navigationValue="preferences">
         <Grid container spacing={24}>
-          <Grid item xs={12} sm={6}>
+          {isParticipant ? <Grid item xs={12} sm={6}>
             <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
-              My products
+              My Items
             </Typography>
             <Paper className={classes.paperContainer}>
               <SearchBar onChange={event => this.handleSearchBarChange(event, 'myAssignedItems')} />
@@ -286,16 +288,16 @@ class PreferencesView extends React.Component {
                 selectedWithSecondaryId={itemToPreview && itemToPreview.id}
               />
             </Paper>
-          </Grid>
+          </Grid> : null}
           <Grid item xs={12} sm={6}>
             <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
-              Other products
-              <IconButton
+              Other items
+              {isParticipant ? <IconButton
                 onClick={() => this.setState({ editMode: true })}
                 color="inherit"
               >
                 <Icon>edit</Icon>
-              </IconButton>
+              </IconButton> : null}
             </Typography>
             <Paper className={classes.paperContainer}>
               <SearchBar onChange={event => this.handleSearchBarChange(event, 'otherAssignedItems', 'myDefinedGroups')} />
@@ -338,7 +340,7 @@ class PreferencesView extends React.Component {
               </Grid>
             </Paper>
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid item xs={12} sm={!isParticipant ? 6 : 12}>
             <ProductPreview item={itemToPreview} />
           </Grid>
         </Grid>
@@ -368,6 +370,7 @@ const mapStateToProps = (state, ownProps) => {
     myAssignedItems: (myProduct && myProduct.items) || [],
     preferences: (preferenceByEdition && preferenceByEdition.preferences) || [],
     myDefinedGroups: (definedGroups && definedGroups.groups) || [],
+    isParticipant: !!(edition && edition.participant),
   });
 };
 

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { withAlert } from 'react-alert';
 import { bindActionCreators } from 'redux';
@@ -234,7 +235,12 @@ class DefinedGroupsView extends Component {
 
 
   render() {
-    const { edition, classes } = this.props;
+    const {
+      edition,
+      classes,
+      isParticipant,
+    } = this.props;
+
     const {
       myDefinedGroups,
       otherAssignedItems,
@@ -249,6 +255,10 @@ class DefinedGroupsView extends Component {
       creationMode,
       editGroupNameMode,
     } = this.state;
+
+    if (!isParticipant) {
+      return (<Redirect to={`/editions/${edition.id}/preferences`} />);
+    }
 
     return (
       <EditionPanelContainer edition={edition} navigationValue={'definedGroups'}>
@@ -393,6 +403,7 @@ const mapStateToProps = (state, ownProps) => {
     edition,
     otherAssignedItems: (otherProducts && otherProducts.items) || [],
     myDefinedGroups: (definedGroups && definedGroups.groups) || [],
+    isParticipant: !!(edition && edition.participant),
   });
 };
 
