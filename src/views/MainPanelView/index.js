@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import Button from '@material-ui/core/Button';
-import Divider from '@material-ui/core/Divider';
 import Icon from '@material-ui/core/Icon';
 import Typography from '@material-ui/core/Typography';
 import MainContainer from '../../components/MainContainer';
@@ -16,14 +15,6 @@ import RequestExpansionPanel from '../../components/RequestExpansionPanel';
 import CreateEditionDialog from '../../components/CreateEditionDialog';
 
 import actions from '../../actions';
-
-
-const messages = {
-  REQUEST_PERM: {
-    success_msg: 'Successfully requested permissions',
-    error_msg: 'Cannot request permissions',
-  },
-};
 
 const styles = theme => ({
   mainContainer: {
@@ -174,7 +165,7 @@ class MainPanelView extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  isModerator: state.auth.roles.includes('moderator') || state.auth.roles.includes('admin'),
+  isModerator: state.auth.roles.includes('ROLE_MODERATOR') || state.auth.roles.includes('ROLE_ADMIN'),
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

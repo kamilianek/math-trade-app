@@ -18,7 +18,7 @@ export function loginWithPassword(username, password) {
       type: LOGIN_FINISHED,
       token: '1i236jghj12j31y32i1231ku2t',
       tokenData: {
-        role: ['admin', 'user', 'moderator'],
+        role: ['ROLE_ADMIN', 'ROLE_USER', 'ROLE_MODERATOR'],
       },
       loginData: {
         username,
