@@ -18,7 +18,7 @@ export function loginWithPassword(username, password) {
       type: LOGIN_FINISHED,
       token: '1i236jghj12j31y32i1231ku2t',
       tokenData: {
-        role: ['admin', 'user', 'moderator'],
+        role: ['ROLE_ADMIN', 'ROLE_USER', 'ROLE_MODERATOR'],
       },
       loginData: {
         username,
@@ -29,8 +29,18 @@ export function loginWithPassword(username, password) {
   };
 }
 
+export function changePassword(newPassword) {
+  return async () => {
+    // TODO: api call
+    // const response = await api.auth.(emhloginEmailangePassword(newPassword);
+    const response = `chngedTo:${newPassword}`;
+    return response;
+  };
+}
+
 
 export default {
   signOut,
   loginWithPassword,
+  changePassword,
 };

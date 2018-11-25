@@ -6,6 +6,7 @@ import otherAssignedProductsReducer from './otherAssignedProducts';
 import definedGroupsReducer from './definedGroups';
 import preferencesReducer from './preferences';
 import permissionRequestReducer from './permissionRequest';
+import userReducer from './user';
 
 export default {
   auth: authReducer,
@@ -16,4 +17,5 @@ export default {
   definedGroups: definedGroupsReducer,
   preferences: preferencesReducer,
   permissionRequest: permissionRequestReducer,
+  user: userReducer,
 };

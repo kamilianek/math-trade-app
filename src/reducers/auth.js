@@ -28,9 +28,9 @@ export const SEND_PERMISSION_REQUEST_STATUS = 'SEND_PERMISSION_REQUEST_STATUS';
 export const INVALIDATE_PERMISSION_REQUEST_STATUS = 'INVALIDATE_PERMISSION_REQUEST_STATUS';
 
 const userRoles = {
-  ADMIN: 'admin',
-  MODERATOR: 'moderator',
-  USER: 'user',
+  ADMIN: 'ROLE_ADMIN',
+  MODERATOR: 'ROLE_MODERATOR',
+  USER: 'ROLE_STATUS',
 };
 export const requestPermissionStatus = {
   PENDING: 'PENDING',

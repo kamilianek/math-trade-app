@@ -56,7 +56,6 @@ class RegistrationView extends React.Component {
       isAddressValid: true,
       city: '',
       isCityValid: true,
-      region: '',
       zip: '',
       isZipValid: true,
       country: '',
@@ -133,10 +132,10 @@ class RegistrationView extends React.Component {
                 label="First name"
                 fullWidth
                 autoComplete="fname"
-                error={!this.state.isFirstNameValid}
+                error={!this.state.isNameValid}
                 onChange={(event) => {
                   this.handleChange(event, 'firstName');
-                  this.setState(this.handleErrorClose('isFirstNameValid'));
+                  this.setState(this.handleErrorClose('isNameValid'));
                 }}
               />
             </Grid>
@@ -148,10 +147,10 @@ class RegistrationView extends React.Component {
                 label="Last name"
                 fullWidth
                 autoComplete="lname"
-                error={!this.state.isLastNameValid}
+                error={!this.state.isSurnameValid}
                 onChange={(event) => {
                   this.handleChange(event, 'lastName');
-                  this.setState(this.handleErrorClose('isLastNameValid'));
+                  this.setState(this.handleErrorClose('isSurnameValid'));
                 }}
               />
             </Grid>
