@@ -29,8 +29,18 @@ export function loginWithPassword(username, password) {
   };
 }
 
+export function changePassword(newPassword) {
+  return async () => {
+    // TODO: api call
+    // const response = await api.auth.(emhloginEmailangePassword(newPassword);
+    const response = `chngedTo:${newPassword}`;
+    return response;
+  };
+}
+
 
 export default {
   signOut,
   loginWithPassword,
+  changePassword,
 };
