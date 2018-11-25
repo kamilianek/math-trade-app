@@ -43,6 +43,7 @@ const styles = theme => ({
   },
   optionButton: {
     marginRight: theme.spacing.unit,
+    marginTop: theme.spacing.unit * 3,
   },
   form: {
     marginTop: theme.spacing.unit * 3,
