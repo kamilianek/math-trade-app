@@ -5,7 +5,7 @@ import EnsureLoggedInPath from './components/EnsureLoggedInPath';
 import LoginView from './views/LoginView';
 import MainPanelView from './views/MainPanelView';
 import RegistrationView from './views/RegistrationView';
-import SecondPanel from './views/SecondPanelView';
+import AccountView from './views/AccountView';
 import SignOutView from './views/SignOutView';
 import MyProductsView from './views/MyProductsView';
 import PreferencesView from './views/PreferencesView';
@@ -22,7 +22,7 @@ export default class AppRouter extends React.Component {
           <EnsureLoggedInPath exact path="/editions/:editionId/products" component={MyProductsView} />
           <EnsureLoggedInPath exact path="/editions/:editionId/preferences" component={PreferencesView} />
           <EnsureLoggedInPath exact path="/editions/:editionId/definedGroups" component={DefinedGroupsView} />
-          <EnsureLoggedInPath exact path="/account" component={SecondPanel} />
+          <EnsureLoggedInPath exact path="/account" component={AccountView} />
           <Route path="/register" component={RegistrationView} />
           <Route path="/login" component={LoginView} />
           <Route path="/signout" component={SignOutView} />
