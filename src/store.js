@@ -15,6 +15,7 @@ const {
   definedGroups,
   preferences,
   permissionRequest,
+  user,
 } = reducers;
 
 const rootPersistConfig = {
@@ -38,6 +39,7 @@ const rootReducer = combineReducers({
   definedGroups,
   preferences,
   permissionRequest,
+  user,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);

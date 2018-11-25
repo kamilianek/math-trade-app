@@ -2,18 +2,11 @@
  * Created by kamilianek on 24.11.18.
  */
 const INITIAL_STATE = {
-  id: 1,
-  name: 'admin',
-  surname: 'admin',
-  username: 'admin',
-  email: 'admin@gmail.com',
-  address: 'admin',
-  city: 'admin',
-  postalCode: 'admin',
-  country: 'admin',
-  roles: [
-    'ROLE_USER',
-  ],
+  isFetchingSince: null,
+  lastSuccessfulFetch: null,
+  lastFailedFetch: null,
+  didInvalidate: null,
+  data: {},
 };
 
 
@@ -21,3 +14,41 @@ export const REQUEST_USER_DETAILS = 'REQUEST_USER_DETAILS';
 export const RECEIVE_USER_DETAILS = 'RECEIVE_USER_DETAILS';
 export const RECEIVE_ERROR_USER_DETAILS = 'RECEIVE_ERROR_USER';
 export const UPDATE_USER_DETAILS = 'UPDATE_USER_DETAILS';
+export const INVALIDATE_USER_DETAILS = 'INVALIDATE_USER_DETAILS';
+
+
+export default function userReducer(state = INITIAL_STATE, action) {
+  switch (action.type) {
+    case RECEIVE_ERROR_USER_DETAILS:
+      return {
+        ...state,
+        isFetchingSince: null,
+        lastFailedFetch: action.timestamp,
+      };
+    case REQUEST_USER_DETAILS:
+      return {
+        ...state,
+        isFetchingSince: action.timestamp,
+      };
+    case INVALIDATE_USER_DETAILS:
+      return {
+        ...state,
+        didInvalidate: true,
+      };
+    case RECEIVE_USER_DETAILS:
+      return {
+        ...state,
+        isFetchingSince: null,
+        didInvalidate: false,
+        lastSuccessfulFetch: action.timestamp,
+        data: action.data,
+      };
+    case UPDATE_USER_DETAILS:
+      return {
+        ...state,
+        data: action.data,
+      };
+    default:
+      return state;
+  }
+}
