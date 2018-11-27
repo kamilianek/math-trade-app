@@ -7,6 +7,7 @@ import definedGroups from './definedGroups';
 import editions from './editions';
 import permissionRequest from './permissionRequest';
 import user from './user';
+import results from './results';
 
 export default {
   auth,
@@ -18,4 +19,5 @@ export default {
   editions,
   permissionRequest,
   user,
+  results,
 };

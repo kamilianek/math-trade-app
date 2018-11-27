@@ -124,10 +124,9 @@ class EditionPanelContainer extends Component {
           Join Edition
         </Button> : null}
         <Divider />
-        <div className={classes.editionNavigationContainer}>
+        {(edition && edition.status === 'OPENED') ? <div className={classes.editionNavigationContainer}>
           <BottomNavigation
             value={navigationValues[navigationValue]}
-            // onChange={() => this.setState({})}
             showLabels
             className={classes.editionNavigation}
           >
@@ -135,7 +134,7 @@ class EditionPanelContainer extends Component {
             <BottomNavigationAction label="Preferences" component={Link} to={'preferences'} />
             <BottomNavigationAction label="Groups" component={Link} to={'definedGroups'} />
           </BottomNavigation>
-        </div>
+        </div> : null}
         { this.props.children }
       </div>
     );

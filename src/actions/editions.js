@@ -57,6 +57,17 @@ const mock_editions = [
     participant: true,
     status: 'FINISHED',
   },
+  {
+    name: 'Mathandel xx1',
+    description: 'this edition is not very cool',
+    endDate: '2019-12-22',
+    maxParticipants: 1100,
+    numberOfParticipants: 647,
+    id: 6,
+    moderator: false,
+    participant: false,
+    status: 'FINISHED',
+  },
 ];
 
 
