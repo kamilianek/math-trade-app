@@ -22,9 +22,11 @@ const styles = theme => ({
     width: '100%',
   },
   heading: {
-    fontSize: theme.typography.pxToRem(15),
     flexBasis: '95%',
     flexShrink: 0,
+  },
+  sectionHeader: {
+    marginTop: 24,
   },
   secondaryHeading: {
     fontSize: theme.typography.pxToRem(15),
@@ -68,6 +70,14 @@ class UserResultsView extends React.Component {
     });
   };
 
+  onRateSubmit(resultId, rate, rateText) {
+    const { rateResult, alert } = this.props;
+
+    rateResult(resultId, rate, rateText)
+      .then(() => alert.show('Successfully rated user', { type: 'success' }))
+      .catch(error => alert.show(error.message, { type: 'error' }));
+  }
+
   renderDetails(id, result, isSender) {
     const { expanded } = this.state;
     const {
@@ -99,13 +109,13 @@ class UserResultsView extends React.Component {
         <ExpansionPanelDetails>
           <Grid container spacing={16}>
             <Grid item xs={12} sm={4}>
-              <Typography variant="h4">Item</Typography>
+              <Typography className={classes.sectionHeader} variant="h5">Item</Typography>
               <Divider className={classes.divider} />
               <Typography variant="h6">{`${result.item.name}`}</Typography>
               <Typography>{`${result.item.description}`}</Typography>
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Typography variant="h4">{isSender ? 'Delivery address' : 'Sender'}</Typography>
+              <Typography className={classes.sectionHeader} variant="h5">{isSender ? 'Delivery address' : 'Sender'}</Typography>
               <Divider className={classes.divider} />
               {data.name && data.surname
                 ? <Typography variant="h6">{`${data.name} ${data.surname}`}</Typography> : null}
@@ -116,7 +126,7 @@ class UserResultsView extends React.Component {
               {data.country ? <Typography>{data.country}</Typography> : null}
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Typography variant="h4">{isSender ? 'Your rate' : 'Rate user'}</Typography>
+              <Typography className={classes.sectionHeader} variant="h5">{isSender ? 'Your rate' : 'Rate user'}</Typography>
               <Divider className={classes.divider} />
               {isSender && !result.rate ? <Typography>
                 You have not been rated yet.
@@ -124,6 +134,9 @@ class UserResultsView extends React.Component {
                 allowRating={!isSender}
                 rate={result.rate && result.rate.rate}
                 rateText={result.rate && result.rate.comment}
+                onRateSubmit={(rate, rateText) => {
+                  this.onRateSubmit(result.id, rate, rateText);
+                }}
               />}
             </Grid>
           </Grid>
@@ -178,6 +191,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return bindActionCreators({
     fetchUserResultsIfNeeded: () => (
       actions.results.fetchUserResultsIfNeeded(id)
+    ),
+    rateResult: (resultId, rate, comment) => (
+      actions.results.rateResult(id, resultId, rate, comment)
     ),
   }, dispatch);
 };

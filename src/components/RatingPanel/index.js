@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withAlert } from 'react-alert';
 
 import Icon from '@material-ui/core/Icon';
 import IconButton from '@material-ui/core/IconButton';
@@ -19,7 +20,7 @@ const styles = theme => ({
   },
   rateText: {
     marginTop: theme.spacing.unit * 3,
-  }
+  },
 });
 
 class RatingPanel extends React.Component {
@@ -30,35 +31,33 @@ class RatingPanel extends React.Component {
       rate: this.props.rate,
       rateText: this.props.rateText,
     };
-  }
 
-  // componentDidMount() {
-  //   let newState = {};
-  //
-  //   if (this.props.rate) {
-  //     newState = {
-  //       ...newState,
-  //       rate: this.props.rate,
-  //     };
-  //   }
-  //
-  //   if (this.props.rateText) {
-  //     newState = {
-  //       ...newState,
-  //       rateText: this.props.rateText,
-  //     };
-  //   }
-  //
-  //   this.setState(newState);
-  // }
+    this.sendComment = this.sendComment.bind(this);
+  }
 
   handleStarClick(rate) {
     this.setState({ rate });
   }
 
+  sendComment() {
+    const { rate, rateText } = this.state;
+    const { alert, onRateSubmit } = this.props;
+
+    if (!rate) {
+      alert.show('You have to rate user', { type: 'error' });
+      return;
+    }
+
+    onRateSubmit(rate, rateText);
+  }
+
   render() {
     const { rate, rateText } = this.state;
-    const { allowRating, starCounts, classes } = this.props;
+    const {
+      allowRating,
+      starCounts,
+      classes,
+    } = this.props;
 
     return (
       <div style={{ display: 'inline-block' }}>
@@ -93,7 +92,12 @@ class RatingPanel extends React.Component {
         {
           allowRating
             ? <div className={classes.sendPanel}>
-                <Button variant="contained" color="primary" className={classes.button}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  className={classes.button}
+                  onClick={this.sendComment}
+                >
                   Comment
                   <Icon className={classes.rightIcon}>send</Icon>
                 </Button>
@@ -120,4 +124,4 @@ RatingPanel.defaultProps = {
 };
 
 
-export default withStyles(styles)(RatingPanel);
+export default withStyles(styles)(withAlert(RatingPanel));

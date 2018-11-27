@@ -208,6 +208,7 @@ export function rateResult(editionId, resultId, rate, comment) {
     // TODO: replace getState with returned value!!
     dispatch({
       type: RATE_RESULT,
+      editionId,
       rate: {
         resultId,
         rate,
