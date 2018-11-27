@@ -7,6 +7,8 @@ import definedGroupsReducer from './definedGroups';
 import preferencesReducer from './preferences';
 import permissionRequestReducer from './permissionRequest';
 import userReducer from './user';
+import resultsReducer from './results';
+import moderatorResultsReducer from './moderatorResults';
 
 export default {
   auth: authReducer,
@@ -18,4 +20,6 @@ export default {
   preferences: preferencesReducer,
   permissionRequest: permissionRequestReducer,
   user: userReducer,
+  results: resultsReducer,
+  moderatorResults: moderatorResultsReducer,
 };
