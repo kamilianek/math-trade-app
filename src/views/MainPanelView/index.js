@@ -54,6 +54,7 @@ class MainPanelView extends React.Component {
     this.state = {
       open: false,
       chosenEditionId: null,
+      chosenEditionStatus: null,
       editionCreationMode: false,
       chosenToEditEditionId: null,
     };
@@ -78,14 +79,22 @@ class MainPanelView extends React.Component {
     });
   };
 
-  setEditionToRedirect(id, status) {
+  setEditionToRedirect(id, status, isParticipant) {
     const { alert } = this.props;
     if (status === 'CLOSED') {
       alert.show('Cannot open closed edition. Please wait for results.', { type: 'inform' });
       return;
     }
 
-    this.setState({ chosenEditionId: id });
+    if (status === 'FINISHED' && !isParticipant) {
+      alert.show('You are not assigned to edition. Cannot watch results', { type: 'inform' });
+      return;
+    }
+
+    this.setState({
+      chosenEditionId: id,
+      chosenEditionStatus: status,
+    });
   }
 
   editionCreationDialogDisagree() {
@@ -113,14 +122,25 @@ class MainPanelView extends React.Component {
       classes,
       isModerator,
     } = this.props;
+
     const {
       chosenEditionId,
+      chosenEditionStatus,
       editionCreationMode,
       chosenToEditEditionId,
     } = this.state;
-    console.log('now inside MainPanel');
+
 
     if (chosenEditionId) {
+      if (chosenEditionStatus === 'FINISHED') {
+        return (
+          <>
+            <MainContainer />
+            <Redirect to={`/editions/${chosenEditionId}/results`} />;
+          </>
+        );
+      }
+
       return (
         <>
           <MainContainer />
