@@ -16,6 +16,8 @@ const {
   preferences,
   permissionRequest,
   user,
+  results,
+  moderatorResults,
 } = reducers;
 
 const rootPersistConfig = {
@@ -40,6 +42,8 @@ const rootReducer = combineReducers({
   preferences,
   permissionRequest,
   user,
+  results,
+  moderatorResults,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
