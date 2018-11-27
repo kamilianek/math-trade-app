@@ -206,31 +206,31 @@ class EditionsTable extends Component {
                       hover
                     >
                       <TableCell
-                        onClick={() => onEditionClicked(row.id, row.status)}
+                        onClick={() => onEditionClicked(row.id, row.status, row.participant)}
                         component="th"
                         scope="row"
                       >
                         {row.name}
                       </TableCell>
                       <TableCell
-                        onClick={() => onEditionClicked(row.id, row.status)}
+                        onClick={() => onEditionClicked(row.id, row.status, row.participant)}
                       >
                         { row.participant ? <Icon>how_to_reg</Icon> : null}
                       </TableCell>
                       <TableCell
-                        onClick={() => onEditionClicked(row.id, row.status)}
+                        onClick={() => onEditionClicked(row.id, row.status, row.participant)}
                         numeric
                       >
                         {row.numberOfParticipants}
                       </TableCell>
                       <TableCell
-                        onClick={() => onEditionClicked(row.id, row.status)}
+                        onClick={() => onEditionClicked(row.id, row.status, row.participant)}
                         numeric
                       >
                         {row.maxParticipants}
                       </TableCell>
                       <TableCell
-                        onClick={() => onEditionClicked(row.id, row.status)}
+                        onClick={() => onEditionClicked(row.id, row.status, row.participant)}
                         style={{ backgroundColor: statusColors[row.status] }}
                       >
                         {row.status}
