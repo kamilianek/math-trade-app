@@ -114,7 +114,7 @@ class EditionPanelContainer extends Component {
         <Typography className={classes.title} component="h1" variant="h2">
           {edition ? `Edition ${edition.name}` : 'Edition not found :('}
         </Typography>
-        {!(edition && edition.participant) ? <Button
+        {!(edition && edition.participant) && edition.status === 'OPENED' ? <Button
           variant="contained"
           color="secondary"
           className={classes.joinButton}
