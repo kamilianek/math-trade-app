@@ -9,15 +9,42 @@ class EnsureLoggedInContainer extends Component {
   };
 
   render() {
-    const { isLoggedIn, location } = this.props;
+    const { isLoggedIn, location, editions } = this.props;
     const pathname = location && location.pathname;
-
+    console.log('pathname: ', pathname);
     if (!isLoggedIn) {
       switch (pathname) {
         default:
           return <Redirect to="/login"/>;
       }
     }
+
+    const parsedPath = pathname.split('/');
+
+    // not allow accessing moderatorPanel if not moderator
+    // or not CLOSED status
+    if (parsedPath[1] === 'editions') {
+      const currentEdition = parsedPath[2] && editions.filter(edition => `${edition.id}` === parsedPath[2]);
+
+      if (parsedPath[3] === 'moderatorPanel') {
+        if (!currentEdition || !currentEdition[0].moderator || currentEdition[0].status !== 'CLOSED') {
+          return <Redirect to="/"/>;
+        }
+      }
+
+      if (parsedPath[3] === 'products' || parsedPath[3] === 'preferences' || parsedPath[3] === 'definedGroups') {
+        if (!currentEdition || currentEdition[0].status !== 'OPENED') {
+          return <Redirect to="/" />;
+        }
+      }
+
+      if (parsedPath[3] === 'results') {
+        if (!currentEdition || !currentEdition[0].participant || currentEdition[0].status !== 'FINISHED') {
+          return <Redirect to="/" />;
+        }
+      }
+    }
+
 
     if (this.props.children) {
       return this.props.children;
@@ -29,9 +56,11 @@ class EnsureLoggedInContainer extends Component {
 
 const mapStateToProps = (state) => {
   const { auth } = state;
+  const isLoggedIn = !!(auth && auth.token);
 
   return {
-    isLoggedIn: !!(auth && auth.token),
+    isLoggedIn,
+    editions: isLoggedIn && state.editions.items,
   };
 };
 
