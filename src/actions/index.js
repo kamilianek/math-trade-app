@@ -8,6 +8,7 @@ import editions from './editions';
 import permissionRequest from './permissionRequest';
 import user from './user';
 import results from './results';
+import moderatorResults from './moderatorResults';
 
 export default {
   auth,
@@ -20,4 +21,5 @@ export default {
   permissionRequest,
   user,
   results,
+  moderatorResults,
 };
