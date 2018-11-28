@@ -27,10 +27,8 @@ class ProductPreview extends Component {
     const {
       item,
       classes,
-      wantedProductsNames,
-      wantedGroupsNames,
     } = this.props;
-    console.log(wantedProductsNames);
+
     return (
       <>
         <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
@@ -39,10 +37,10 @@ class ProductPreview extends Component {
         <Paper className={classes.paperContainer}>
           { item
             ? <>
-            <Typography className={classes.sectionSubtitle} component="h1" variant="subtitle1">
+            <Typography className={classes.sectionSubtitle} component="h1" variant="h6">
               {item.name}
             </Typography>
-            <Typography className={classes.sectionSubtitle}>
+            <Typography variant="body2" className={classes.sectionSubtitle}>
               {item.description}
             </Typography>
             { (item.images || []).map(image => (
