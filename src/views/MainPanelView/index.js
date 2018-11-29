@@ -82,6 +82,11 @@ class MainPanelView extends React.Component {
   setEditionToRedirect(id, status, isParticipant, isModerator) {
     const { alert } = this.props;
 
+    if (status === 'CANCELLED') {
+      alert.show('This edition has been cancelled.', { type: 'inform' });
+      return;
+    }
+
     if (status === 'CLOSED' && !isModerator) {
       alert.show('Cannot open closed edition. Please wait for results.', { type: 'inform' });
       return;
