@@ -17,9 +17,7 @@ export function loginWithPassword(username, password) {
     dispatch({
       type: LOGIN_FINISHED,
       token: '1i236jghj12j31y32i1231ku2t',
-      tokenData: {
-        role: ['ROLE_ADMIN', 'ROLE_USER', 'ROLE_MODERATOR'],
-      },
+      roles: ['ROLE_ADMIN', 'ROLE_USER', 'ROLE_MODERATOR'],
       loginData: {
         username,
       },
