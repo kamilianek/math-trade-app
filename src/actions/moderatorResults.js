@@ -5,12 +5,13 @@ import {
   INVALIDATE_MODERATOR_RESULTS,
 } from '../reducers/moderatorResults';
 
+
 const VALIDATE_TIME_MODERATOR_RESULTS = 1000 * 60 * 10;
 const FETCHING_TIMEOUT_MODERATOR_RESULTS = 1000 * 32;
 
 
 const mock_results = {
-  status: 'PUBLISHED',
+  status: 'CLOSED',
   results: [
     {
       id: 2,

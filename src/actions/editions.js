@@ -12,6 +12,11 @@ import {
   CANCEL_EDITION,
 } from '../reducers/editions';
 
+import {
+  UPDATE_MODERATOR_RESULTS_STATUS,
+} from '../reducers/moderatorResults';
+
+
 const VALIDATE_TIME = 1000 * 60 * 5;
 const FETCHING_TIMEOUT = 1000 * 32;
 
@@ -210,6 +215,11 @@ export function reopenEdition(id) {
       type: REOPEN_EDITION,
       id,
     });
+    dispatch({
+      type: UPDATE_MODERATOR_RESULTS_STATUS,
+      editionId: id,
+      status: 'OPENED',
+    });
   };
 }
 
@@ -222,6 +232,11 @@ export function publishEdition(id) {
       type: PUBLISH_EDITION,
       id,
     });
+    dispatch({
+      type: UPDATE_MODERATOR_RESULTS_STATUS,
+      editionId: id,
+      status: 'PUBLISHED',
+    });
   };
 }
 
@@ -233,6 +248,11 @@ export function cancelEdition(id) {
     dispatch({
       type: CANCEL_EDITION,
       id,
+    });
+    dispatch({
+      type: UPDATE_MODERATOR_RESULTS_STATUS,
+      editionId: id,
+      status: 'CANCELLED',
     });
   };
 }

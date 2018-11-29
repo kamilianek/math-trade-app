@@ -6,6 +6,7 @@ export const REQUEST_MODERATOR_RESULTS = 'REQUEST_MODERATOR_RESULTS';
 export const RECEIVE_MODERATOR_RESULTS = 'RECEIVE_MODERATOR_RESULTS';
 export const RECEIVE_ERROR_MODERATOR_RESULTS = 'RECEIVE_ERROR_MODERATOR_RESULTS';
 export const INVALIDATE_MODERATOR_RESULTS = 'INVALIDATE_MODERATOR_RESULTS';
+export const UPDATE_MODERATOR_RESULTS_STATUS = 'UPDATE_MODERATOR_RESULTS_STATUS';
 
 export default function moderatorResultsReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
@@ -54,6 +55,20 @@ export default function moderatorResultsReducer(state = INITIAL_STATE, action) {
           [action.editionId]: {
             ...state.resultsByEdition[action.editionId],
             didInvalidate: true,
+          },
+        },
+      };
+    case UPDATE_MODERATOR_RESULTS_STATUS:
+      return {
+        ...state,
+        resultsByEdition: {
+          ...state.resultsByEdition,
+          [action.editionId]: {
+            ...state.resultsByEdition[action.editionId],
+            result: {
+              ...state.resultsByEdition[action.editionId].result,
+              status: action.status,
+            },
           },
         },
       };

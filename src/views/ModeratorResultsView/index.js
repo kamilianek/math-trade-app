@@ -108,23 +108,6 @@ const mockUser2 = {
   name: 'Przemsyław',
   surname: 'Nowak',
   rates: [
-    {
-      resultId: 5,
-      rate: 5,
-      comment: 'Very nice',
-    },
-    {
-      resultId: 4,
-      rate: 4,
-      comment: 'Polecam tego użytkownika. Wszystko przebigło bardzo sprawnie! '
-      + 'Polecam tego użytkownika. Wszystko przebigło bardzo sprawnie! Polecam tego użytkownika.'
-      + 'Wszystko przebigło bardzo sprawnie!',
-    },
-    {
-      resultId: 5,
-      rate: 5,
-      comment: 'Very nice',
-    },
   ],
 };
 
@@ -446,7 +429,7 @@ const mapStateToProps = (state, ownProps) => {
     && state.moderatorResults.resultsByEdition[id]
     && state.moderatorResults.resultsByEdition[id].result
     && state.moderatorResults.resultsByEdition[id].result.status;
-
+  console.log(state);
   return ({
     edition,
     status,
