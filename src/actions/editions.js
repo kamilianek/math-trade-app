@@ -24,7 +24,7 @@ const mock_editions = [
   {
     name: 'Mathandel 621',
     description: 'this edition is very cool',
-    endDate: '2019-11-03',
+    endDate: '2018-10-25T17:27:19.698',
     maxParticipants: 12,
     numberOfParticipants: 1,
     id: 2,

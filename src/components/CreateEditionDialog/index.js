@@ -67,7 +67,7 @@ class CreateEditionDialog extends React.Component {
       return {
         newEditionName: props.edition.name,
         newEditionMaxParticipants: props.edition.maxParticipants,
-        // newEditionEndDate: edition.newEditionEndDate,
+        newEditionEndDate: props.edition.newEditionEndDate,
         newEditionDescription: props.edition.description,
         chosenEditionId: props.chosenEditionId,
       };
@@ -177,6 +177,7 @@ class CreateEditionDialog extends React.Component {
   render() {
     const {
       isNewEditionEndDateValid,
+      newEditionEndDate,
       newEditionMaxParticipants,
       newEditionName,
       isNewEditionMaxParticipantsValid,
@@ -241,7 +242,7 @@ class CreateEditionDialog extends React.Component {
           margin="normal"
         />
         <TextField
-          ref={this.dataPicker}
+          defaultValue={newEditionEndDate}
           id="datetime-local"
           disabled={isClosed}
           label="End date"
