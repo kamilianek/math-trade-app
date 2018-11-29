@@ -63,10 +63,13 @@ const styles = theme => ({
     marginLeft: 10,
   },
   registerButton: {
-    textAlign: 'center',
+    height: 46,
+    float: 'right',
+    marginRight: 25,
   },
 });
 
+const FACEBOOK_APP_ID = '164788700874989';
 
 class LoginView extends React.Component {
   constructor() {
@@ -78,12 +81,33 @@ class LoginView extends React.Component {
       password: '',
       isPasswordValid: true,
       navigateToRegisterView: false,
+      navigateToFacebookRegisterView: false,
     };
 
     this.passwordLogin = this.passwordLogin.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.validateForm = this.validateForm.bind(this);
     this.handleErrorClose = this.handleErrorClose.bind(this);
+  }
+
+  componentDidMount() {
+    window.fbAsyncInit = () => {
+      window.FB.init({
+        appId: '164788700874989',
+        cookie: true,
+        xfbml: true,
+        version: 'v2.1',
+      });
+    };
+
+    (function (d, s, id) {
+      let js;
+      const fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = `https://connect.facebook.net/pl_PL/sdk.js#xfbml=1&version=v3.0&appId=${FACEBOOK_APP_ID}&autoLogAppEvents=1`;
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
   }
 
   handleChange = (event, name) => {
@@ -116,6 +140,34 @@ class LoginView extends React.Component {
       });
   }
 
+  fbLogin() {
+    const { apiUrl } = this.props;
+    window.FB.login((result) => {
+      // TODO: move to separate file
+      // if (result.authResponse) {
+      //   fetch(`${apiUrl}/auth/facebook`, {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify({
+      //       access_token: result.authResponse.accessToken,
+      //     }),
+      //   })
+      //     .then(res => res.json())
+      //     .then((res) => {
+      //       if (res.status === 404) {
+      //         this.props.alert.error('Nie udało się zalogować, spróbuj ponownie :(', { timeout: 5000 });
+      //       }
+      //       this.props.didLogin(res.data);
+      //       this.props.alert.success('Logowanie pomyślne :)');
+      //     }).catch(err => this.props.alert.error(err, { timeout: 5000 }));
+      // } else {
+      //   alert('Error: no auth response');
+      // }
+    }, { scope: 'public_profile,email' });
+  }
+
   validateForm() {
     const isUsernameValid = this.state.username.length > 0;
     const isPasswordValid = this.state.password.length > 0;
@@ -146,8 +198,9 @@ class LoginView extends React.Component {
       return <Redirect to='/' />;
     }
 
+
     if (navigateToRegisterView) {
-      return <Redirect to='/register' />;
+      return <Redirect to='/register/password' />;
     }
 
     return (
@@ -236,9 +289,6 @@ class LoginView extends React.Component {
                 onClick={() => this.setState({ navigateToRegisterView: true })}
               >
                 Register
-                <div
-                  className={classes.facebookLoginButton}
-                />
               </Button>
             </Grid>
           </Grid>
@@ -262,5 +312,5 @@ const mapDispatchToProps = dispatch => bindActionCreators({
 
 
 export default withStyles(styles)(
-  withAlert(connect(mapStateToProps, mapDispatchToProps)(LoginView))
+  withAlert(connect(mapStateToProps, mapDispatchToProps)(LoginView)),
 );

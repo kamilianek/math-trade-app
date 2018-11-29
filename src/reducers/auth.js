@@ -26,6 +26,7 @@ export const RECEIVE_ERROR_PERMISSION_REQUEST_STATUS = 'RECEIVE_ERROR_PERMISSION
 export const RECEIVE_PERMISSION_REQUEST_STATUS = 'RECEIVE_PERMISSION_REQUEST_STATUS';
 export const SEND_PERMISSION_REQUEST_STATUS = 'SEND_PERMISSION_REQUEST_STATUS';
 export const INVALIDATE_PERMISSION_REQUEST_STATUS = 'INVALIDATE_PERMISSION_REQUEST_STATUS';
+export const REGISTER_WITH_PASSWORD = 'REGISTER_WITH_PASSWORD';
 
 const userRoles = {
   ADMIN: 'ROLE_ADMIN',
@@ -50,6 +51,13 @@ export default function authReducer(state = INITIAL_STATE, action) {
     case SIGN_OUT_FINISHED:
       return {
         ...INITIAL_STATE,
+      };
+    case REGISTER_WITH_PASSWORD:
+      return {
+        ...state,
+        token: action.token,
+        roles: action.roles,
+        loginData: action.loginData,
       };
     case REQUEST_PERMISSION_REQUEST_STATUS:
       return {
