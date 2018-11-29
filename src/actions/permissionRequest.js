@@ -10,6 +10,21 @@ import {
   requestPermissionStatus,
 } from '../reducers/auth';
 
+const mockRequestsToverify = [
+  {
+    id: 1,
+    userId: 2,
+    reason: 'Donec velit libero, pretium id urna ut, elementum lacinia lorem. Mauris id est nec enim mollis ultrices ut vitae erat. Integer varius nulla et feugiat feugiat. Mauris nisi justo, eleifend sagittis erat pulvinar, porttitor suscipit mauris. Nulla facilisi. Mauris ut est condimentum, accumsan sem vitae, dapibus turpis. Donec vel leo purus.',
+    moderatorRequestStatus: 'PENDING',
+  },
+  {
+    id: 2,
+    userId: 3,
+    reason: 'Donec dolor dolor, pharetra nec tincidunt vitae, tincidunt id leo. Duis quis hendrerit leo, ac condimentum nulla.',
+    moderatorRequestStatus: 'PENDING',
+  },
+];
+
 
 const VALIDATE_TIME = 1000 * 60 * 5;
 const FETCHING_TIMEOUT = 1000 * 32;
@@ -65,7 +80,6 @@ function shouldFetchPermissionRequest(permissionRequest) {
     request,
   } = permissionRequest;
 
-  console.log('permissionRequest: ', permissionRequest);
   const status = request.moderatorRequestStatus;
 
   // not fetch if fetched but there is no request or status was accepted or rejected
@@ -90,7 +104,6 @@ function shouldFetchPermissionRequest(permissionRequest) {
 export function fetchPermissionRequestStatusIfNeeded() {
   return (dispatch, getState) => {
     if (shouldFetchPermissionRequest(getState().auth.permissionRequest)) {
-      console.log('should fetch...');
       return dispatch(fetchPermissionRequest());
     }
 
@@ -115,7 +128,14 @@ export function sendPermissionRequest(requestReason) {
   };
 }
 
+
+export function fetchRequestsToVerify() {
+  // await api.permissionRequest.fetchRequestsToVerify
+  return Promise.resolve({ requests: mockRequestsToverify });
+}
+
 export default {
   fetchPermissionRequestStatusIfNeeded,
   sendPermissionRequest,
+  fetchRequestsToVerify,
 };

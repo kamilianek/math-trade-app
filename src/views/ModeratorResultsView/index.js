@@ -429,7 +429,7 @@ const mapStateToProps = (state, ownProps) => {
     && state.moderatorResults.resultsByEdition[id]
     && state.moderatorResults.resultsByEdition[id].result
     && state.moderatorResults.resultsByEdition[id].result.status;
-  console.log(state);
+
   return ({
     edition,
     status,

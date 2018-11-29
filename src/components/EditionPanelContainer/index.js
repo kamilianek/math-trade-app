@@ -108,7 +108,7 @@ class EditionPanelContainer extends Component {
         >
           <Icon>arrow_back</Icon>
         </IconButton>
-        <Typography className={classes.title} component="h1" variant="h2">
+        <Typography className={classes.title} component="h1" variant="h4">
           {edition ? `Edition ${edition.name}` : 'Edition not found :('}
         </Typography>
         {!(edition && edition.participant) && edition.status === 'OPENED' ? <Button

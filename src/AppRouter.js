@@ -12,6 +12,7 @@ import PreferencesView from './views/PreferencesView';
 import DefinedGroupsView from './views/DefinedGroupsView';
 import UserResultsView from './views/UserResultsView';
 import ModeratorResultsView from './views/ModeratorResultsView';
+import PermissionRequestsView from './views/PermissionRequestsView';
 
 
 export default class AppRouter extends React.Component {
@@ -27,6 +28,7 @@ export default class AppRouter extends React.Component {
           <EnsureLoggedInPath exact path="/editions/:editionId/results" component={UserResultsView} />
           <EnsureLoggedInPath exact path="/editions/:editionId/moderatorPanel" component={ModeratorResultsView} />
           <EnsureLoggedInPath exact path="/account" component={AccountView} />
+          <EnsureLoggedInPath exact path="/permissionRequests" component={PermissionRequestsView}/>
           <Route path="/register" component={RegistrationView} />
           <Route path="/login" component={LoginView} />
           <Route path="/signout" component={SignOutView} />

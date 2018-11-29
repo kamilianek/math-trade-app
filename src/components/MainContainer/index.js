@@ -19,7 +19,8 @@ const pathValue = {
   '/editions': 0,
   '/': 0,
   '/account': 1,
-  '/signout': 2,
+  '/signout': 3,
+  '/permissionRequests': 2,
 };
 
 class MainContainer extends React.Component {
@@ -32,7 +33,7 @@ class MainContainer extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, isModerator } = this.props;
     const { pathname } = this.props.location;
 
     return (
@@ -54,6 +55,13 @@ class MainContainer extends React.Component {
               component={Link}
               to="account"
             />
+            {
+              isModerator ? <Tab
+                label="Requests"
+                component={Link}
+                to="permissionRequests"
+              /> : null
+            }
             <Tab
               label="Sign out"
               component={Link}
@@ -70,5 +78,9 @@ MainContainer.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
+const mapStateToProps = state => ({
+  isModerator: state.auth.roles.includes('ROLE_MODERATOR'),
+});
 
-export default withStyles(styles)(withRouter((connect(null, null)(MainContainer))));
+
+export default withStyles(styles)(withRouter(connect(mapStateToProps, null)(MainContainer)));

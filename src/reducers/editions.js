@@ -77,7 +77,6 @@ export default function editionsReducer(state = INITIAL_STATE, action) {
         } : edition)),
       };
     case PUBLISH_EDITION:
-      console.log('publish!!!! ', typeof action.id);
       return {
         ...state,
         items: state.items.map(edition => (edition.id === action.id ? {

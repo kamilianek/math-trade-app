@@ -177,7 +177,6 @@ export function editEdition(id, name, description, endDate, maxParticipants) {
   return async (dispatch) => {
     // const item = await api.definedGroups.createEdition()
     // TODO: use response as edited edition
-    console.log(id, name, description, endDate, maxParticipants);
     dispatch({
       type: EDIT_EDITION,
       edition: {
@@ -227,7 +226,6 @@ export function reopenEdition(id) {
 export function publishEdition(id) {
   return async (dispatch) => {
     // const item = await api.editions.publishEdition()
-    console.log('publishEdition action', id);
     dispatch({
       type: PUBLISH_EDITION,
       id,

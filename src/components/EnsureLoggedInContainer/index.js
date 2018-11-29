@@ -11,7 +11,7 @@ class EnsureLoggedInContainer extends Component {
   render() {
     const { isLoggedIn, location, editions } = this.props;
     const pathname = location && location.pathname;
-    console.log('pathname: ', pathname);
+
     if (!isLoggedIn) {
       switch (pathname) {
         default:

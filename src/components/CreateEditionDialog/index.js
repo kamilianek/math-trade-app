@@ -13,6 +13,8 @@ import Button from '@material-ui/core/Button';
 import CustomDialog from '../CustomDialog';
 import actions from '../../actions';
 
+const moment = require('moment');
+
 const styles = theme => ({
   textField: {
     width: '100%',
@@ -41,7 +43,6 @@ const dialogContent = {
 class CreateEditionDialog extends React.Component {
   constructor(props) {
     super(props);
-    this.dataPicker = React.createRef();
 
     this.state = {
       chosenEditionId: null,
@@ -129,11 +130,11 @@ class CreateEditionDialog extends React.Component {
 
     const isNewEditionNameValid = newEditionName.length > 0;
     const isNewEditionMaxParticipantsValid = newEditionMaxParticipants > 0;
-    // const isNewEditionEndDateValid = this.dataPicker.current.props.value.length > 0;
+    const isNewEditionEndDateValid = newEditionEndDate && moment().isBefore(newEditionEndDate);
     const isNewEditionDescriptionValid = newEditionDescription.length > 0;
 
     if (isNewEditionNameValid && isNewEditionMaxParticipantsValid
-         && isNewEditionDescriptionValid) {
+         && isNewEditionDescriptionValid && isNewEditionEndDateValid) {
       if (chosenEditionId) {
         this.props.editEdition(
           newEditionName,
@@ -169,12 +170,12 @@ class CreateEditionDialog extends React.Component {
       isNewEditionNameValid,
       isNewEditionMaxParticipantsValid,
       isNewEditionDescriptionValid,
+      isNewEditionEndDateValid,
     });
   }
 
   render() {
     const {
-      newEditionEndDate,
       isNewEditionEndDateValid,
       newEditionMaxParticipants,
       newEditionName,
@@ -247,7 +248,7 @@ class CreateEditionDialog extends React.Component {
           error={!isNewEditionEndDateValid}
           type="datetime-local"
           className={classes.textField}
-          onChange={event => console.log('eevnt: ', event.target.value)}
+          onChange={event => this.handleChange(event, 'newEditionEndDate', 'isNewEditionEndDateValid')}
           InputLabelProps={{
             shrink: true,
           }}
@@ -285,7 +286,7 @@ CreateEditionDialog.defaultProps = {
 const mapStateToProps = (state, ownProps) => {
   const id = ownProps.chosenEditionId;
   const edition = id ? state.editions.items.filter(e => e.id === id)[0] : null;
-  console.log('edition: ', edition);
+
   return ({
     edition,
   });
