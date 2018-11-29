@@ -10,7 +10,7 @@ const FETCHING_TIMEOUT_MODERATOR_RESULTS = 1000 * 32;
 
 
 const mock_results = {
-  status: 'PENDING',
+  status: 'PUBLISHED',
   results: [
     {
       id: 2,
@@ -140,9 +140,10 @@ function shouldFetchModeratorResults(results) {
   );
 }
 
-export function fetchModeratorResultsIfNeeded(editionId) {
+export function fetchModeratorResultsIfNeeded(editionId, forced) {
   return (dispatch, getState) => {
-    if (shouldFetchModeratorResults(getState().moderatorResults.resultsByEdition[editionId])) {
+    if (forced
+      || shouldFetchModeratorResults(getState().moderatorResults.resultsByEdition[editionId])) {
       return dispatch(fetchModeratorResults(editionId));
     }
 

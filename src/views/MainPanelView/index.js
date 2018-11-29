@@ -79,14 +79,15 @@ class MainPanelView extends React.Component {
     });
   };
 
-  setEditionToRedirect(id, status, isParticipant) {
+  setEditionToRedirect(id, status, isParticipant, isModerator) {
     const { alert } = this.props;
-    if (status === 'CLOSED') {
+
+    if (status === 'CLOSED' && !isModerator) {
       alert.show('Cannot open closed edition. Please wait for results.', { type: 'inform' });
       return;
     }
 
-    if (status === 'FINISHED' && !isParticipant) {
+    if (status === 'PUBLISHED' && !isParticipant && !isModerator) {
       alert.show('You are not assigned to edition. Cannot watch results', { type: 'inform' });
       return;
     }
@@ -132,20 +133,20 @@ class MainPanelView extends React.Component {
 
 
     if (chosenEditionId) {
-      if (chosenEditionStatus === 'FINISHED') {
+      if (chosenEditionStatus === 'PUBLISHED') {
         return (
-          <>
-            <MainContainer />
-            <Redirect to={`/editions/${chosenEditionId}/results`} />;
-          </>
+            <Redirect to={`/editions/${chosenEditionId}/results`} />
+        );
+      }
+
+      if (chosenEditionStatus === 'CLOSED') {
+        return (
+          <Redirect to={`/editions/${chosenEditionId}/moderatorPanel`}/>
         );
       }
 
       return (
-        <>
-          <MainContainer />
-          <Redirect to={`/editions/${chosenEditionId}/products`} />;
-        </>
+        <Redirect to={`/editions/${chosenEditionId}/products`} />
       );
     }
 

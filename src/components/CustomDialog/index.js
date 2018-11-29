@@ -23,6 +23,7 @@ class CustomDialog extends Component {
       agreeText,
       disagreeText,
       children,
+      warning,
     } = this.props;
 
     return (
@@ -49,7 +50,7 @@ class CustomDialog extends Component {
           {handleDisagree ? <Button onClick={handleDisagree} color="primary">
             {disagreeText}
           </Button> : null}
-          {handleAgree ? <Button onClick={handleAgree} color="primary">
+          {handleAgree ? <Button onClick={handleAgree} color={warning ? 'secondary' : 'primary'}>
             {agreeText}
           </Button> : null}
         </DialogActions>
@@ -61,19 +62,22 @@ class CustomDialog extends Component {
 CustomDialog.propTypes = {
   handleAgree: PropTypes.func,
   handleDisagree: PropTypes.func,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   textBody: PropTypes.string,
   openDialog: PropTypes.bool.isRequired,
   agreeText: PropTypes.string,
   disagreeText: PropTypes.string,
+  warning: PropTypes.bool,
 };
 
 CustomDialog.defaultProps = {
   handleDisagree: null,
   handleAgree: null,
+  title: '',
   textBody: '',
   agreeText: 'Yes',
   disagreeText: 'No',
+  warning: false,
 };
 
 

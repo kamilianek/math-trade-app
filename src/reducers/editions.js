@@ -17,6 +17,9 @@ export const CREATE_EDITION = 'CREATE_EDITION';
 export const EDIT_EDITION = 'EDIT_EDITION';
 export const CLOSE_EDITION = 'CLOSE_EDITION';
 export const JOIN_EDITION = 'JOIN_EDITION';
+export const REOPEN_EDITION = 'REOPEN_EDITION';
+export const PUBLISH_EDITION = 'PUBLISH_EDITION';
+export const CANCEL_EDITION = 'CANCEL_EDITION';
 
 export default function editionsReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
@@ -63,6 +66,31 @@ export default function editionsReducer(state = INITIAL_STATE, action) {
         items: state.items.map(edition => (edition.id === action.id ? {
           ...edition,
           status: 'CLOSED',
+        } : edition)),
+      };
+    case REOPEN_EDITION:
+      return {
+        ...state,
+        items: state.items.map(edition => (edition.id === action.id ? {
+          ...edition,
+          status: 'OPENED',
+        } : edition)),
+      };
+    case PUBLISH_EDITION:
+      console.log('publish!!!! ', typeof action.id);
+      return {
+        ...state,
+        items: state.items.map(edition => (edition.id === action.id ? {
+          ...edition,
+          status: 'PUBLISHED',
+        } : edition)),
+      };
+    case CANCEL_EDITION:
+      return {
+        ...state,
+        items: state.items.map(edition => (edition.id === action.id ? {
+          ...edition,
+          status: 'CANCELLED',
         } : edition)),
       };
     case JOIN_EDITION:

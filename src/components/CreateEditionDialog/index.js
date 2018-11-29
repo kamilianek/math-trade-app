@@ -252,7 +252,7 @@ class CreateEditionDialog extends React.Component {
             shrink: true,
           }}
         />
-        {chosenEditionId ? <>
+        {chosenEditionId && edition.status === 'OPENED' ? <>
           <Typography className={classes.closeText} component="h1" variant="body2">
             If you close edition you will be able to re-open it in the future
           </Typography>

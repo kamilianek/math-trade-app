@@ -7,6 +7,9 @@ import {
   EDIT_EDITION,
   CLOSE_EDITION,
   JOIN_EDITION,
+  REOPEN_EDITION,
+  PUBLISH_EDITION,
+  CANCEL_EDITION,
 } from '../reducers/editions';
 
 const VALIDATE_TIME = 1000 * 60 * 5;
@@ -22,7 +25,7 @@ const mock_editions = [
     id: 2,
     moderator: true,
     participant: false,
-    status: 'CLOSED',
+    status: 'PUBLISHED',
   },
   {
     name: 'Mathandel 2',
@@ -55,7 +58,7 @@ const mock_editions = [
     id: 5,
     moderator: false,
     participant: true,
-    status: 'FINISHED',
+    status: 'PUBLISHED',
   },
   {
     name: 'Mathandel xx1',
@@ -66,7 +69,7 @@ const mock_editions = [
     id: 6,
     moderator: false,
     participant: false,
-    status: 'FINISHED',
+    status: 'PUBLISHED',
   },
 ];
 
@@ -144,6 +147,7 @@ export function fetchEditionsIfNeeded() {
   };
 }
 
+// TODO: use response as created edition
 export function createEdition(name, description, endDate, maxParticipants) {
   return async (dispatch) => {
     // const item = await api.definedGroups.createEdition()
@@ -186,6 +190,7 @@ export function editEdition(id, name, description, endDate, maxParticipants) {
   };
 }
 
+// TODO: pass returned object
 export function closeEdition(id) {
   return async (dispatch) => {
     // const item = await api.editions.closeEdition()
@@ -195,6 +200,44 @@ export function closeEdition(id) {
     });
   };
 }
+
+// TODO: pass returned object
+export function reopenEdition(id) {
+  return async (dispatch) => {
+    console.log('reopenEdition action', id);
+    // const item = await api.editions.reopenEdition()
+    dispatch({
+      type: REOPEN_EDITION,
+      id,
+    });
+  };
+}
+
+// TODO: pass returned object
+export function publishEdition(id) {
+  return async (dispatch) => {
+    // const item = await api.editions.publishEdition()
+    console.log('publishEdition action', id);
+    dispatch({
+      type: PUBLISH_EDITION,
+      id,
+    });
+  };
+}
+
+// TODO: pass returned object
+export function cancelEdition(id) {
+  return async (dispatch) => {
+    // const item = await api.editions.cancelEdition()
+    console.log('cancelEdition action', id);
+    dispatch({
+      type: CANCEL_EDITION,
+      id,
+    });
+  };
+}
+
+
 export function joinEdition(id) {
   return async (dispatch) => {
     // const item = await api.editions.joinEdition()
@@ -211,4 +254,7 @@ export default {
   editEdition,
   closeEdition,
   joinEdition,
+  reopenEdition,
+  publishEdition,
+  cancelEdition,
 };

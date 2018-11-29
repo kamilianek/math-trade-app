@@ -27,7 +27,7 @@ class EnsureLoggedInContainer extends Component {
       const currentEdition = parsedPath[2] && editions.filter(edition => `${edition.id}` === parsedPath[2]);
 
       if (parsedPath[3] === 'moderatorPanel') {
-        if (!currentEdition || !currentEdition[0].moderator || currentEdition[0].status !== 'CLOSED') {
+        if (!currentEdition || !currentEdition[0].moderator || currentEdition[0].status === 'OPENED') {
           return <Redirect to="/"/>;
         }
       }
@@ -39,7 +39,7 @@ class EnsureLoggedInContainer extends Component {
       }
 
       if (parsedPath[3] === 'results') {
-        if (!currentEdition || !currentEdition[0].participant || currentEdition[0].status !== 'FINISHED') {
+        if (!currentEdition || (!currentEdition[0].participant && !currentEdition[0].moderator) || currentEdition[0].status !== 'PUBLISHED') {
           return <Redirect to="/" />;
         }
       }
