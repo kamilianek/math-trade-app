@@ -5,7 +5,7 @@ const INITIAL_STATE = {
   loginData: {
     username: null,
   },
-  roles: ['user'],
+  roles: ['ROLE_USER'],
   permissionRequest: {
     isFetchingSince: null,
     lastSuccessfulFetch: 1543051709502,
@@ -30,7 +30,7 @@ export const INVALIDATE_PERMISSION_REQUEST_STATUS = 'INVALIDATE_PERMISSION_REQUE
 const userRoles = {
   ADMIN: 'ROLE_ADMIN',
   MODERATOR: 'ROLE_MODERATOR',
-  USER: 'ROLE_STATUS',
+  USER: 'ROLE_USER',
 };
 export const requestPermissionStatus = {
   PENDING: 'PENDING',
@@ -44,7 +44,7 @@ export default function authReducer(state = INITIAL_STATE, action) {
       return {
         ...state,
         token: action.token,
-        tokenData: action.tokenData,
+        roles: action.roles,
         loginData: action.loginData,
       };
     case SIGN_OUT_FINISHED:

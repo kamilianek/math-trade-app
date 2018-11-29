@@ -186,7 +186,6 @@ class RequestExpansionPanel extends Component {
 
 const mapStateToProps = state => ({
   roles: state.auth.roles,
-  log: console.log(state),
   status: state.auth.permissionRequest.request.moderatorRequestStatus,
   reason: (state.auth.permissionRequest.request
     && state.auth.permissionRequest.request.reason) || '',

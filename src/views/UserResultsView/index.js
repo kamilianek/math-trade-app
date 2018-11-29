@@ -200,7 +200,7 @@ const mapStateToProps = (state, ownProps) => {
   const results = state.results.resultsByEdition
     && state.results.resultsByEdition[id]
     && state.results.resultsByEdition[id].result;
-  console.log('isModratior: ', edition);
+
   return ({
     edition,
     isModerator: edition && edition.moderator,

@@ -159,7 +159,7 @@ class MainPanelView extends React.Component {
       <>
         <MainContainer />
         <div className={classes.mainContainer}>
-          <Typography component="h1" variant="h2">
+          <Typography component="h1" variant="h4">
             Editions list
           </Typography>
           <EditionsTable
