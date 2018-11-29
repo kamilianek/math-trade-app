@@ -119,7 +119,7 @@ const styles = theme => ({
 
 const statusColors = {
   OPENED: '#bedd9a',
-  FINISHED: 'grey',
+  PUBLISHED: 'grey',
   CLOSED: '#ffdd72',
 };
 
@@ -206,31 +206,56 @@ class EditionsTable extends Component {
                       hover
                     >
                       <TableCell
-                        onClick={() => onEditionClicked(row.id, row.status, row.participant)}
+                        onClick={() => onEditionClicked(
+                          row.id,
+                          row.status,
+                          row.participant,
+                          row.moderator,
+                        )}
                         component="th"
                         scope="row"
                       >
                         {row.name}
                       </TableCell>
                       <TableCell
-                        onClick={() => onEditionClicked(row.id, row.status, row.participant)}
+                        onClick={() => onEditionClicked(
+                          row.id,
+                          row.status,
+                          row.participant,
+                          row.moderator,
+                        )}
                       >
                         { row.participant ? <Icon>how_to_reg</Icon> : null}
                       </TableCell>
                       <TableCell
-                        onClick={() => onEditionClicked(row.id, row.status, row.participant)}
+                        onClick={() => onEditionClicked(
+                          row.id,
+                          row.status,
+                          row.participant,
+                          row.moderator,
+                        )}
                         numeric
                       >
                         {row.numberOfParticipants}
                       </TableCell>
                       <TableCell
-                        onClick={() => onEditionClicked(row.id, row.status, row.participant)}
+                        onClick={() => onEditionClicked(
+                          row.id,
+                          row.status,
+                          row.participant,
+                          row.moderator,
+                        )}
                         numeric
                       >
                         {row.maxParticipants}
                       </TableCell>
                       <TableCell
-                        onClick={() => onEditionClicked(row.id, row.status, row.participant)}
+                        onClick={() => onEditionClicked(
+                          row.id,
+                          row.status,
+                          row.participant,
+                          row.moderator,
+                        )}
                         style={{ backgroundColor: statusColors[row.status] }}
                       >
                         {row.status}

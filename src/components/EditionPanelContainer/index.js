@@ -15,6 +15,7 @@ import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
 
 import actions from '../../actions';
 
@@ -25,15 +26,12 @@ const styles = theme => ({
     marginLeft: theme.spacing.unit * 3,
     marginRight: theme.spacing.unit * 3,
     marginTop: theme.spacing.unit * 5,
-    marginBottom: theme.spacing.unit * 5,
+    marginBottom: theme.spacing.unit * 7,
     [theme.breakpoints.up(400 + theme.spacing.unit * 3 * 2)]: {
       width: 1100,
       marginLeft: 'auto',
       marginRight: 'auto',
     },
-  },
-  rightButtonIcon: {
-    marginRight: theme.spacing.unit,
   },
   addEditionButtonContainer: {
     width: '100%',
@@ -53,7 +51,7 @@ const styles = theme => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    marginTop: theme.spacing.unit * 5,
+    marginTop: theme.spacing.unit * 2,
   },
   editionNavigation: {
     width: 500,
@@ -102,19 +100,18 @@ class EditionPanelContainer extends Component {
 
     return (
       <div className={classes.mainContainer}>
-        <Button
-          variant="contained"
+        <IconButton
           color="primary"
+          size="large"
           className={classes.backButton}
           onClick={() => this.setState({ goBack: true })}
         >
-          <Icon className={classes.rightButtonIcon}>keyboard_arrow_left</Icon>
-          Back
-        </Button>
+          <Icon>arrow_back</Icon>
+        </IconButton>
         <Typography className={classes.title} component="h1" variant="h2">
           {edition ? `Edition ${edition.name}` : 'Edition not found :('}
         </Typography>
-        {!(edition && edition.participant) ? <Button
+        {!(edition && edition.participant) && edition.status === 'OPENED' ? <Button
           variant="contained"
           color="secondary"
           className={classes.joinButton}
@@ -154,5 +151,5 @@ const mapDispatchToProps = (dispatch, ownProps) => bindActionCreators({
 
 
 export default withStyles(styles)(
-  withAlert(connect(null, mapDispatchToProps)(EditionPanelContainer))
+  withAlert(connect(null, mapDispatchToProps)(EditionPanelContainer)),
 );

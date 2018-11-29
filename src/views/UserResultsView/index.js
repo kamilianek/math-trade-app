@@ -1,9 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withAlert } from 'react-alert';
+import { Redirect } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { withStyles } from '@material-ui/core/styles';
+
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -11,6 +12,7 @@ import Typography from '@material-ui/core/Typography';
 import Icon from '@material-ui/core/Icon';
 import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 
 import actions from '../../actions';
 
@@ -46,12 +48,16 @@ const styles = theme => ({
     marginTop: theme.spacing.unit * 2,
     marginBottom: theme.spacing.unit * 2,
   },
+  actionButtonsPanel: {
+    marginTop: theme.spacing.unit * 2,
+  },
 });
 
 
 class UserResultsView extends React.Component {
   state = {
     expanded: null,
+    seeAll: false,
   };
 
   componentDidMount() {
@@ -151,10 +157,28 @@ class UserResultsView extends React.Component {
       edition,
       resultsToSend,
       resultsToReceive,
+      isModerator,
     } = this.props;
-    console.log('resultsToSend: ', resultsToSend);
+
+    if (this.state.seeAll) {
+      return <Redirect to={`/editions/${edition.id}/moderatorPanel`} />;
+    }
+
     return (
       <EditionPanelContainer edition={edition} navigationValue="products">
+        <div className={classes.actionButtonsPanel}>
+          {isModerator ? <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={() => {
+              this.setState({ seeAll: true });
+            }}
+          >
+            All results
+            <Icon>people_outline</Icon>
+          </Button> : null}
+        </div>
         <div className={classes.root}>
           <Typography className={classes.toSendHeader} variant="h4">
             Items to send
@@ -176,8 +200,10 @@ const mapStateToProps = (state, ownProps) => {
   const results = state.results.resultsByEdition
     && state.results.resultsByEdition[id]
     && state.results.resultsByEdition[id].result;
+  console.log('isModratior: ', edition);
   return ({
     edition,
+    isModerator: edition && edition.moderator,
     resultsToSend: (results && results.resultsToSend) || [],
     resultsToReceive: (results && results.resultsToReceive) || [],
     receivers: (results && results.receivers) || [],
@@ -186,7 +212,7 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  const id = ownProps.match.params.editionId;
+  const id = parseInt(ownProps.match.params.editionId, 10);
 
   return bindActionCreators({
     fetchUserResultsIfNeeded: () => (

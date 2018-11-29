@@ -408,7 +408,7 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  const id = ownProps.match.params.editionId;
+  const id = parseInt(ownProps.match.params.editionId, 10);
   return bindActionCreators({
     fetchDefinedGroupsIfNeeded: () => (
       actions.definedGroups.fetchDefinedGroupsIfNeeded(id)

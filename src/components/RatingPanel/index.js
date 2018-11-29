@@ -21,6 +21,10 @@ const styles = theme => ({
   rateText: {
     marginTop: theme.spacing.unit * 3,
   },
+  helper: {
+    borderLeft: `2px solid ${theme.palette.divider}`,
+    padding: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
+  },
 });
 
 class RatingPanel extends React.Component {
@@ -57,10 +61,11 @@ class RatingPanel extends React.Component {
       allowRating,
       starCounts,
       classes,
+      className,
     } = this.props;
 
     return (
-      <div style={{ display: 'inline-block' }}>
+      <div style={{ display: 'inline-block' }} className={className}>
         {
           new Array(starCounts).fill(0).map(
             (_, index) => (
@@ -85,7 +90,7 @@ class RatingPanel extends React.Component {
             fullWidth
             value={rateText}
             onChange={event => this.setState({ rateText: event.target.value })}
-          /> : <Typography className={classes.rateText}>
+          /> : <Typography variant="caption" className={[classes.rateText, classes.helper]}>
             {rateText}
           </Typography>
         }
@@ -112,8 +117,9 @@ RatingPanel.propTypes = {
   allowRating: PropTypes.bool,
   rate: PropTypes.number,
   starCounts: PropTypes.number,
-  onRateSubmit: PropTypes.func.isRequired,
+  onRateSubmit: PropTypes.func,
   rateText: PropTypes.string,
+  className: PropTypes.object,
 };
 
 RatingPanel.defaultProps = {
@@ -121,6 +127,8 @@ RatingPanel.defaultProps = {
   rate: 0,
   starCounts: 5,
   rateText: '',
+  onRateSubmit: () => null,
+  className: {},
 };
 
 
