@@ -89,13 +89,13 @@ class RegistrationView extends React.Component {
     const isEmailValid = this.state.email.length > 0 && this.state.email.length < 41;
     const isPasswordValid = this.state.password.length >= 6
       && this.state.repeatedPassword.length >= 6;
-    const isPasswordValidSame = !(this.state.password === this.state.repeatedPassword);
+    const isPasswordValidSame = this.state.password === this.state.repeatedPassword;
     const isAddressValid = this.state.address.length > 0;
     const isCityValid = this.state.city.length > 0;
     const isZipValid = this.state.zip.length > 0;
     const isCountryValid = this.state.country.length > 0;
 
-    console.log({
+    this.setState({
       isFirstNameValid,
       isLastNameValid,
       isUsernameValid,
@@ -107,7 +107,7 @@ class RegistrationView extends React.Component {
       isCountryValid,
     });
 
-    if (isPasswordValidSame) {
+    if (!isPasswordValidSame) {
       alert.show('Completed passwords are different', { type: 'error' });
     }
 
@@ -130,7 +130,7 @@ class RegistrationView extends React.Component {
         postalCode: this.state.zip,
         country: this.state.country,
       };
-
+      console.log('dupadupa');
       registerWithPassword(data)
         .then(() => alert.show('Successfully created account', { type: 'success' }))
         .catch(error => alert.show(error.message, { type: 'error' }));
