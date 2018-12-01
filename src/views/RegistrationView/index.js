@@ -9,6 +9,11 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import withStyles from '@material-ui/core/styles/withStyles';
+import { withAlert } from 'react-alert';
+import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
+
+import actions from '../../actions';
 
 const styles = theme => ({
   mainContainer: {
@@ -76,12 +81,15 @@ class RegistrationView extends React.Component {
   handleErrorClose = name => (this.state[name] ? null : { [name]: true });
 
   validateForm = () => {
-    const isFirstNameValid = this.state.firstName.length > 0;
-    const isLastNameValid = this.state.lastName.length > 0;
-    const isUsernameValid = this.state.username.length > 0;
-    const isEmailValid = this.state.email.length > 0;
-    const isPasswordValid = this.state.password.length > 0
-      && this.state.repeatedPassword.length > 0;
+    const { alert } = this.props;
+
+    const isFirstNameValid = this.state.firstName.length >= 2 && this.state.firstName.length < 41;
+    const isLastNameValid = this.state.lastName.length >= 2 && this.state.lastName.length < 41;
+    const isUsernameValid = this.state.username.length >= 3 && this.state.username.length < 15;
+    const isEmailValid = this.state.email.length > 0 && this.state.email.length < 41;
+    const isPasswordValid = this.state.password.length >= 6
+      && this.state.repeatedPassword.length >= 6;
+    const isPasswordValidSame = this.state.password === this.state.repeatedPassword;
     const isAddressValid = this.state.address.length > 0;
     const isCityValid = this.state.city.length > 0;
     const isZipValid = this.state.zip.length > 0;
@@ -99,21 +107,43 @@ class RegistrationView extends React.Component {
       isCountryValid,
     });
 
+    if (!isPasswordValidSame) {
+      alert.show('Completed passwords are different', { type: 'error' });
+    }
+
     return isFirstNameValid && isLastNameValid && isUsernameValid && isEmailValid && isPasswordValid
-      && isAddressValid && isCityValid && isZipValid && isCountryValid;
+      && isPasswordValidSame && isAddressValid && isCityValid && isZipValid && isCountryValid;
   };
 
   onRegisterSubmit = () => {
-    if (this.validateForm()) {
-      console.log('form is correct');
-      return;
-    }
+    const { registerWithPassword, alert } = this.props;
 
-    console.log('invalid form');
+    if (this.validateForm()) {
+      const data = {
+        name: this.state.firstName,
+        surname: this.state.lastName,
+        username: this.state.username,
+        email: this.state.email,
+        password: this.state.password,
+        address: this.state.address,
+        city: this.state.city,
+        postalCode: this.state.zip,
+        country: this.state.country,
+      };
+      console.log('dupadupa');
+      registerWithPassword(data)
+        .then(() => alert.show('Successfully created account', { type: 'success' }))
+        .catch(error => alert.show(error.message, { type: 'error' }));
+    }
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, isLoggedIn } = this.props;
+
+    if (isLoggedIn) {
+      return <Redirect to='/' />;
+    }
+
     return (
       <div className={classes.mainContainer}>
         <Paper className={classes.paper}>
@@ -132,10 +162,10 @@ class RegistrationView extends React.Component {
                 label="First name"
                 fullWidth
                 autoComplete="fname"
-                error={!this.state.isNameValid}
+                error={!this.state.isFirstNameValid}
                 onChange={(event) => {
                   this.handleChange(event, 'firstName');
-                  this.setState(this.handleErrorClose('isNameValid'));
+                  this.setState(this.handleErrorClose('isFirstNameValid'));
                 }}
               />
             </Grid>
@@ -147,10 +177,10 @@ class RegistrationView extends React.Component {
                 label="Last name"
                 fullWidth
                 autoComplete="lname"
-                error={!this.state.isSurnameValid}
+                error={!this.state.isLastNameValid}
                 onChange={(event) => {
                   this.handleChange(event, 'lastName');
-                  this.setState(this.handleErrorClose('isSurnameValid'));
+                  this.setState(this.handleErrorClose('isLastNameValid'));
                 }}
               />
             </Grid>
@@ -167,6 +197,7 @@ class RegistrationView extends React.Component {
                   this.handleChange(event, 'username');
                   this.setState(this.handleErrorClose('isUsernameValid'));
                 }}
+                helperText="3-15 characters"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -198,6 +229,7 @@ class RegistrationView extends React.Component {
                   this.handleChange(event, 'password');
                   this.setState(this.handleErrorClose('isPasswordValid'));
                 }}
+                helperText="Minimum 6 characters"
               />
             </Grid>
             <Grid item xs={12}>
@@ -306,5 +338,16 @@ RegistrationView.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
+const mapDispatchToProps = dispatch => ({
+  registerWithPassword: data => dispatch(actions.auth.registerWithPassword(data)),
+});
 
-export default withStyles(styles)(RegistrationView);
+const mapStateToProps = state => ({
+  con: console.log(state),
+  isLoggedIn: !!(state.auth && state.auth.token),
+});
+
+
+export default withAlert(
+  withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(RegistrationView)),
+);
