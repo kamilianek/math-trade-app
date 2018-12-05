@@ -1,3 +1,6 @@
+import { SIGN_OUT_FINISHED } from './auth';
+
+
 const INITIAL_STATE = {
   productsByEdition: { },
 };
@@ -10,6 +13,10 @@ export const RECEIVE_OTHER_ASSIGNED_PRODUCTS = 'RECEIVE_OTHER_ASSIGNED_PRODUCTS'
 
 export default function otherAssignedProductsReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
+    case SIGN_OUT_FINISHED:
+      return {
+        ...INITIAL_STATE,
+      };
     case INVALIDATE_OTHER_ASSIGNED_PRODUCTS:
       return {
         ...state,

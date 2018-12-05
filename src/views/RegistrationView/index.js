@@ -130,7 +130,7 @@ class RegistrationView extends React.Component {
         postalCode: this.state.zip,
         country: this.state.country,
       };
-      console.log('dupadupa');
+
       registerWithPassword(data)
         .then(() => alert.show('Successfully created account', { type: 'success' }))
         .catch(error => alert.show(error.message, { type: 'error' }));

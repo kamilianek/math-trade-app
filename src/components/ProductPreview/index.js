@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
@@ -27,6 +28,7 @@ class ProductPreview extends Component {
     const {
       item,
       classes,
+      apiUrl,
     } = this.props;
 
     return (
@@ -44,7 +46,7 @@ class ProductPreview extends Component {
               {item.description}
             </Typography>
             { (item.images || []).map(image => (
-              <img className={classes.image} src={image.uri} />
+              <img className={classes.image} src={`${apiUrl}/images/${image.name}`} />
             )) }
             </> : null
           }
@@ -59,5 +61,9 @@ ProductPreview.propTypes = {
   item: PropTypes.object,
 };
 
+const mapStateToProps = state => ({
+  apiUrl: state.auth.apiUrl,
+});
 
-export default withStyles(styles)(ProductPreview);
+
+export default withStyles(styles)(connect(mapStateToProps, null)(ProductPreview));

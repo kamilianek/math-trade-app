@@ -1,6 +1,5 @@
-/**
- * Created by kamilianek on 24.11.18.
- */
+import { SIGN_OUT_FINISHED } from './auth';
+
 const INITIAL_STATE = {
   isFetchingSince: null,
   lastSuccessfulFetch: null,
@@ -19,6 +18,10 @@ export const INVALIDATE_USER_DETAILS = 'INVALIDATE_USER_DETAILS';
 
 export default function userReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
+    case SIGN_OUT_FINISHED:
+      return {
+        ...INITIAL_STATE,
+      };
     case RECEIVE_ERROR_USER_DETAILS:
       return {
         ...state,

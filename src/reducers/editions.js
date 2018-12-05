@@ -1,6 +1,5 @@
-/**
- * Created by kamilianek on 05.11.18.
- */
+import { SIGN_OUT_FINISHED } from './auth';
+
 const INITIAL_STATE = {
   items: [],
   isFetchingSince: null,
@@ -23,6 +22,10 @@ export const CANCEL_EDITION = 'CANCEL_EDITION';
 
 export default function editionsReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
+    case SIGN_OUT_FINISHED:
+      return {
+        ...INITIAL_STATE,
+      };
     case CREATE_EDITION:
       return {
         ...state,
@@ -61,46 +64,15 @@ export default function editionsReducer(state = INITIAL_STATE, action) {
         ],
       };
     case CLOSE_EDITION:
-      return {
-        ...state,
-        items: state.items.map(edition => (edition.id === action.id ? {
-          ...edition,
-          status: 'CLOSED',
-        } : edition)),
-      };
     case REOPEN_EDITION:
-      return {
-        ...state,
-        items: state.items.map(edition => (edition.id === action.id ? {
-          ...edition,
-          status: 'OPENED',
-        } : edition)),
-      };
     case PUBLISH_EDITION:
-      return {
-        ...state,
-        items: state.items.map(edition => (edition.id === action.id ? {
-          ...edition,
-          status: 'PUBLISHED',
-        } : edition)),
-      };
     case CANCEL_EDITION:
-      return {
-        ...state,
-        items: state.items.map(edition => (edition.id === action.id ? {
-          ...edition,
-          status: 'CANCELLED',
-        } : edition)),
-      };
     case JOIN_EDITION:
       return {
         ...state,
-        items: state.items.map(edition => (edition.id === action.id ? {
-          ...edition,
-          participant: true,
-          numberOfParticipants: edition.numberOfParticipants + 1,
-        } : edition)),
+        items: state.items.map(edition => (edition.id === action.id ? action.edition : edition)),
       };
+
     default:
       return state;
   }

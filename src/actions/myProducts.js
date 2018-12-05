@@ -7,6 +7,8 @@ import {
   UPDATE_MY_ASSIGNED_PRODUCT,
 } from '../reducers/myAssignedProducts';
 
+import productsApi from '../api/products';
+
 import {
   REMOVE_MY_NOT_ASSIGNED_PRODUCT,
 } from '../reducers/myNotAssignedProducts';
@@ -14,54 +16,6 @@ import {
 const VALIDATE_TIME = 1000 * 60 * 10;
 const FETCHING_TIMEOUT = 1000 * 32;
 
-const myAssignedProducts = [
-  {
-    id: 1,
-    name: 'Fetched product1',
-    description: 'This products was fetched',
-    userId: 1,
-    editionId: 3,
-    images: [
-      { uri: 'http://placekitten.com/g/620/600' },
-      { uri: 'http://placekitten.com/g/450/800' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Fetched product2',
-    description: 'This products was fetched',
-    userId: 1,
-    editionId: 3,
-    images: [
-      { uri: 'http://placekitten.com/g/220/300' },
-      { uri: 'http://placekitten.com/g/120/300' },
-      { uri: 'http://placekitten.com/g/800/600' },
-      { uri: 'http://placekitten.com/g/400/400' },
-      { uri: 'http://placekitten.com/g/250/600' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Lorem ipsum dolor sit amet',
-    description: 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum dictum ipsum eu elit iaculis, ut pellentesque velit sollicitudin. Donec gravida quis tellus vitae lacinia. Fusce ultricies eget erat commodo consequat.',
-    userId: 1,
-    editionId: 3,
-    images: [
-      { uri: 'http://placekitten.com/g/1100/800' },
-      { uri: 'http://placekitten.com/g/120/300' },
-    ],
-  },
-  {
-    id: 4,
-    name: 'In ultricies id leo ut fringilla',
-    description: 'Mauris lobortis ultrices dui, varius condimentum erat efficitur ut. Donec eget augue leo. Suspendisse accumsan venenatis maximus.',
-    userId: 1,
-    editionId: 3,
-    images: [
-      { uri: 'http://placekitten.com/g/500/500' },
-    ],
-  },
-];
 
 function requestMyAssignedProducts(editionId) {
   return {
@@ -97,14 +51,16 @@ function receiveErrorMyAssignedProducts(editionId) {
 }
 
 function fetchMyAssignedProducts(editionId) {
-  return async (dispatch) => {
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
     dispatch(requestMyAssignedProducts(editionId));
-    try {
-      // const items = await api.myProducts.fetchMyAssignedProducts(editionId)
-      dispatch(receiveMyAssignedProducts(editionId, myAssignedProducts));
-    } catch (e) {
-      dispatch(receiveErrorMyAssignedProducts(editionId));
-    }
+    return productsApi.fetchMyItems(apiUrl, token, editionId)
+      .then((response) => {
+        dispatch(receiveMyAssignedProducts(editionId, response));
+      }, (error) => {
+        dispatch(receiveErrorMyAssignedProducts(editionId));
+        throw error;
+      });
   };
 }
 
@@ -142,38 +98,54 @@ export function fetchMyAssignedProductsIfNeeded(editionId) {
 }
 
 export function createProduct(editionId, name, description, images) {
-  return async (dispatch) => {
-    // const item = await api.myProducts.createProduct()
-    dispatch({
-      type: CREATE_MY_ASSIGNED_PRODUCT,
-      editionId,
-      item: {
-        id: Math.floor(Math.random() * 1000000),
-        userId: 1,
-        name,
-        editionId,
-        description,
-        images,
-      },
-    });
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+    const item = {
+      name,
+      description,
+      imagesToRemove: [],
+    };
+
+    return productsApi.createItem(apiUrl, token, editionId, item, images)
+      .then((response) => {
+        console.log(response);
+        dispatch({
+          type: CREATE_MY_ASSIGNED_PRODUCT,
+          editionId: response.editionId,
+          item: response,
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
-export function updateMyAssignedProduct(editionId, id, name, description, images) {
-  return async (dispatch) => {
-    // const item = await api.myProducts.updateProduct()
-    dispatch({
-      type: UPDATE_MY_ASSIGNED_PRODUCT,
-      editionId,
-      item: {
-        id,
-        userId: 1,
-        name,
-        editionId,
-        description,
-        images,
-      },
-    });
+export function updateMyAssignedProduct(
+  editionId,
+  itemId,
+  name,
+  description,
+  images,
+  imagesToRemove,
+) {
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+    const item = {
+      name,
+      description,
+      imagesToRemove,
+    };
+
+    return productsApi.editItem(apiUrl, token, itemId, item, images)
+      .then((response) => {
+        dispatch({
+          type: UPDATE_MY_ASSIGNED_PRODUCT,
+          editionId,
+          item: response,
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
@@ -185,22 +157,20 @@ function removeMyNotAssignedProduct(itemId) {
 }
 
 export function assignProductToEdition(editionId, itemId) {
-  return async (dispatch, getState) => {
-    // const items = await api.myProducts.assignProductToEdition(editionId, productId)
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
 
-    // TODO: replace getState with returned value!!
-    const item = getState().myNotAssignedProducts.items.filter(i => i.id === itemId)[0];
-
-    dispatch({
-      type: CREATE_MY_ASSIGNED_PRODUCT,
-      editionId,
-      item: {
-        ...item,
-        editionId,
-      },
-    });
-
-    dispatch(removeMyNotAssignedProduct(itemId));
+    return productsApi.assignItemToEdition(apiUrl, token, editionId, itemId)
+      .then((response) => {
+        dispatch({
+          type: CREATE_MY_ASSIGNED_PRODUCT,
+          editionId,
+          item: response,
+        });
+        dispatch(removeMyNotAssignedProduct(itemId));
+      }, (error) => {
+        throw error;
+      });
   };
 }
 

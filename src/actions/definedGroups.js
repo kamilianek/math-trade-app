@@ -8,23 +8,25 @@ import {
   UPDATE_DEFINED_GROUP_CONTENT,
 } from '../reducers/definedGroups';
 
+import definedGroupsApi from '../api/definedGroups';
+
 const VALIDATE_TIME = 1000 * 60 * 5;
 const FETCHING_TIMEOUT = 1000 * 32;
 
-const myDefinedGroups = [
-  {
-    id: 10000,
-    name: 'Group345',
-    productsIds: [1003, 1004, 1005],
-    groupIds: [],
-  },
-  {
-    id: 10001,
-    name: 'Group567',
-    productsIds: [1005, 1006, 1007],
-    groupIds: [10000],
-  },
-];
+// const myDefinedGroups = [
+//   {
+//     id: 10000,
+//     name: 'Group345',
+//     productsIds: [1003, 1004, 1005],
+//     groupIds: [],
+//   },
+//   {
+//     id: 10001,
+//     name: 'Group567',
+//     productsIds: [1005, 1006, 1007],
+//     groupIds: [10000],
+//   },
+// ];
 
 
 function requestDefinedGroups(editionId) {
@@ -62,15 +64,16 @@ function receiveErrorDefinedGroups(editionId) {
 
 
 function fetchDefinedGroups(editionId) {
-  return async (dispatch) => {
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
     dispatch(requestDefinedGroups(editionId));
-    try {
-      // const definedGroups = await api.definedGroups.fetchDefinedGroups(editionId)
-      dispatch(receiveDefinedGroups(editionId, myDefinedGroups));
-    } catch (e) {
-      dispatch(receiveErrorDefinedGroups(editionId));
-      throw e;
-    }
+    return definedGroupsApi.fetchDefinedGroups(apiUrl, token, editionId)
+      .then((response) => {
+        dispatch(receiveDefinedGroups(editionId, response));
+      }, (error) => {
+        dispatch(receiveErrorDefinedGroups(editionId));
+        throw error;
+      });
   };
 }
 
@@ -108,52 +111,59 @@ export function fetchDefinedGroupsIfNeeded(editionId) {
 }
 
 export function createDefinedGroup(editionId, name) {
-  return async (dispatch) => {
-    // const item = await api.definedGroups.createDefinedGroup()
-    dispatch({
-      type: CREATE_DEFINED_GROUP,
-      editionId,
-      group: {
-        id: Math.floor(Math.random() * 1000000),
-        name,
-        productsIds: [],
-        groupIds: [],
-      },
-    });
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+    const definedGroup = { name };
+    return definedGroupsApi.createDefinedGroup(apiUrl, token, editionId, definedGroup)
+      .then((response) => {
+        dispatch({
+          type: CREATE_DEFINED_GROUP,
+          editionId,
+          group: response,
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
 export function editDefinedGroup(editionId, definedGroupId, name) {
-  return async (dispatch, getState) => {
-    // const item = await api.definedGroups.editDefinedGroup()
-    // TODO: replace getState with returned value!!
-    const group = getState().definedGroups.definedGroupsByEdition[editionId].groups
-      .filter(g => g.id === definedGroupId)[0];
-    dispatch({
-      type: EDIT_DEFINED_GROUP,
-      editionId,
-      group: {
-        ...group,
-        name,
-      },
-    });
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+    const definedGroup = { name };
+
+    return definedGroupsApi.editDefinedGroup(apiUrl, token, editionId, definedGroupId, definedGroup)
+      .then((response) => {
+        dispatch({
+          type: EDIT_DEFINED_GROUP,
+          editionId,
+          group: response,
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
-export function updateDefinedGroupContent(editionId, definedGroupId, productsIds, groupIds) {
-  return async (dispatch, getState) => {
-    // const item = await api.definedGroups.updateDefinedGroupContents()
-    // TODO: replace getState with returned value!!
-    const group = getState().definedGroups.definedGroupsByEdition[editionId].groups
-      .filter(g => g.id === definedGroupId)[0];
-    dispatch({
-      type: UPDATE_DEFINED_GROUP_CONTENT,
+export function updateDefinedGroupContent(editionId, definedGroupId, itemsIds, groupIds) {
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+    const definedGroup = { itemsIds, groupIds };
+
+    return definedGroupsApi.updateDefinedGroupContent(
+      apiUrl,
+      token,
       editionId,
-      group: {
-        ...group,
-        productsIds,
-        groupIds,
-      },
+      definedGroupId,
+      definedGroup,
+    ).then((response) => {
+      dispatch({
+        type: UPDATE_DEFINED_GROUP_CONTENT,
+        editionId,
+        group: response,
+      });
+    }, (error) => {
+      throw error;
     });
   };
 }

@@ -9,7 +9,7 @@ class EnsureLoggedInContainer extends Component {
   };
 
   render() {
-    const { isLoggedIn, location, editions } = this.props;
+    const { isLoggedIn, location, editions, userExists } = this.props;
     const pathname = location && location.pathname;
 
     if (!isLoggedIn) {
@@ -17,6 +17,10 @@ class EnsureLoggedInContainer extends Component {
         default:
           return <Redirect to="/login"/>;
       }
+    }
+
+    if (!userExists) {
+      return <Redirect to="/register" />;
     }
 
     const parsedPath = pathname.split('/');
@@ -60,6 +64,7 @@ const mapStateToProps = (state) => {
 
   return {
     isLoggedIn,
+    userExists: auth.userExists,
     editions: isLoggedIn && state.editions.items,
   };
 };

@@ -145,8 +145,9 @@ class EditionsTable extends Component {
       alert,
     } = this.props;
 
+    //console.log('>>', fetchEditionsIfNeeded());
     fetchEditionsIfNeeded()
-      .catch(() => alert('Cannot fetch editions', { type: 'error' }));
+      .catch(error => alert.show(error.message, { type: 'error' }));
   }
 
   callSorting(event, property) {
@@ -308,6 +309,7 @@ EditionsTable.propTypes = {
 
 const mapStateToProps = state => ({
   editions: state.editions.items,
+  log: console.log(state),
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

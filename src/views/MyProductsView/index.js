@@ -119,6 +119,7 @@ class MyProductsView extends React.Component {
       isDescriptionValid: true,
       images: [],
       newImages: [],
+      imagesToRemove: [],
       newName: '',
       newDescription: '',
       isNewNameValid: true,
@@ -142,10 +143,14 @@ class MyProductsView extends React.Component {
       fetchMyAssignedProductsIfNeeded,
       fetchMyNotAssignedProductsIfNeeded,
       alert,
+      isParticipant,
     } = this.props;
-    fetchMyAssignedProductsIfNeeded()
-      .then(() => fetchMyNotAssignedProductsIfNeeded())
-      .catch(() => alert.show('Cannot load your products', { type: 'error' }));
+
+    if (isParticipant) {
+      fetchMyAssignedProductsIfNeeded()
+        .then(() => fetchMyNotAssignedProductsIfNeeded())
+        .catch(() => alert.show('Cannot load your products', { type: 'error' }));
+    }
   }
 
   onItemClick(item, dataHeader) {
@@ -155,6 +160,7 @@ class MyProductsView extends React.Component {
         name: item.name,
         description: item.description,
         images: item.images,
+        imagesToRemove: [],
         editMode: false,
         productCreationMode: false,
         isNewNameValid: true,
@@ -218,6 +224,7 @@ class MyProductsView extends React.Component {
       productCreationMode,
       images,
       newImages,
+      imagesToRemove,
       editMode,
       currentItem,
     } = this.state;
@@ -228,20 +235,45 @@ class MyProductsView extends React.Component {
     }
 
     if (productCreationMode) {
-      createProduct(newName, newDescription, newImages)
+      const imagesToSend = newImages.filter(image => !image.id && image.file)
+        .map(image => image.file);
+
+      console.log('imagesToSend: ', imagesToSend);
+      createProduct(newName, newDescription, imagesToSend)
         .then(() => alert.show('Successfully created product', { type: 'success' }))
         .catch(error => alert.show(`Cannot add product: ${error.message}`, { type: 'error' }));
+
+      this.setState({
+        productCreationMode: false,
+        editMode: false,
+      });
+
+      return;
     }
 
     console.log(productCreationMode, editMode, images);
 
     if (editMode) {
+      const imagesToSend = images.filter(image => !image.id && image.file)
+        .map(image => image.file);
       if (currentItem.editionId) { // assigned product edition
-        updateMyAssignedProduct(currentItem.id, name, description, images)
+        updateMyAssignedProduct(
+          currentItem.id,
+          name,
+          description,
+          imagesToSend,
+          imagesToRemove,
+        )
           .then(() => alert.show('Successfully updated product', { type: 'success' }))
           .catch(error => alert.show(`Cannot update product: ${error.message}`, { type: 'error' }));
       } else { // not assigned product edition
-        updateMyNotAssignedProduct(currentItem.id, name, description, images)
+        updateMyNotAssignedProduct(
+          currentItem.id,
+          name,
+          description,
+          imagesToSend,
+          imagesToRemove,
+        )
           .then(() => alert.show('Successfully updated product', { type: 'success' }))
           .catch(error => alert.show(`Cannot update product: ${error.message}`, { type: 'error' }));
       }
@@ -268,15 +300,29 @@ class MyProductsView extends React.Component {
     });
   }
 
-  removeImage(uri) {
+  removeImage(name) {
     const { images, newImages, productCreationMode } = this.state;
+    let uriToRemove = null;
 
     if (productCreationMode) {
-      const updatedImages = newImages.filter(image => image.uri !== uri);
+      const updatedImages = newImages.filter(image => image.name !== name);
       this.setState({ newImages: updatedImages });
     } else {
-      const updatedImages = images.filter(image => image.uri !== uri);
-      this.setState({ images: updatedImages });
+      const updatedImages = images.filter((image) => {
+        if (image.name !== name) {
+          return true;
+        }
+
+        if (image.id) {
+          uriToRemove = image.id;
+        }
+
+        return false;
+      });
+      this.setState(state => ({
+        images: updatedImages,
+        imagesToRemove: uriToRemove ? [...state.imagesToRemove, uriToRemove] : state.imagesToRemove,
+      }));
     }
   }
 
@@ -301,11 +347,11 @@ class MyProductsView extends React.Component {
           if (event.loaded <= MyProductsView.MAX_IMAGE_SIZE) {
             if (productCreationMode) {
               this.setState(state => ({
-                newImages: [...state.newImages, { uri: event.target.result }],
+                newImages: [...state.newImages, { name: event.target.result, file }],
               }));
             } else {
               this.setState(state => ({
-                images: [...state.images, { uri: event.target.result }],
+                images: [...state.images, { name: event.target.result, file }],
               }));
             }
           } else {
@@ -337,6 +383,7 @@ class MyProductsView extends React.Component {
       myAssignedItems,
       myNotAssignedItems,
       isParticipant,
+      apiUrl,
     } = this.props;
 
     const {
@@ -443,12 +490,12 @@ class MyProductsView extends React.Component {
                 <div className={classes.gridListContainer}>
                   {imagesToShow.map(image => (
                     <div className={classes.deleteButtonContainer}>
-                      <img src={image.uri} alt={'image'} className={classes.image} />
+                      <img src={image.id ? `${apiUrl}/images/${image.name}` : image.name} alt={'image'} className={classes.image} />
                       { editMode || productCreationMode
                         ? <div className={classes.titleBar} /> : null }
                       { editMode || productCreationMode
                         ? <IconButton
-                            onClick={() => this.removeImage(image.uri)}
+                            onClick={() => this.removeImage(image.name)}
                             color="inherit"
                             className={classes.deleteButtonIcon}
                           >
@@ -538,6 +585,7 @@ const mapStateToProps = (state, ownProps) => {
   const product = state.myAssignedProducts.productsByEdition[id];
 
   return ({
+    apiUrl: state.auth && state.auth.apiUrl,
     edition,
     myAssignedItems: (product && product.items) || [],
     myNotAssignedItems: state.myNotAssignedProducts.items || [],
@@ -558,14 +606,14 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     createProduct: (name, description, images) => (
       actions.myProducts.createProduct(id, name, description, images)
     ),
-    updateMyAssignedProduct: (currentItemId, name, description, images) => (
+    updateMyAssignedProduct: (currentItemId, name, description, images, imagesToRemove) => (
       actions.myProducts.updateMyAssignedProduct(
-        id, currentItemId, name, description, images,
+        id, currentItemId, name, description, images, imagesToRemove,
       )
     ),
-    updateMyNotAssignedProduct: (currentItemId, name, description, images) => (
+    updateMyNotAssignedProduct: (currentItemId, name, description, images, imagesToRemove) => (
       actions.myNotAssignedProducts.updateMyNotAssignedProduct(
-        currentItemId, name, description, images,
+        currentItemId, name, description, images, imagesToRemove,
       )
     ),
     assignProductToEdition: currentItemId => (

@@ -1,7 +1,8 @@
+import { SIGN_OUT_FINISHED } from './auth';
+
 const INITIAL_STATE = {
   definedGroupsByEdition: { },
 };
-
 
 export const RECEIVE_ERROR_DEFINED_GROUPS = 'RECEIVE_ERROR_DEFINED_GROUPS';
 export const REQUEST_DEFINED_GROUPS = 'REQUEST_DEFINED_GROUPS';
@@ -13,6 +14,10 @@ export const UPDATE_DEFINED_GROUP_CONTENT = 'UPDATE_DEFINED_GROUP_CONTENT';
 
 export default function definedGroupsReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
+    case SIGN_OUT_FINISHED:
+      return {
+        ...INITIAL_STATE,
+      };
     case INVALIDATE_DEFINED_GROUPS:
       return {
         ...state,

@@ -88,7 +88,7 @@ class PreferencesView extends React.Component {
     let preferenceForItem = null;
 
     if (myAssignedItems && myAssignedItems[0]) {
-      preferenceForItem = preferences.filter(pref => pref.haveProductId === myAssignedItems[0].id);
+      preferenceForItem = preferences.filter(pref => pref.haveItemId === myAssignedItems[0].id);
     }
 
     this.state = {
@@ -96,7 +96,7 @@ class PreferencesView extends React.Component {
       myProductsSearchMode: false,
       otherProductsSearchMode: false,
       selectedOtherProductIds: (preferenceForItem && preferenceForItem[0]
-        && preferenceForItem[0].wantedProductsIds) || [],
+        && preferenceForItem[0].wantedItemsIds) || [],
       selectedGroupIds: (preferenceForItem && preferenceForItem[0]
         && preferenceForItem[0].wantedDefinedGroupsIds) || [],
       preferences,
@@ -121,19 +121,22 @@ class PreferencesView extends React.Component {
       fetchMyAssignedProducts,
       fetchDefinedGroups,
       alert,
+      isParticipant,
     } = this.props;
 
     fetchOtherAssignedProducts()
-      .catch(() => alert.show('Cannot load your items', { type: 'error' }));
+      .catch(error => alert.show(`Cannot load others items: ${error.message}`, { type: 'error' }));
 
-    fetchMyAssignedProducts()
-      .catch(() => alert.show('Cannot load other items', { type: 'error' }));
+    if (isParticipant) {
+      fetchMyAssignedProducts()
+        .catch(error => alert.show(`Cannot load your items: ${error.message}`, { type: 'error' }));
 
-    fetchDefinedGroups()
-      .catch(() => alert.show('Cannot load defined groups', { type: 'error' }));
+      fetchDefinedGroups()
+        .catch(error => alert.show(`Cannot load defined groups: ${error.message}`, { type: 'error' }));
 
-    fetchPreferences()
-      .catch(() => alert.show('Cannot load preferences', { type: 'error' }));
+      fetchPreferences()
+        .catch(error => alert.show(`Cannot load preferences: ${error.message}`, { type: 'error' }));
+    }
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -141,13 +144,13 @@ class PreferencesView extends React.Component {
       let preferenceForItem = null;
       if (state.myAssignedItems && state.selectedMyProduct) {
         preferenceForItem = props.preferences.filter(
-          pref => pref.haveProductId === state.selectedMyProduct.id,
+          pref => pref.haveItemId === state.selectedMyProduct.id,
         );
       }
       return {
         preferences: props.preferences,
         selectedOtherProductIds: (preferenceForItem && preferenceForItem[0]
-          && preferenceForItem[0].wantedProductsIds) || [],
+          && preferenceForItem[0].wantedItemsIds) || [],
         selectedGroupIds: (preferenceForItem && preferenceForItem[0]
           && preferenceForItem[0].wantedDefinedGroupsIds) || [],
       };
@@ -201,13 +204,13 @@ class PreferencesView extends React.Component {
     const { preferences } = this.props;
 
     const preferenceForItem = preferences.filter(
-      pref => pref.haveProductId === selectedMyProduct.id,
+      pref => pref.haveItemId === selectedMyProduct.id,
     );
 
     this.setState({
       openDialog: false,
       selectedOtherProductIds: preferenceForItem.length > 0
-        ? preferenceForItem[0].wantedProductsIds : [],
+        ? preferenceForItem[0].wantedItemsIds : [],
       selectedGroupIds: preferenceForItem.length > 0
         ? preferenceForItem[0].wantedDefinedGroupsIds : [],
       editMode: false,
@@ -274,12 +277,12 @@ class PreferencesView extends React.Component {
                 data={myProductsSearchMode ? myAssignedItems : this.props.myAssignedItems}
                 primaryAction={(item) => {
                   const pref = preferences.filter(
-                    i => i.haveProductId === item.id,
+                    i => i.haveItemId === item.id,
                   );
                   this.setState({
                     selectedMyProduct: item,
                     selectedGroupIds: (pref.length > 0 && pref[0].wantedDefinedGroupsIds) || [],
-                    selectedOtherProductIds: (pref.length > 0 && pref[0].wantedProductsIds) || [],
+                    selectedOtherProductIds: (pref.length > 0 && pref[0].wantedItemsIds) || [],
                   });
                 }}
                 editMode={editMode}
@@ -341,7 +344,7 @@ class PreferencesView extends React.Component {
             </Paper>
           </Grid>
           <Grid item xs={12} sm={!isParticipant ? 6 : 12}>
-            <ProductPreview item={itemToPreview} />
+            <ProductPreview item={itemToPreview}/>
           </Grid>
         </Grid>
         <CustomDialog
@@ -389,8 +392,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     fetchDefinedGroups: () => (
       actions.definedGroups.fetchDefinedGroupsIfNeeded(id)
     ),
-    updatePreference: (productId, wantedProductsIds, wantedDefinedGroupsIds) => (
-      actions.preferences.updatePreference(id, productId, wantedProductsIds, wantedDefinedGroupsIds)
+    updatePreference: (productId, wantedItemsIds, wantedDefinedGroupsIds) => (
+      actions.preferences.updatePreference(id, productId, wantedItemsIds, wantedDefinedGroupsIds)
     ),
   }, dispatch);
 };

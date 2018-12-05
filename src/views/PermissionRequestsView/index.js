@@ -1,5 +1,9 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
+import { withAlert } from 'react-alert';
 
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -57,8 +61,10 @@ class PermissionRequestsView extends React.Component {
   }
 
   componentDidMount() {
-    actions.permissionRequest.fetchRequestsToVerify()
-      .then(response => this.setState({ requests: response.requests }))
+    const { fetchRequestsToVerify, alert } = this.props;
+
+    fetchRequestsToVerify()
+      .then(response => this.setState({ requests: response }))
       .catch(error => alert.show(error.message, { type: 'error' }));
   }
 
@@ -72,15 +78,20 @@ class PermissionRequestsView extends React.Component {
 
   handleSubmit() {
     const { accepted, rejected } = this.state;
+    const { fetchRequestsToVerify, resolveModeratorRequests, alert } = this.props;
 
     if (accepted.length === 0 && rejected.length === 0) {
       alert.show('You didn\'t resolved any permission requests', { type: 'error' });
     }
 
-    // TODO: request here
-
-
-    // TODO: and fetch again
+    resolveModeratorRequests(accepted, rejected)
+      .then((response) => {
+        alert.show(response.message, { type: 'success' });
+        fetchRequestsToVerify()
+          .then(fetchResponse => this.setState({ requests: fetchResponse }))
+          .catch(error => alert.show(error.message, { type: 'error' }));
+      })
+      .catch(error => alert.show(error.message, { type: 'error' }));
   }
 
   render() {
@@ -142,5 +153,18 @@ class PermissionRequestsView extends React.Component {
   }
 }
 
+const mapDispatchToProps = dispatch => bindActionCreators({
+  fetchRequestsToVerify: () => (
+    actions.permissionRequest.fetchRequestsToVerify()
+  ),
+  resolveModeratorRequests: (acceptedRequestsIds, rejectedRequestsIds) => (
+    actions.permissionRequest.resolveModeratorRequests(
+      acceptedRequestsIds, rejectedRequestsIds,
+    )
+  ),
+}, dispatch);
 
-export default withStyles(styles)(PermissionRequestsView);
+
+export default withStyles(styles)(
+  withAlert(connect(null, mapDispatchToProps)(PermissionRequestsView)),
+);

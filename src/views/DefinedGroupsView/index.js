@@ -72,8 +72,8 @@ class DefinedGroupsView extends Component {
       myDefinedGroups,
       otherAssignedItems,
       selectedMyGroup: (myDefinedGroups && myDefinedGroups[0]) || null,
-      selectedProductIds: (myDefinedGroups && myDefinedGroups[0]
-        && myDefinedGroups[0].productsIds) || [],
+      selectedItemIds: (myDefinedGroups && myDefinedGroups[0]
+        && myDefinedGroups[0].itemsIds) || [],
       selectedGroupIds: (myDefinedGroups && myDefinedGroups[0]
         && myDefinedGroups[0].groupIds) || [],
       groupToPreview: null,
@@ -96,10 +96,14 @@ class DefinedGroupsView extends Component {
   componentDidMount() {
     const {
       fetchDefinedGroupsIfNeeded,
+      alert,
+      isParticipant,
     } = this.props;
 
-    fetchDefinedGroupsIfNeeded()
-      .catch(() => alert.show('Cannot load your defined groups', { type: 'error' }));
+    if (isParticipant) {
+      fetchDefinedGroupsIfNeeded()
+        .catch(() => alert.show('Cannot load your defined groups', { type: 'error' }));
+    }
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -109,7 +113,7 @@ class DefinedGroupsView extends Component {
 
       return {
         myDefinedGroups: props.myDefinedGroups,
-        selectedProductIds: (selectedDefinedGroup[0] && selectedDefinedGroup[0].productsIds) || [],
+        selectedItemIds: (selectedDefinedGroup[0] && selectedDefinedGroup[0].itemsIds) || [],
         selectedGroupIds: (selectedDefinedGroup[0] && selectedDefinedGroup[0].groupIds) || [],
       };
     }
@@ -134,7 +138,7 @@ class DefinedGroupsView extends Component {
 
     this.setState({
       openDialog: false,
-      selectedProductIds: selectedMyGroup.productsIds,
+      selectedItemIds: selectedMyGroup.itemsIds,
       selectedGroupIds: selectedMyGroup.groupIds,
       editMode: false,
     });
@@ -202,7 +206,7 @@ class DefinedGroupsView extends Component {
 
     const {
       selectedMyGroup,
-      selectedProductIds,
+      selectedItemIds,
       selectedGroupIds,
     } = this.state;
 
@@ -211,7 +215,7 @@ class DefinedGroupsView extends Component {
       return;
     }
 
-    updateDefinedGroupContent(selectedMyGroup.id, selectedProductIds, selectedGroupIds)
+    updateDefinedGroupContent(selectedMyGroup.id, selectedItemIds, selectedGroupIds)
       .then(() => alert.show('Successfully updated defined group', { type: 'success' }))
       .catch(err => alert.show(`Cannot update defined group: ${err.message}`, { type: 'error' }));
 
@@ -247,7 +251,7 @@ class DefinedGroupsView extends Component {
       editMode,
       selectedMyGroup,
       groupToPreview,
-      selectedProductIds,
+      selectedItemIds,
       selectedGroupIds,
       openDialog,
       newDefinedGroupName,
@@ -272,7 +276,7 @@ class DefinedGroupsView extends Component {
                 data={this.props.myDefinedGroups}
                 primaryAction={item => this.setState({
                   selectedMyGroup: item,
-                  selectedProductIds: item.productsIds,
+                  selectedItemIds: item.itemsIds,
                   selectedGroupIds: item.groupIds,
                 })}
                 editMode={editMode}
@@ -317,16 +321,16 @@ class DefinedGroupsView extends Component {
                 data={[otherAssignedItems, myDefinedGroups]}
                 disabled={!editMode}
                 titles={['Other items: ', 'My defined groups: ']}
-                currentSelected={[selectedProductIds, selectedGroupIds]}
+                currentSelected={[selectedItemIds, selectedGroupIds]}
                 onItemClick={[
-                  item => this.handleItemClick(item, 'selectedProductIds'),
+                  item => this.handleItemClick(item, 'selectedItemIds'),
                   item => this.handleItemClick(item, 'selectedGroupIds'),
                 ]}
                 secondaryAction={item => this.setState({ groupToPreview: item })}
                 selectedWithSecondaryId={groupToPreview && groupToPreview.id}
               />
               <Typography className={classes.sectionSubtitle} component="h1" variant="body1">
-                {`Items assigned: ${selectedGroupIds.length + selectedProductIds.length}`}
+                {`Items assigned: ${selectedGroupIds.length + selectedItemIds.length}`}
               </Typography>
               <Grid item xs={12} sm={6}>
                 {editMode ? <Button
@@ -352,8 +356,8 @@ class DefinedGroupsView extends Component {
             <ProductPreview
               item={groupToPreview}
               editionId={edition.id}
-              wantedProductsNames={groupToPreview && groupToPreview.productsIds
-                ? otherAssignedItems.filter(i => groupToPreview.productsIds.includes(i.id)) : null}
+              wantedProductsNames={groupToPreview && groupToPreview.itemsIds
+                ? otherAssignedItems.filter(i => groupToPreview.itemsIds.includes(i.id)) : null}
               wantedGroupsNames={groupToPreview && groupToPreview.groupIds
                 ? myDefinedGroups.filter(i => groupToPreview.groupIds.includes(i.id)) : null}
             />
@@ -419,8 +423,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     editDefinedGroup: (definedGroupId, name) => (
       actions.definedGroups.editDefinedGroup(id, definedGroupId, name)
     ),
-    updateDefinedGroupContent: (definedGroupId, productsIds, groupIds) => (
-      actions.definedGroups.updateDefinedGroupContent(id, definedGroupId, productsIds, groupIds)
+    updateDefinedGroupContent: (definedGroupId, itemsIds, groupIds) => (
+      actions.definedGroups.updateDefinedGroupContent(id, definedGroupId, itemsIds, groupIds)
     ),
   }, dispatch);
 };

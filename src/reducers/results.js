@@ -1,3 +1,6 @@
+import { SIGN_OUT_FINISHED } from './auth';
+
+
 const INITIAL_STATE = {
   resultsByEdition: {},
 };
@@ -10,6 +13,10 @@ export const RATE_RESULT = 'RATE_RESULT';
 
 export default function resultsReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
+    case SIGN_OUT_FINISHED:
+      return {
+        ...INITIAL_STATE,
+      };
     case RECEIVE_USER_RESULTS:
       return {
         ...state,
