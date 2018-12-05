@@ -16,67 +16,10 @@ import {
   UPDATE_MODERATOR_RESULTS_STATUS,
 } from '../reducers/moderatorResults';
 
+import editionsApi from '../api/editions';
 
 const VALIDATE_TIME = 1000 * 60 * 5;
 const FETCHING_TIMEOUT = 1000 * 32;
-
-const mock_editions = [
-  {
-    name: 'Mathandel 621',
-    description: 'this edition is very cool',
-    endDate: '2018-10-25T17:27:19.698',
-    maxParticipants: 12,
-    numberOfParticipants: 1,
-    id: 2,
-    moderator: true,
-    participant: false,
-    status: 'PUBLISHED',
-  },
-  {
-    name: 'Mathandel 2',
-    description: 'this edition is very cool',
-    endDate: '2019-11-22',
-    maxParticipants: 1,
-    numberOfParticipants: 1,
-    id: 3,
-    moderator: true,
-    participant: true,
-    status: 'OPENED',
-  },
-  {
-    name: 'Mathandel 222',
-    description: 'this edition is very cool',
-    endDate: '2019-11-22',
-    maxParticipants: 100,
-    numberOfParticipants: 67,
-    id: 4,
-    moderator: false,
-    participant: false,
-    status: 'OPENED',
-  },
-  {
-    name: 'Mathandel 222',
-    description: 'this edition is very cool',
-    endDate: '2019-11-22',
-    maxParticipants: 100,
-    numberOfParticipants: 47,
-    id: 5,
-    moderator: false,
-    participant: true,
-    status: 'PUBLISHED',
-  },
-  {
-    name: 'Mathandel xx1',
-    description: 'this edition is not very cool',
-    endDate: '2019-12-22',
-    maxParticipants: 1100,
-    numberOfParticipants: 647,
-    id: 6,
-    moderator: false,
-    participant: false,
-    status: 'PUBLISHED',
-  },
-];
 
 
 function requestEditions(editionId) {
@@ -111,15 +54,15 @@ function receiveErrorEditions() {
 
 
 function fetchEditions() {
-  return async (dispatch) => {
+  return (dispatch, getState) => {
     dispatch(requestEditions());
-    try {
-      // const editions = await api.editions.fetchEditions()
-      dispatch(receiveEditions(mock_editions));
-    } catch (e) {
-      dispatch(receiveErrorEditions());
-      throw e;
-    }
+    return editionsApi.fetchEditions(getState().auth.apiUrl, getState().auth.token)
+      .then((editions) => {
+        dispatch(receiveEditions(editions));
+      }, (error) => {
+        dispatch(receiveErrorEditions());
+        throw error;
+      });
   };
 }
 
@@ -152,117 +95,151 @@ export function fetchEditionsIfNeeded() {
   };
 }
 
-// TODO: use response as created edition
+// TODO: fix date
 export function createEdition(name, description, endDate, maxParticipants) {
-  return async (dispatch) => {
-    // const item = await api.definedGroups.createEdition()
-    dispatch({
-      type: CREATE_EDITION,
-      edition: {
-        name,
-        description,
-        endDate,
-        maxParticipants,
-        numberOfParticipants: 1,
-        id: Math.floor(Math.random() * 10000000),
-        moderator: true,
-        participant: true,
-        status: 'OPENED',
-      },
-    });
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+
+    return editionsApi.createEdition(apiUrl, token, {
+      name,
+      description,
+      endDate: '2019-10-10',
+      maxParticipants,
+    })
+      .then((response) => {
+        console.log(response);
+        dispatch({
+          type: CREATE_EDITION,
+          edition: response,
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
 export function editEdition(id, name, description, endDate, maxParticipants) {
-  return async (dispatch) => {
-    // const item = await api.definedGroups.createEdition()
-    // TODO: use response as edited edition
-    dispatch({
-      type: EDIT_EDITION,
-      edition: {
-        name,
-        description,
-        endDate,
-        maxParticipants,
-        id,
-        numberOfParticipants: 1,
-        moderator: true,
-        participant: true,
-        status: 'OPENED',
-      },
-    });
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+    return editionsApi.editEdition(apiUrl, token, id, {
+      name,
+      description,
+      endDate: '2019-10-10',
+      maxParticipants,
+    })
+      .then((response) => {
+        console.log(response);
+        dispatch({
+          type: EDIT_EDITION,
+          edition: response,
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
-// TODO: pass returned object
+
 export function closeEdition(id) {
-  return async (dispatch) => {
-    // const item = await api.editions.closeEdition()
-    dispatch({
-      type: CLOSE_EDITION,
-      id,
-    });
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+    return editionsApi.resolveEdition(apiUrl, token, id)
+      .then((response) => {
+        dispatch({
+          type: CLOSE_EDITION,
+          id,
+          edition: response,
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
-// TODO: pass returned object
+
 export function reopenEdition(id) {
-  return async (dispatch) => {
-    console.log('reopenEdition action', id);
-    // const item = await api.editions.reopenEdition()
-    dispatch({
-      type: REOPEN_EDITION,
-      id,
-    });
-    dispatch({
-      type: UPDATE_MODERATOR_RESULTS_STATUS,
-      editionId: id,
-      status: 'OPENED',
-    });
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+
+    return editionsApi.reopenEdition(apiUrl, token, id)
+      .then((response) => {
+        dispatch({
+          type: REOPEN_EDITION,
+          id,
+          edition: response,
+        });
+        dispatch({
+          type: UPDATE_MODERATOR_RESULTS_STATUS,
+          editionId: id,
+          status: 'OPENED',
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
-// TODO: pass returned object
+
 export function publishEdition(id) {
-  return async (dispatch) => {
-    // const item = await api.editions.publishEdition()
-    dispatch({
-      type: PUBLISH_EDITION,
-      id,
-    });
-    dispatch({
-      type: UPDATE_MODERATOR_RESULTS_STATUS,
-      editionId: id,
-      status: 'PUBLISHED',
-    });
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+
+    return editionsApi.publishEdition(apiUrl, token, id)
+      .then((response) => {
+        dispatch({
+          type: PUBLISH_EDITION,
+          id,
+          edition: response,
+        });
+        dispatch({
+          type: UPDATE_MODERATOR_RESULTS_STATUS,
+          editionId: id,
+          status: 'PUBLISHED',
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
-// TODO: pass returned object
+
 export function cancelEdition(id) {
-  return async (dispatch) => {
-    // const item = await api.editions.cancelEdition()
-    console.log('cancelEdition action', id);
-    dispatch({
-      type: CANCEL_EDITION,
-      id,
-    });
-    dispatch({
-      type: UPDATE_MODERATOR_RESULTS_STATUS,
-      editionId: id,
-      status: 'CANCELLED',
-    });
+  return async (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+
+    return editionsApi.cancelEdition(apiUrl, token, id)
+      .then((response) => {
+        dispatch({
+          type: CANCEL_EDITION,
+          id,
+          edition: response,
+        });
+        dispatch({
+          type: UPDATE_MODERATOR_RESULTS_STATUS,
+          editionId: id,
+          status: 'CANCELLED',
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
 
 export function joinEdition(id) {
-  return async (dispatch) => {
-    // const item = await api.editions.joinEdition()
-    dispatch({
-      type: JOIN_EDITION,
-      id,
-    });
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+
+    return editionsApi.joinEdition(apiUrl, token, id)
+      .then((response) => {
+        dispatch({
+          type: JOIN_EDITION,
+          id,
+          edition: response,
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 

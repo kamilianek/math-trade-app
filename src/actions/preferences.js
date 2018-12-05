@@ -6,25 +6,27 @@ import {
   UPDATE_PREFERENCE_FOR_PRODUCT,
 } from '../reducers/preferences';
 
+import preferencesApi from '../api/preferences';
+
 const VALIDATE_TIME = 1000 * 60 * 5;
 const FETCHING_TIMEOUT = 1000 * 32;
 
-const editionPreferences = [
-  {
-    id: 1,
-    userId: 1,
-    haveProductId: 1,
-    wantedProductsIds: [1000, 1003, 1004],
-    wantedDefinedGroupsIds: [10000],
-  },
-  {
-    id: 2,
-    userId: 1,
-    haveProductId: 3,
-    wantedProductsIds: [1002, 1003],
-    wantedDefinedGroupsIds: [10000, 10001],
-  },
-];
+// const editionPreferences = [
+//   {
+//     id: 1,
+//     userId: 1,
+//     haveProductId: 1,
+//     wantedProductsIds: [1000, 1003, 1004],
+//     wantedDefinedGroupsIds: [10000],
+//   },
+//   {
+//     id: 2,
+//     userId: 1,
+//     haveProductId: 3,
+//     wantedProductsIds: [1002, 1003],
+//     wantedDefinedGroupsIds: [10000, 10001],
+//   },
+// ];
 
 
 function requestPreferences(editionId) {
@@ -61,14 +63,17 @@ function receiveErrorPreferences(editionId) {
 }
 
 function fetchPreferences(editionId) {
-  return async (dispatch) => {
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+
     dispatch(requestPreferences(editionId));
-    try {
-      // const items = await api.myProducts.fetchPreferences(editionId)
-      dispatch(receivePreferences(editionId, editionPreferences));
-    } catch (e) {
-      dispatch(receiveErrorPreferences(editionId));
-    }
+    return preferencesApi.fetchPreferences(apiUrl, token, editionId)
+      .then((response) => {
+        dispatch(receivePreferences(editionId, response));
+      }, (error) => {
+        dispatch(receiveErrorPreferences(editionId));
+        throw error;
+      });
   };
 }
 
@@ -104,21 +109,23 @@ export function fetchPreferencesIfNeeded(editionId) {
   };
 }
 
-export function updatePreference(editionId, productId, wantedProductsIds, wantedDefinedGroupsIds) {
-  return async (dispatch) => {
-    // const items = await api.myProducts.updatePreference(editionId, preference)
-    // TODO: replace getState with returned value!!
-    dispatch({
-      type: UPDATE_PREFERENCE_FOR_PRODUCT,
-      editionId,
-      preference: {
-        id: Math.floor(Math.random() * 1000000),
-        userId: 1,
-        haveProductId: productId,
-        wantedProductsIds,
-        wantedDefinedGroupsIds,
-      },
-    });
+export function updatePreference(editionId, itemId, wantedItemsIds, wantedDefinedGroupsIds) {
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+    const preference = {
+      wantedItemsIds,
+      wantedDefinedGroupsIds,
+    };
+    return preferencesApi.updatePreference(apiUrl, token, editionId, itemId, preference)
+      .then((response) => {
+        dispatch({
+          type: UPDATE_PREFERENCE_FOR_PRODUCT,
+          editionId,
+          preference: response,
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
