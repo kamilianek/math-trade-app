@@ -1,14 +1,15 @@
 const INITIAL_STATE = {
-  apiUrl: 'https://mathtrade.api.url.com/api/v1',
+  apiUrl: 'http://localhost:8081',
   token: null,
   tokenData: [],
   loginData: {
     username: null,
   },
-  roles: ['ROLE_USER'],
+  userExists: null,
+  roles: [],
   permissionRequest: {
     isFetchingSince: null,
-    lastSuccessfulFetch: 1543051709502,
+    lastSuccessfulFetch: null,
     lastFailedFetch: null,
     request: {
       id: null,
@@ -47,6 +48,7 @@ export default function authReducer(state = INITIAL_STATE, action) {
         token: action.token,
         roles: action.roles,
         loginData: action.loginData,
+        userExists: action.userExists,
       };
     case SIGN_OUT_FINISHED:
       return {
@@ -58,6 +60,7 @@ export default function authReducer(state = INITIAL_STATE, action) {
         token: action.token,
         roles: action.roles,
         loginData: action.loginData,
+        userExists: action.userExists,
       };
     case REQUEST_PERMISSION_REQUEST_STATUS:
       return {
@@ -107,7 +110,7 @@ export default function authReducer(state = INITIAL_STATE, action) {
     case 'persist/REHYDRATE':
       return {
         ...state,
-        apiUrl: 'https://mathtrade.api.url.com/api/v1',
+        apiUrl: 'http://localhost:8081',
       };
     default:
       return state;

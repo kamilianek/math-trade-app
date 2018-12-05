@@ -5,7 +5,6 @@ import myNotAssignedProductsReducer from './myNotAssignedProducts';
 import otherAssignedProductsReducer from './otherAssignedProducts';
 import definedGroupsReducer from './definedGroups';
 import preferencesReducer from './preferences';
-import permissionRequestReducer from './permissionRequest';
 import userReducer from './user';
 import resultsReducer from './results';
 import moderatorResultsReducer from './moderatorResults';
@@ -18,7 +17,6 @@ export default {
   otherAssignedProducts: otherAssignedProductsReducer,
   definedGroups: definedGroupsReducer,
   preferences: preferencesReducer,
-  permissionRequest: permissionRequestReducer,
   user: userReducer,
   results: resultsReducer,
   moderatorResults: moderatorResultsReducer,

@@ -1,3 +1,6 @@
+import { SIGN_OUT_FINISHED } from './auth';
+
+
 const INITIAL_STATE = {
   resultsByEdition: {},
 };
@@ -10,6 +13,10 @@ export const UPDATE_MODERATOR_RESULTS_STATUS = 'UPDATE_MODERATOR_RESULTS_STATUS'
 
 export default function moderatorResultsReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
+    case SIGN_OUT_FINISHED:
+      return {
+        ...INITIAL_STATE,
+      };
     case RECEIVE_MODERATOR_RESULTS:
       return {
         ...state,

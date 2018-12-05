@@ -1,3 +1,4 @@
+import { SIGN_OUT_FINISHED } from './auth';
 
 const INITIAL_STATE = {
   productsByEdition: {
@@ -14,6 +15,10 @@ export const UPDATE_MY_ASSIGNED_PRODUCT = 'UPDATE_MY_ASSIGNED_PRODUCT';
 
 export default function myAssignedProductsReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
+    case SIGN_OUT_FINISHED:
+      return {
+        ...INITIAL_STATE,
+      };
     case INVALIDATE_MY_ASSIGNED_PRODUCTS:
       return {
         ...state,

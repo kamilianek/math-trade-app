@@ -1,28 +1,8 @@
+import { SIGN_OUT_FINISHED } from './auth';
+
+
 const INITIAL_STATE = {
-  preferencesByEdition: {
-    3: {
-      isFetchingSince: null,
-      lastSuccessfulFetch: null,
-      lastFailedFetch: null,
-      didInvalidate: false,
-      preferences: [
-        {
-          id: 1,
-          userId: 2,
-          haveProductId: 3,
-          wantedProductsIds: [4, 5, 6],
-          wantedDefinedGroupsIds: [3],
-        },
-        {
-          id: 2,
-          userId: 2,
-          haveProductId: 4,
-          wantedProductsIds: [10, 11, 12],
-          wantedDefinedGroupsIds: [4],
-        },
-      ],
-    },
-  },
+  preferencesByEdition: { },
 };
 
 export const RECEIVE_ERROR_PREFERENCES = 'RECEIVE_ERROR_PREFERENCES';
@@ -34,6 +14,10 @@ export const UPDATE_PREFERENCE_FOR_PRODUCT = 'UPDATE_PREFERENCE_FOR_PRODUCT';
 
 export default function preferencesReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
+    case SIGN_OUT_FINISHED:
+      return {
+        ...INITIAL_STATE,
+      };
     case INVALIDATE_PREFERENCES:
       return {
         ...state,
@@ -82,7 +66,6 @@ export default function preferencesReducer(state = INITIAL_STATE, action) {
           },
         },
       };
-    // TODO: will be changed after API integration - will receive action.preference
     case UPDATE_PREFERENCE_FOR_PRODUCT:
       return {
         ...state,
@@ -92,7 +75,7 @@ export default function preferencesReducer(state = INITIAL_STATE, action) {
             ...state.preferencesByEdition[action.editionId],
             preferences: [
               ...state.preferencesByEdition[action.editionId].preferences
-                .filter(pref => (pref.haveProductId !== action.preference.haveProductId)),
+                .filter(pref => (pref.haveItemId !== action.preference.haveItemId)),
               action.preference,
             ],
           },
