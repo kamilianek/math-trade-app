@@ -5,12 +5,13 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 import Icon from '@material-ui/core/Icon';
-import Paper from '@material-ui/core/Paper';
 
-import RatingPanel from '../../components/RatingPanel';
+
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+
+import RatingPanel from '../RatingPanel';
 
 const styles = theme => ({
   avatar: {
