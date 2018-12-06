@@ -12,6 +12,7 @@ import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
 import Tooltip from '@material-ui/core/Tooltip';
 import Chip from '@material-ui/core/Chip';
+import TextField from '@material-ui/core/TextField';
 
 import EditionPanelContainer from '../../components/EditionPanelContainer';
 import ResultsTable from '../../components/ResultsTable';
@@ -128,6 +129,8 @@ class ModeratorResultsView extends React.Component {
       openPersonalResults: false,
       sender: {},
       receiver: {},
+      newEndDate: '',
+      isNewEditionEndDateValid: true,
     };
 
     this.handlePreview = this.handlePreview.bind(this);
@@ -139,6 +142,8 @@ class ModeratorResultsView extends React.Component {
 
   componentDidMount() {
     const { fetchModeratorResultsIfNeeded, alert } = this.props;
+
+    this.setState({ newEndDate: this.props.edition.endDate });
 
     fetchModeratorResultsIfNeeded(false)
       .catch(error => alert.show(error.message, { type: 'error' }));
@@ -167,9 +172,16 @@ class ModeratorResultsView extends React.Component {
     const {
       alert,
       reopenEdition,
+      edition,
     } = this.props;
+    const { newEndDate } = this.state;
 
-    reopenEdition()
+    if (edition.endDate > newEndDate) {
+      this.setState({ isNewEditionEndDateValid: false });
+      return;
+    }
+
+    reopenEdition(newEndDate)
       .then(() => alert.show('Successfully reopened edition', { type: 'success' }))
       .catch(error => alert.show(error.message, { type: 'error' }));
 
@@ -342,6 +354,8 @@ class ModeratorResultsView extends React.Component {
       rowToPreview,
       openDialog,
       openPersonalResults,
+      newEndDate,
+      isNewEditionEndDateValid,
     } = this.state;
 
     if (openPersonalResults) {
@@ -412,7 +426,26 @@ class ModeratorResultsView extends React.Component {
           disagreeText="Cancel"
           openDialog={!!openDialog}
           warning
-        />
+          type={openDialog}
+          edition={openDialog === 'reopen' ? edition : null}
+        >
+          {openDialog === 'reopen' ? <TextField
+            value={newEndDate}
+            id="newEndDate"
+            label="End date"
+            type="date"
+            error={!isNewEditionEndDateValid}
+            helperText={isNewEditionEndDateValid ? null : 'Should not be set before previous date'}
+            className={classes.textField}
+            onChange={event => this.setState({
+              newEndDate: event.target.value,
+              isNewEditionEndDateValid: true,
+            })}
+            InputLabelProps={{
+              shrink: true,
+            }}
+          /> : null}
+        </CustomDialog>
       </EditionPanelContainer>
     );
   }
@@ -455,8 +488,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     fetchModeratorResultsIfNeeded: force => (
       actions.moderatorResults.fetchModeratorResultsIfNeeded(id, force)
     ),
-    reopenEdition: () => (
-      actions.editions.reopenEdition(id)
+    reopenEdition: date => (
+      actions.editions.reopenEdition(id, date)
     ),
     publishEdition: () => (
       actions.editions.publishEdition(id)
@@ -464,7 +497,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     cancelEdition: () => (
       actions.editions.cancelEdition(id)
     ),
-    fetchOtherUser: (userId) => (
+    fetchOtherUser: userId => (
       actions.user.fetchOtherUser(userId)
     ),
   }, dispatch);

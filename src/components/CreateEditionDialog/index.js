@@ -67,7 +67,7 @@ class CreateEditionDialog extends React.Component {
       return {
         newEditionName: props.edition.name,
         newEditionMaxParticipants: props.edition.maxParticipants,
-        newEditionEndDate: props.edition.newEditionEndDate,
+        newEditionEndDate: props.edition.endDate,
         newEditionDescription: props.edition.description,
         chosenEditionId: props.chosenEditionId,
       };
@@ -195,6 +195,7 @@ class CreateEditionDialog extends React.Component {
 
     const isClosed = !!(edition && edition.status === 'CLOSED');
 
+    console.log(newEditionEndDate);
     return (
       <CustomDialog
         handleDisagree={this.editionCreationDialogDisagree}
@@ -242,12 +243,12 @@ class CreateEditionDialog extends React.Component {
           margin="normal"
         />
         <TextField
-          defaultValue={newEditionEndDate}
+          value={newEditionEndDate}
           id="datetime-local"
           disabled={isClosed}
           label="End date"
           error={!isNewEditionEndDateValid}
-          type="datetime-local"
+          type="date"
           className={classes.textField}
           onChange={event => this.handleChange(event, 'newEditionEndDate', 'isNewEditionEndDateValid')}
           InputLabelProps={{

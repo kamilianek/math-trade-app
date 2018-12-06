@@ -95,7 +95,7 @@ export function fetchEditionsIfNeeded() {
   };
 }
 
-// TODO: fix date
+
 export function createEdition(name, description, endDate, maxParticipants) {
   return (dispatch, getState) => {
     const { apiUrl, token } = getState().auth;
@@ -103,7 +103,7 @@ export function createEdition(name, description, endDate, maxParticipants) {
     return editionsApi.createEdition(apiUrl, token, {
       name,
       description,
-      endDate: '2019-10-10',
+      endDate,
       maxParticipants,
     })
       .then((response) => {
@@ -124,7 +124,7 @@ export function editEdition(id, name, description, endDate, maxParticipants) {
     return editionsApi.editEdition(apiUrl, token, id, {
       name,
       description,
-      endDate: '2019-10-10',
+      endDate,
       maxParticipants,
     })
       .then((response) => {
@@ -161,7 +161,7 @@ export function closeEdition(id) {
 export function reopenEdition(id, date) {
   return (dispatch, getState) => {
     const { apiUrl, token } = getState().auth;
-    const endDate = { endDate: '2019-10-10' };
+    const endDate = { endDate: date };
     return editionsApi.reopenEdition(apiUrl, token, id, endDate)
       .then((response) => {
         dispatch({

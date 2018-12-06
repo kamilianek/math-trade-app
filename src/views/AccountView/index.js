@@ -317,7 +317,6 @@ class AccountView extends React.Component {
                   label="First name"
                   fullWidth
                   value={editMode ? this.state.name : data.name}
-                  autoComplete="fname"
                   disabled={!editMode}
                   error={!this.state.isNameValid}
                   onChange={(event) => {
@@ -333,7 +332,6 @@ class AccountView extends React.Component {
                   label="Last name"
                   fullWidth
                   value={editMode ? this.state.surname : data.surname}
-                  autoComplete="lname"
                   error={!this.state.isSurnameValid}
                   disabled={!editMode}
                   onChange={(event) => {
@@ -348,8 +346,7 @@ class AccountView extends React.Component {
                   id="email"
                   label="Email address"
                   fullWidth
-                  autoComplete="email"
-                  defaultValue={editMode ? this.state.email : data.email}
+                  value={editMode ? this.state.email : data.email}
                   error={!this.state.isEmailValid}
                   disabled={!editMode}
                   onChange={(event) => {
@@ -364,7 +361,6 @@ class AccountView extends React.Component {
                   label="Address line"
                   required
                   fullWidth
-                  autoComplete="address"
                   value={editMode ? this.state.address : data.address}
                   error={!this.state.isAddressValid}
                   disabled={!editMode}
@@ -380,7 +376,6 @@ class AccountView extends React.Component {
                   id="city"
                   label="City"
                   fullWidth
-                  autoComplete="city"
                   value={editMode ? this.state.city : data.city}
                   error={!this.state.isCityValid}
                   disabled={!editMode}
@@ -396,7 +391,6 @@ class AccountView extends React.Component {
                   id="postalCode"
                   label="Zip / Postal code"
                   fullWidth
-                  autoComplete="postal-code"
                   value={editMode ? this.state.postalCode : data.postalCode}
                   error={!this.state.isPostalCodeValid}
                   disabled={!editMode}
@@ -412,8 +406,7 @@ class AccountView extends React.Component {
                   id="country"
                   label="Country"
                   fullWidth
-                  autoComplete="country"
-                  defaultValue={editMode ? this.state.country : data.country}
+                  value={editMode ? this.state.country : data.country}
                   error={!this.state.isCountryValid}
                   disabled={!editMode}
                   onChange={(event) => {
@@ -478,7 +471,6 @@ const mapStateToProps = state => ({
   data: {
     ...state.user.data,
   },
-  consolelog: console.log('>> state: ', state),
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

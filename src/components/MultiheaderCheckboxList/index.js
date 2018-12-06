@@ -47,7 +47,7 @@ class MultiheaderCheckboxList extends Component {
             data.map(item => (
               <ListItem
                 button
-                key={item.id}
+                key={`kk${item.id}`}
                 disabled={disabled}
                 onClick={() => onItemClick[index](item)}
               >

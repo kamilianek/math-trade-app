@@ -57,15 +57,16 @@ function receiveErrorUserDetails() {
 
 
 function fetchUserDetails() {
-  return async (dispatch) => {
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
     dispatch(requestUserDetails());
-    try {
-      // const userDetails = await api.user.fetchMyData()
-      dispatch(receiveUserDetails(mock_user_data));
-    } catch (e) {
-      dispatch(receiveErrorUserDetails());
-      throw e;
-    }
+    return userApi.fetchMyData(apiUrl, token)
+      .then((response) => {
+        dispatch(receiveUserDetails(response));
+      }, (error) => {
+        dispatch(receiveErrorUserDetails());
+        throw error;
+      });
   };
 }
 
@@ -99,26 +100,26 @@ export function fetchUserDetailsIfNeeded() {
 }
 
 export function updateUserDetails(name, surname, email, address, city, postalCode, country) {
-  return async (dispatch) => {
-    // const item = await api.userDetails.updateUserDetails()
-    // TODO: use response as user details
-    dispatch({
-      type: UPDATE_USER_DETAILS,
-      data: {
-        id: 1,
-        name,
-        surname,
-        username: 'johnny_user',
-        email,
-        address,
-        city,
-        postalCode,
-        country,
-        roles: [
-          'ROLE_USER',
-        ],
-      },
-    });
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+    const details = {
+      name,
+      surname,
+      email,
+      address,
+      city,
+      postalCode,
+      country,
+    };
+    return userApi.editUserDetails(apiUrl, token, details)
+      .then((response) => {
+        dispatch({
+          type: UPDATE_USER_DETAILS,
+          data: response,
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
