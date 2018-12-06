@@ -87,29 +87,6 @@ const styles = theme => ({
   },
 });
 
-const mockUser1 = {
-  username: 'kowalsky',
-  email: 'kowal123@user1.com',
-  name: 'Jan',
-  surname: 'Kowalski',
-  rates: [
-    {
-      resultId: 1,
-      rate: 3,
-      comment: 'Produkt niestety niezgodny z opisem',
-    },
-  ],
-
-};
-
-const mockUser2 = {
-  username: 'przemo',
-  email: 'nowak123prze@user1.com',
-  name: 'Przemsyław',
-  surname: 'Nowak',
-  rates: [
-  ],
-};
 
 const texts = {
   reopen: {
@@ -149,6 +126,8 @@ class ModeratorResultsView extends React.Component {
       rowToPreview: null,
       openDialog: null,
       openPersonalResults: false,
+      sender: {},
+      receiver: {},
     };
 
     this.handlePreview = this.handlePreview.bind(this);
@@ -166,9 +145,21 @@ class ModeratorResultsView extends React.Component {
   }
 
   handlePreview(row) {
+    const { fetchOtherUser, alert } = this.props;
+
     this.setState({
       openPreview: true,
       rowToPreview: row,
+      sender: null,
+      receiver: null,
+    }, () => {
+      fetchOtherUser(row.senderId)
+        .then(response => this.setState({ sender: response }))
+        .catch(error => alert.show(error.message, { type: 'error' }));
+
+      fetchOtherUser(row.receiverId)
+        .then(response => this.setState({ receiver: response }))
+        .catch(error => alert.show(error.message, { type: 'error' }));
     });
   }
 
@@ -357,6 +348,8 @@ class ModeratorResultsView extends React.Component {
       return <Redirect to={`/editions/${edition.id}/results`} />;
     }
 
+    console.log('rowToPreview: ', rowToPreview);
+
     return (
       <EditionPanelContainer edition={edition}>
         {this.renderActionButtonPanel()}
@@ -387,7 +380,10 @@ class ModeratorResultsView extends React.Component {
                     Sender
                   </Typography>
                   <Paper className={classes.paper}>
-                   <UserPreview userData={mockUser1} />
+                    { this.state.sender ? <UserPreview
+                      userData={this.state.sender}
+                      ownRate={rowToPreview.rateObj}
+                    /> : null }
                   </Paper>
                 </>
               : null}
@@ -396,7 +392,13 @@ class ModeratorResultsView extends React.Component {
                 <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
                   Receiver
                 </Typography>
-                <UserPreview userData={mockUser2} />
+              <Paper className={classes.paper}>
+                { this.state.receiver
+                  ? <UserPreview
+                    userData={this.state.receiver}
+                    ownRate={{}}
+                  /> : null }
+              </Paper>
               </>
               : null}
           </Grid>
@@ -461,6 +463,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     ),
     cancelEdition: () => (
       actions.editions.cancelEdition(id)
+    ),
+    fetchOtherUser: (userId) => (
+      actions.user.fetchOtherUser(userId)
     ),
   }, dispatch);
 };

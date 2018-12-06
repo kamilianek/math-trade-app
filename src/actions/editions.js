@@ -145,6 +145,7 @@ export function closeEdition(id) {
     const { apiUrl, token } = getState().auth;
     return editionsApi.resolveEdition(apiUrl, token, id)
       .then((response) => {
+        console.log('response: ', response);
         dispatch({
           type: CLOSE_EDITION,
           id,
@@ -157,11 +158,11 @@ export function closeEdition(id) {
 }
 
 
-export function reopenEdition(id) {
+export function reopenEdition(id, date) {
   return (dispatch, getState) => {
     const { apiUrl, token } = getState().auth;
-
-    return editionsApi.reopenEdition(apiUrl, token, id)
+    const endDate = { endDate: '2019-10-10' };
+    return editionsApi.reopenEdition(apiUrl, token, id, endDate)
       .then((response) => {
         dispatch({
           type: REOPEN_EDITION,

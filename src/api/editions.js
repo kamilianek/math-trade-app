@@ -73,13 +73,14 @@ function publishEdition(apiUrl, token, editionId) {
     .then(response => handleResponse(response, 200, 'Publishing edition'));
 }
 
-function reopenEdition(apiUrl, token, editionId) {
+function reopenEdition(apiUrl, token, editionId, endDate) {
   return fetch(`${apiUrl}/api/editions/${editionId}/re-open`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: token,
     },
+    body: JSON.stringify(endDate),
   })
     .then(response => handleResponse(response, 200, 'Reopening edition'));
 }
