@@ -38,7 +38,7 @@ class CheckboxList extends Component {
               <ListItem
                 button
                 dense
-                key={item.id}
+                key={`'ll${item.id}`}
                 disabled={editMode}
                 onClick={() => primaryAction(item)}
               >

@@ -263,6 +263,7 @@ class PreferencesView extends React.Component {
       myProductsSearchMode,
     } = this.state;
 
+    console.log(selectedGroupIds, selectedOtherProductIds);
 
     return (
       <EditionPanelContainer edition={this.props.edition} navigationValue="preferences">
@@ -295,7 +296,7 @@ class PreferencesView extends React.Component {
           <Grid item xs={12} sm={6}>
             <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
               Other items
-              {isParticipant ? <IconButton
+              {isParticipant && selectedMyProduct ? <IconButton
                 onClick={() => this.setState({ editMode: true })}
                 color="inherit"
               >
