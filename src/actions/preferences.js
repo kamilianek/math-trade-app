@@ -11,23 +11,6 @@ import preferencesApi from '../api/preferences';
 const VALIDATE_TIME = 1000 * 60 * 5;
 const FETCHING_TIMEOUT = 1000 * 32;
 
-// const editionPreferences = [
-//   {
-//     id: 1,
-//     userId: 1,
-//     haveProductId: 1,
-//     wantedProductsIds: [1000, 1003, 1004],
-//     wantedDefinedGroupsIds: [10000],
-//   },
-//   {
-//     id: 2,
-//     userId: 1,
-//     haveProductId: 3,
-//     wantedProductsIds: [1002, 1003],
-//     wantedDefinedGroupsIds: [10000, 10001],
-//   },
-// ];
-
 
 function requestPreferences(editionId) {
   return {

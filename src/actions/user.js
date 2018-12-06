@@ -6,6 +6,8 @@ import {
   INVALIDATE_USER_DETAILS,
 } from '../reducers/user';
 
+import userApi from '../api/user';
+
 const VALIDATE_TIME = 1000 * 60 * 10;
 const FETCHING_TIMEOUT = 1000 * 32;
 
@@ -120,7 +122,19 @@ export function updateUserDetails(name, surname, email, address, city, postalCod
   };
 }
 
+export function fetchOtherUser(userId) {
+  return (_, getState) => {
+    const { apiUrl, token } = getState().auth;
+
+    return userApi.fetchUser(apiUrl, token, userId)
+      .then(response => response, (error) => {
+        throw error;
+      });
+  };
+}
+
 export default {
   fetchUserDetailsIfNeeded,
   updateUserDetails,
+  fetchOtherUser,
 };

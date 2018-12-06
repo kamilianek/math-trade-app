@@ -54,7 +54,7 @@ class UserPreview extends React.Component {
 
   render() {
     const { isExpanded } = this.state;
-    const { userData, classes } = this.props;
+    const { userData, classes, ownRate } = this.props;
     const {
       username,
       email,
@@ -64,9 +64,13 @@ class UserPreview extends React.Component {
     } = userData;
 
     let topRates = rates;
-    if (rates.length > 10) {
+
+    if (ownRate) {
+      topRates = [ownRate];
+    } else if (rates.length > 10) {
       topRates = rates.slice(0, 11);
     }
+
     return (
       <ExpansionPanel expanded={isExpanded}>
         <ExpansionPanelSummary
@@ -86,6 +90,7 @@ class UserPreview extends React.Component {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <div className={classes.comments}>
+            { ownRate ? <Typography variant="body2">{ 'He was rated:' }</Typography> : null }
             {
               topRates.map(rate => <RatingPanel
                 className={classes.comment}
@@ -102,6 +107,7 @@ class UserPreview extends React.Component {
 
 UserPreview.propTypes = {
   userData: PropTypes.object.isRequired,
+  ownRate: PropTypes.object,
 };
 
 

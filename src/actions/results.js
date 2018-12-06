@@ -13,116 +13,14 @@ import {
   RATE_RESULT,
 } from '../reducers/results';
 
+import resultsApi from '../api/results';
+
 const VALIDATE_TIME_USER_RESULTS = 1000 * 60 * 10;
 const FETCHING_TIMEOUT_USER_RESULTS = 1000 * 32;
 
+
 // const VALIDATE_TIME_MODERATOR_RESULTS = 1000 * 60 * 10;
 // const FETCHING_TIMEOUT_MODERATOR_RESULTS = 1000 * 32;
-
-const mock_results = {
-  resultsToSend: [
-    {
-      id: 2,
-      senderId: null,
-      receiverId: 2,
-      item: {
-        id: 3,
-        name: 'Carcassone',
-        description: 'item3 description',
-        userId: 3,
-        editionId: 1,
-        images: [
-          { uri: 'http://placekitten.com/g/400/400' },
-          { uri: 'http://placekitten.com/g/250/600' },
-        ],
-      },
-      rate: {
-        resultId: 2,
-        rate: 4,
-        comment: 'Wspaniały użytkownik.\nOpis zgodny z produktem.\nWszystko dotarło na czas. Gorąco polecam!',
-      },
-    },
-    {
-      id: 4,
-      senderId: null,
-      receiverId: 2,
-      item: {
-        id: 3,
-        name: 'Catan',
-        description: 'item10 description',
-        userId: 3,
-        editionId: 1,
-        images: [
-          { uri: 'http://placekitten.com/g/400/400' },
-          { uri: 'http://placekitten.com/g/250/600' },
-        ],
-      },
-      rate: null,
-    },
-  ],
-  resultsToReceive: [
-    {
-      id: 3,
-      senderId: 1,
-      receiverId: null,
-      item: {
-        id: 1,
-        name: 'item1',
-        description: 'item1 description',
-        userId: 1,
-        editionId: 1,
-        images: [
-          { uri: 'http://placekitten.com/g/220/300' },
-          { uri: 'http://placekitten.com/g/120/300' },
-        ],
-      },
-      rate: null,
-    },
-    {
-      id: 5,
-      senderId: 1,
-      receiverId: null,
-      item: {
-        id: 4,
-        name: 'Magia i miecz',
-        description: 'Przykładowy opis gry',
-        userId: 1,
-        editionId: 1,
-        images: [
-          { uri: 'http://placekitten.com/g/220/300' },
-          { uri: 'http://placekitten.com/g/120/300' },
-        ],
-      },
-      rate: {
-        resultId: 3,
-        rate: 2,
-        comment: 'Produkt niezgodny z opisem!',
-      },
-    },
-  ],
-  senders: [
-    {
-      id: 1,
-      name: 'admin',
-      surname: 'admin',
-      username: 'admin',
-      email: 'admin@admin.admin',
-    },
-  ],
-  receivers: [
-    {
-      id: 2,
-      name: 'Jan',
-      surname: 'Kowalski',
-      username: 'jkowsky',
-      email: 'kowalsky@gmail.com',
-      address: 'ul. Kawiory 99',
-      city: 'Kraków',
-      country: 'Polska',
-      postalCode: '33-555',
-    },
-  ],
-};
 
 
 function requestResults(editionId) {
@@ -159,14 +57,16 @@ function receiveErrorResults(editionId) {
 }
 
 function fetchResults(editionId) {
-  return async (dispatch) => {
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
     dispatch(requestResults(editionId));
-    try {
-      // const items = await api.results.fetchResults(editionId)
-      dispatch(receiveResults(editionId, mock_results));
-    } catch (e) {
-      dispatch(receiveErrorResults(editionId));
-    }
+    return resultsApi.fetchResults(apiUrl, token, editionId)
+      .then((response) => {
+        dispatch(receiveResults(editionId, response));
+      }, (error) => {
+        dispatch(receiveErrorResults(editionId));
+        throw error;
+      });
   };
 }
 
@@ -203,18 +103,23 @@ export function fetchUserResultsIfNeeded(editionId) {
 }
 
 export function rateResult(editionId, resultId, rate, comment) {
-  return async (dispatch) => {
-    // const items = await api.myProducts.rateResult(resultId, rate, comment)
-    // TODO: replace getState with returned value!!
-    dispatch({
-      type: RATE_RESULT,
-      editionId,
-      rate: {
-        resultId,
-        rate,
-        comment,
-      },
-    });
+  return (dispatch, getState) => {
+    const { apiUrl, token } = getState().auth;
+    const rateData = {
+      rate,
+      comment,
+    };
+
+    return resultsApi.rateResult(apiUrl, token, resultId, rateData)
+      .then((response) => {
+        dispatch({
+          type: RATE_RESULT,
+          editionId,
+          rate: response,
+        });
+      }, (error) => {
+        throw error;
+      });
   };
 }
 
