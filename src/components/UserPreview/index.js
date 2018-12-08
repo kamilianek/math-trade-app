@@ -106,8 +106,18 @@ class UserPreview extends React.Component {
 }
 
 UserPreview.propTypes = {
-  userData: PropTypes.object.isRequired,
+  userData: PropTypes.object,
   ownRate: PropTypes.object,
+};
+
+UserPreview.defaultProps = {
+  userData: {
+    username: '',
+    email: '',
+    name: '',
+    surname: '',
+    rates: [],
+  },
 };
 
 

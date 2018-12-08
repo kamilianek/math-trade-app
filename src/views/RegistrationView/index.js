@@ -100,7 +100,7 @@ class RegistrationView extends React.Component {
       isLastNameValid,
       isUsernameValid,
       isEmailValid,
-      isPasswordValid,
+      isPasswordValid: isLastNameValid && isPasswordValidSame,
       isAddressValid,
       isCityValid,
       isZipValid,

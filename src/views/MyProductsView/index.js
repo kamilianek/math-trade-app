@@ -542,6 +542,7 @@ class MyProductsView extends React.Component {
 
                         </Grid>
                         <Grid item xs={12} sm={8}>
+                          <div style={{ float: 'right' }}>
                           {editMode || productCreationMode ? <Button
                             variant="contained"
                             color="primary"
@@ -554,10 +555,12 @@ class MyProductsView extends React.Component {
                             variant="contained"
                             color="primary"
                             className={classes.backButton}
+                            style={{ marginRight: 0 }}
                             onClick={() => this.submitProductChange()}
                           >
                             { productCreationMode ? 'Add item' : 'Update' }
                           </Button> : null}
+                          </div>
                         </Grid>
                       </Grid>
                     </Grid>

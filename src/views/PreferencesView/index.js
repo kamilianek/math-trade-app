@@ -308,7 +308,7 @@ class PreferencesView extends React.Component {
               <MultiheaderCheckboxList
                 data={otherProductsSearchMode
                   ? [otherAssignedItems, myDefinedGroups]
-                  : [this.props.otherAssignedItems, this.props.myDefinedGroups]}
+                  : [this.props.otherAssignedItems.slice(0, 100), this.props.myDefinedGroups]}
                 disabled={!editMode}
                 titles={['Other items: ', 'My defined groups: ']}
                 currentSelected={[selectedOtherProductIds, selectedGroupIds]}
@@ -344,8 +344,8 @@ class PreferencesView extends React.Component {
               </Grid>
             </Paper>
           </Grid>
-          <Grid item xs={12} sm={!isParticipant ? 6 : 12}>
-            <ProductPreview item={itemToPreview}/>
+          <Grid item xs={12} sm={12}>
+            <ProductPreview item={itemToPreview} showOwnerUser />
           </Grid>
         </Grid>
         <CustomDialog

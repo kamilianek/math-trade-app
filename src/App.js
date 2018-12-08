@@ -45,7 +45,7 @@ class App extends Component {
     return (
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
-        <AlertProvider template={AlertTemplate} position="bottom right" timeout={5000} transition="fade" >
+        <AlertProvider template={AlertTemplate} position="bottom right" timeout={15000} transition="fade" >
           <Provider
             store={this.store}
             persistor={this.persistor}
