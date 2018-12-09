@@ -338,12 +338,12 @@ class DefinedGroupsView extends Component {
           <Grid item xs={12} sm={6}>
             <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
               Products and defined groups
-              <IconButton
+              { selectedMyGroup ? <IconButton
                 onClick={() => this.setState({ editMode: true })}
                 color="inherit"
               >
                 <Icon>edit</Icon>
-              </IconButton>
+              </IconButton> : null}
             </Typography>
             <Paper className={classes.paperContainer}>
               <SearchBar onChange={event => this.handleSearchBarChange(event, 'otherAssignedItems', 'myDefinedGroups')} />
@@ -363,11 +363,11 @@ class DefinedGroupsView extends Component {
                     ),
                   ]}
                 disabled={!editMode}
-                titles={['Other items: ', 'My defined groups: ']}
-                currentSelected={[selectedItemIds, selectedGroupIds]}
+                titles={['My defined groups: ', 'Other items: ']}
+                currentSelected={[selectedGroupIds, selectedItemIds]}
                 onItemClick={[
-                  item => this.handleItemClick(item, 'selectedItemIds'),
                   item => this.handleItemClick(item, 'selectedGroupIds'),
+                  item => this.handleItemClick(item, 'selectedItemIds'),
                 ]}
                 itemCounts={otherProductsSearchMode ? [
                   myDefinedGroups.length,

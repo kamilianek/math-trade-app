@@ -360,10 +360,10 @@ class PreferencesView extends React.Component {
                   this.props.myDefinedGroups.length,
                   this.props.otherAssignedItems.length,
                 ]}
-                currentSelected={[selectedOtherProductIds, selectedGroupIds]}
+                currentSelected={[selectedGroupIds, selectedOtherProductIds]}
                 onItemClick={[
-                  item => this.handleToggle(item, 'selectedOtherProductIds'),
                   item => this.handleToggle(item, 'selectedGroupIds'),
+                  item => this.handleToggle(item, 'selectedOtherProductIds'),
                 ]}
                 secondaryAction={item => this.setState({ itemToPreview: item })}
                 selectedWithSecondaryId={itemToPreview && itemToPreview.id}
