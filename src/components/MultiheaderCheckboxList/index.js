@@ -37,12 +37,15 @@ class MultiheaderCheckboxList extends Component {
       currentSelected,
       secondaryAction,
       selectedWithSecondaryId,
+      itemCounts,
     } = this.props;
 
     return (
       <li className={classes.listSection} key={index}>
         <ul className={classes.ul}>
-          <ListSubheader>{`${titles[index]} ${data.length}`}</ListSubheader>
+          <ListSubheader>
+            {`${titles[index]} ${itemCounts ? itemCounts[index] : data.length}`}
+          </ListSubheader>
           {
             data.map(item => (
               <ListItem
@@ -106,12 +109,14 @@ MultiheaderCheckboxList.propTypes = {
   disabled: PropTypes.bool,
   secondaryAction: PropTypes.func,
   selectedWithSecondaryId: PropTypes.number,
+  itemCounts: PropTypes.array,
 };
 
 MultiheaderCheckboxList.defaultProps = {
   disabled: false,
   secondaryAction: null,
   selectedWithSecondaryId: 0,
+  itemCounts: null,
 };
 
 export default withStyles(styles)(MultiheaderCheckboxList);

@@ -47,6 +47,16 @@ const styles = theme => ({
     minHeight: theme.spacing.unit * 2,
     padding: theme.spacing.unit * 2,
   },
+  paging: {
+    marginTop: theme.spacing.unit * 3,
+    marginBottom: theme.spacing.unit * 3,
+    float: 'right',
+  },
+  assignedText: {
+    marginTop: theme.spacing.unit * 3,
+    marginBottom: theme.spacing.unit * 3,
+    marginLeft: theme.spacing.unit * 3,
+  },
   productListContainer: {
     maxHeight: 600,
     width: '100%',
@@ -64,6 +74,8 @@ const styles = theme => ({
   },
 });
 
+const ITEMS_ON_PAGE = 50;
+
 class DefinedGroupsView extends Component {
   constructor(props) {
     super(props);
@@ -71,6 +83,7 @@ class DefinedGroupsView extends Component {
     this.state = {
       myDefinedGroups,
       otherAssignedItems,
+      otherProductsSearchMode: false,
       selectedMyGroup: (myDefinedGroups && myDefinedGroups[0]) || null,
       selectedItemIds: (myDefinedGroups && myDefinedGroups[0]
         && myDefinedGroups[0].itemsIds) || [],
@@ -83,6 +96,11 @@ class DefinedGroupsView extends Component {
       editGroupNameMode: false,
       creationMode: false,
       openDialog: false,
+
+      currentPage: 1,
+      currentPageOnSearch: 1,
+      pageCounts: 1 + Math.floor((otherAssignedItems.length - 1) / ITEMS_ON_PAGE),
+      pageCountsOnSearch: 1,
     };
 
     this.handleItemClick = this.handleItemClick.bind(this);
@@ -127,9 +145,16 @@ class DefinedGroupsView extends Component {
     const updatedList2 = this.props[section2]
       .filter(item => item.name.toUpperCase().includes(phrase));
 
+    const pageCountsOnSearch = 1 + Math.floor(
+      (updatedList1.length + updatedList2.length - 1) / ITEMS_ON_PAGE,
+    );
+
     this.setState({
       [section1]: updatedList1,
       [section2]: updatedList2,
+      otherProductsSearchMode: phrase.length !== 0,
+      currentPageOnSearch: 1,
+      pageCountsOnSearch,
     });
   };
 
@@ -258,6 +283,11 @@ class DefinedGroupsView extends Component {
       isNewDefinedGroupNameValid,
       creationMode,
       editGroupNameMode,
+      currentPage,
+      currentPageOnSearch,
+      pageCounts,
+      pageCountsOnSearch,
+      otherProductsSearchMode,
     } = this.state;
 
     if (!isParticipant) {
@@ -318,7 +348,20 @@ class DefinedGroupsView extends Component {
             <Paper className={classes.paperContainer}>
               <SearchBar onChange={event => this.handleSearchBarChange(event, 'otherAssignedItems', 'myDefinedGroups')} />
               <MultiheaderCheckboxList
-                data={[otherAssignedItems, myDefinedGroups]}
+                data={otherProductsSearchMode
+                  ? [
+                    myDefinedGroups,
+                    otherAssignedItems.slice(
+                      (currentPageOnSearch - 1) * ITEMS_ON_PAGE,
+                      currentPageOnSearch * ITEMS_ON_PAGE,
+                    ),
+                  ]
+                  : [
+                    this.props.myDefinedGroups,
+                    this.props.otherAssignedItems.slice(
+                      (currentPage - 1) * ITEMS_ON_PAGE, currentPage * ITEMS_ON_PAGE,
+                    ),
+                  ]}
                 disabled={!editMode}
                 titles={['Other items: ', 'My defined groups: ']}
                 currentSelected={[selectedItemIds, selectedGroupIds]}
@@ -326,12 +369,59 @@ class DefinedGroupsView extends Component {
                   item => this.handleItemClick(item, 'selectedItemIds'),
                   item => this.handleItemClick(item, 'selectedGroupIds'),
                 ]}
+                itemCounts={otherProductsSearchMode ? [
+                  myDefinedGroups.length,
+                  otherAssignedItems.length,
+                ] : [
+                  this.props.myDefinedGroups.length,
+                  this.props.otherAssignedItems.length,
+                ]}
                 secondaryAction={item => this.setState({ groupToPreview: item })}
                 selectedWithSecondaryId={groupToPreview && groupToPreview.id}
               />
-              <Typography className={classes.sectionSubtitle} component="h1" variant="body1">
-                {`Items assigned: ${selectedGroupIds.length + selectedItemIds.length}`}
-              </Typography>
+              <Grid container spacing={24}>
+                <Grid item xs={12} sm={8}>
+                  <Typography className={classes.assignedText} component="h1" variant="body1">
+                    {`Items assigned: ${
+                      (selectedItemIds || []).length + (selectedGroupIds || []).length
+                    }`}
+                  </Typography>
+                </Grid>
+                <Grid style={{ display: 'inline-flex' }} item xs={12} sm={4}>
+                  <Button
+                    color="primary"
+                    size="small"
+                    disabled={otherProductsSearchMode
+                      ? currentPageOnSearch === 1 : currentPage === 1}
+                    onClick={() => this.setState((state) => {
+                      if (otherProductsSearchMode) {
+                        return { currentPageOnSearch: state.currentPageOnSearch - 1 };
+                      }
+                      return { currentPage: state.currentPage - 1 };
+                    })}
+                  >
+                    <Icon>keyboard_arrow_left</Icon>
+                  </Button>
+                  <Typography className={classes.paging} component="h1" variant="body1">
+                    {otherProductsSearchMode
+                      ? `${currentPageOnSearch}/${pageCountsOnSearch}` : `${currentPage}/${pageCounts}`}
+                  </Typography>
+                  <Button
+                    color="primary"
+                    size="small"
+                    disabled={otherProductsSearchMode
+                      ? currentPageOnSearch === pageCountsOnSearch : currentPage === pageCounts}
+                    onClick={() => this.setState((state) => {
+                      if (otherProductsSearchMode) {
+                        return { currentPageOnSearch: state.currentPageOnSearch + 1 };
+                      }
+                      return { currentPage: state.currentPage + 1 };
+                    })}
+                  >
+                    <Icon>keyboard_arrow_right</Icon>
+                  </Button>
+                </Grid>
+              </Grid>
               <Grid item xs={12} sm={6}>
                 {editMode ? <Button
                   variant="contained"
