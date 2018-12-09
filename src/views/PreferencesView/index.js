@@ -142,6 +142,9 @@ class PreferencesView extends React.Component {
     } = this.props;
 
     fetchOtherAssignedProducts()
+      .then(() => this.setState({
+        pageCounts: 1 + Math.floor((this.props.otherAssignedItems.length - 1) / ITEMS_ON_PAGE),
+      }))
       .catch(error => alert.show(`Cannot load others items: ${error.message}`, { type: 'error' }));
 
     if (isParticipant) {
