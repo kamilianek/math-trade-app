@@ -127,7 +127,7 @@ class EditionPanelContainer extends Component {
             showLabels
             className={classes.editionNavigation}
           >
-            <BottomNavigationAction label="Products" component={Link} to={'products'} />
+            <BottomNavigationAction label="Items" component={Link} to={'products'} />
             <BottomNavigationAction label="Preferences" component={Link} to={'preferences'} />
             <BottomNavigationAction label="Groups" component={Link} to={'definedGroups'} />
           </BottomNavigation>
