@@ -20,6 +20,8 @@ import MultiheaderCheckboxList from '../../components/MultiheaderCheckboxList';
 import actions from '../../actions';
 
 
+const ITEMS_ON_PAGE = 50;
+
 const dialogContent = {
   cancelPreferenceEdition: {
     title: 'Cancel preference edition',
@@ -38,6 +40,16 @@ const styles = theme => ({
     margin: theme.spacing.unit * 3,
     marginRight: theme.spacing.unit * 5,
     height: 30,
+  },
+  paging: {
+    marginTop: theme.spacing.unit * 3,
+    marginBottom: theme.spacing.unit * 3,
+    float: 'right',
+  },
+  assignedText: {
+    marginTop: theme.spacing.unit * 3,
+    marginBottom: theme.spacing.unit * 3,
+    marginLeft: theme.spacing.unit * 3,
   },
   productListContainer: {
     height: 600,
@@ -106,6 +118,11 @@ class PreferencesView extends React.Component {
       itemToPreview: null,
       editMode: false,
       openDialog: false,
+
+      currentPage: 1,
+      currentPageOnSearch: 1,
+      pageCounts: 1 + Math.floor((otherAssignedItems.length - 1) / ITEMS_ON_PAGE),
+      pageCountsOnSearch: 1,
     };
 
     this.handleDialogAgree = this.handleDialogAgree.bind(this);
@@ -125,6 +142,9 @@ class PreferencesView extends React.Component {
     } = this.props;
 
     fetchOtherAssignedProducts()
+      .then(() => this.setState({
+        pageCounts: 1 + Math.floor((this.props.otherAssignedItems.length - 1) / ITEMS_ON_PAGE),
+      }))
       .catch(error => alert.show(`Cannot load others items: ${error.message}`, { type: 'error' }));
 
     if (isParticipant) {
@@ -172,17 +192,29 @@ class PreferencesView extends React.Component {
     if (section2) {
       const updatedList2 = this.props[section2]
         .filter(item => item.name.toUpperCase().includes(phrase));
+
+      const pageCountsOnSearch = 1 + Math.floor(
+        (updatedList1.length + updatedList2.length - 1) / ITEMS_ON_PAGE,
+      );
+
       this.setState({
         [section1]: updatedList1,
         [section2]: updatedList2,
         otherProductsSearchMode: phrase.length !== 0,
+        currentPageOnSearch: 1,
+        pageCountsOnSearch,
       });
       return;
     }
+    const pageCountsOnSearch = 1 + Math.floor(
+      (updatedList1.length - 1) / ITEMS_ON_PAGE,
+    );
 
     this.setState({
       [section1]: updatedList1,
       myProductsSearchMode: phrase.length !== 0,
+      currentPageOnSearch: 1,
+      pageCountsOnSearch,
     });
   };
 
@@ -261,9 +293,11 @@ class PreferencesView extends React.Component {
       preferences,
       otherProductsSearchMode,
       myProductsSearchMode,
+      currentPage,
+      currentPageOnSearch,
+      pageCounts,
+      pageCountsOnSearch,
     } = this.state;
-
-    console.log(selectedGroupIds, selectedOtherProductIds);
 
     return (
       <EditionPanelContainer edition={this.props.edition} navigationValue="preferences">
@@ -307,23 +341,79 @@ class PreferencesView extends React.Component {
               <SearchBar onChange={event => this.handleSearchBarChange(event, 'otherAssignedItems', 'myDefinedGroups')} />
               <MultiheaderCheckboxList
                 data={otherProductsSearchMode
-                  ? [otherAssignedItems, myDefinedGroups]
-                  : [this.props.otherAssignedItems, this.props.myDefinedGroups]}
+                  ? [
+                    myDefinedGroups,
+                    otherAssignedItems.slice(
+                      (currentPageOnSearch - 1) * ITEMS_ON_PAGE,
+                      currentPageOnSearch * ITEMS_ON_PAGE,
+                    ),
+                  ]
+                  : [
+                    this.props.myDefinedGroups,
+                    this.props.otherAssignedItems.slice(
+                      (currentPage - 1) * ITEMS_ON_PAGE, currentPage * ITEMS_ON_PAGE,
+                    ),
+                  ]}
                 disabled={!editMode}
-                titles={['Other items: ', 'My defined groups: ']}
-                currentSelected={[selectedOtherProductIds, selectedGroupIds]}
+                titles={['My defined groups: ', 'Other items: ']}
+                itemCounts={otherProductsSearchMode ? [
+                  myDefinedGroups.length,
+                  otherAssignedItems.length,
+                ] : [
+                  this.props.myDefinedGroups.length,
+                  this.props.otherAssignedItems.length,
+                ]}
+                currentSelected={[selectedGroupIds, selectedOtherProductIds]}
                 onItemClick={[
-                  item => this.handleToggle(item, 'selectedOtherProductIds'),
                   item => this.handleToggle(item, 'selectedGroupIds'),
+                  item => this.handleToggle(item, 'selectedOtherProductIds'),
                 ]}
                 secondaryAction={item => this.setState({ itemToPreview: item })}
                 selectedWithSecondaryId={itemToPreview && itemToPreview.id}
               />
-              <Typography className={classes.sectionSubtitle} component="h1" variant="body1">
-                {`Items assigned: ${
-                  (selectedOtherProductIds || []).length + (selectedGroupIds || []).length
-                }`}
-              </Typography>
+              <Grid container spacing={24}>
+                <Grid item xs={12} sm={8}>
+                  <Typography className={classes.assignedText} component="h1" variant="body1">
+                    {`Items assigned: ${
+                      (selectedOtherProductIds || []).length + (selectedGroupIds || []).length
+                    }`}
+                  </Typography>
+                </Grid>
+                <Grid style={{ display: 'inline-flex' }} item xs={12} sm={4}>
+                  <Button
+                    color="primary"
+                    size="small"
+                    disabled={otherProductsSearchMode
+                      ? currentPageOnSearch === 1 : currentPage === 1}
+                    onClick={() => this.setState((state) => {
+                      if (otherProductsSearchMode) {
+                        return { currentPageOnSearch: state.currentPageOnSearch - 1 };
+                      }
+                      return { currentPage: state.currentPage - 1 };
+                    })}
+                  >
+                    <Icon>keyboard_arrow_left</Icon>
+                  </Button>
+                  <Typography className={classes.paging} component="h1" variant="body1">
+                    {otherProductsSearchMode
+                      ? `${currentPageOnSearch}/${pageCountsOnSearch}` : `${currentPage}/${pageCounts}`}
+                  </Typography>
+                  <Button
+                    color="primary"
+                    size="small"
+                    disabled={otherProductsSearchMode
+                      ? currentPageOnSearch === pageCountsOnSearch : currentPage === pageCounts}
+                    onClick={() => this.setState((state) => {
+                      if (otherProductsSearchMode) {
+                        return { currentPageOnSearch: state.currentPageOnSearch + 1 };
+                      }
+                      return { currentPage: state.currentPage + 1 };
+                    })}
+                  >
+                    <Icon>keyboard_arrow_right</Icon>
+                  </Button>
+                </Grid>
+              </Grid>
               <Grid item xs={12} sm={6}>
                 {editMode ? <Button
                   variant="contained"
@@ -344,8 +434,8 @@ class PreferencesView extends React.Component {
               </Grid>
             </Paper>
           </Grid>
-          <Grid item xs={12} sm={!isParticipant ? 6 : 12}>
-            <ProductPreview item={itemToPreview}/>
+          <Grid item xs={12} sm={12}>
+            <ProductPreview item={itemToPreview} showOwnerUser />
           </Grid>
         </Grid>
         <CustomDialog

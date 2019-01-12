@@ -149,7 +149,7 @@ class MyProductsView extends React.Component {
     if (isParticipant) {
       fetchMyAssignedProductsIfNeeded()
         .then(() => fetchMyNotAssignedProductsIfNeeded())
-        .catch(() => alert.show('Cannot load your products', { type: 'error' }));
+        .catch(() => alert.show('Cannot load your items', { type: 'error' }));
     }
   }
 
@@ -240,8 +240,8 @@ class MyProductsView extends React.Component {
 
       console.log('imagesToSend: ', imagesToSend);
       createProduct(newName, newDescription, imagesToSend)
-        .then(() => alert.show('Successfully created product', { type: 'success' }))
-        .catch(error => alert.show(`Cannot add product: ${error.message}`, { type: 'error' }));
+        .then(() => alert.show('Successfully created item', { type: 'success' }))
+        .catch(error => alert.show(`Cannot add item: ${error.message}`, { type: 'error' }));
 
       this.setState({
         productCreationMode: false,
@@ -438,14 +438,14 @@ class MyProductsView extends React.Component {
                     editMode: false,
                   })}
                 >
-                  Create product
+                  Create Item
                 </Button>
               </div>
             </Paper>
           </Grid>
           <Grid item xs={12} sm={8}>
             <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
-              Product
+              Item
               <IconButton
                 onClick={() => this.setState({
                   editMode: true,
@@ -542,6 +542,7 @@ class MyProductsView extends React.Component {
 
                         </Grid>
                         <Grid item xs={12} sm={8}>
+                          <div style={{ float: 'right' }}>
                           {editMode || productCreationMode ? <Button
                             variant="contained"
                             color="primary"
@@ -554,10 +555,12 @@ class MyProductsView extends React.Component {
                             variant="contained"
                             color="primary"
                             className={classes.backButton}
+                            style={{ marginRight: 0 }}
                             onClick={() => this.submitProductChange()}
                           >
                             { productCreationMode ? 'Add item' : 'Update' }
                           </Button> : null}
+                          </div>
                         </Grid>
                       </Grid>
                     </Grid>

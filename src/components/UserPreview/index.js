@@ -71,6 +71,12 @@ class UserPreview extends React.Component {
       topRates = rates.slice(0, 11);
     }
 
+    const len = rates.length;
+    let meanRate = 'User has not been rated yet';
+    if (len) {
+      meanRate = rates.map(rate => rate.rate).reduce((prev, cur) => prev + cur) / rates.length;
+    }
+
     return (
       <ExpansionPanel expanded={isExpanded}>
         <ExpansionPanelSummary
@@ -86,6 +92,7 @@ class UserPreview extends React.Component {
             </Typography>
             <Typography variant="body2">{ `${name} ${surname}` }</Typography>
             <Typography variant="body2">{ `${email}` }</Typography>
+            <Typography variant="h6" style={{ marginTop: 10 }}>{ len ? `Rate: ${meanRate.toFixed(2)}` : null }</Typography>
           </div>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
@@ -106,8 +113,18 @@ class UserPreview extends React.Component {
 }
 
 UserPreview.propTypes = {
-  userData: PropTypes.object.isRequired,
+  userData: PropTypes.object,
   ownRate: PropTypes.object,
+};
+
+UserPreview.defaultProps = {
+  userData: {
+    username: '',
+    email: '',
+    name: '',
+    surname: '',
+    rates: [],
+  },
 };
 
 

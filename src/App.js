@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { Provider as AlertProvider } from 'react-alert';
 
 import './App.css';
@@ -45,12 +46,12 @@ class App extends Component {
     return (
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
-        <AlertProvider template={AlertTemplate} position="bottom right" timeout={5000} transition="fade" >
+        <AlertProvider template={AlertTemplate} position="bottom right" timeout={15000} transition="fade" >
           <Provider
             store={this.store}
             persistor={this.persistor}
           >
-            <PersistGate loading={null} persistor={this.persistor}>
+            <PersistGate loading={<CircularProgress />} persistor={this.persistor}>
               <AppRouter />
             </PersistGate>
           </Provider>

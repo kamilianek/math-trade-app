@@ -266,7 +266,7 @@ class CreateEditionDialog extends React.Component {
             className={classes.closeButton}
             onClick={this.handleEditionClose}
           >
-            Close
+            Close Edition
           </Button>
         </> : null}
       </CustomDialog>
