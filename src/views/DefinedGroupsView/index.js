@@ -337,7 +337,7 @@ class DefinedGroupsView extends Component {
           </Grid>
           <Grid item xs={12} sm={6}>
             <Typography className={classes.sectionSubtitle} component="h1" variant="h5">
-              Products and defined groups
+              Items and defined groups
               { selectedMyGroup ? <IconButton
                 onClick={() => this.setState({ editMode: true })}
                 color="inherit"

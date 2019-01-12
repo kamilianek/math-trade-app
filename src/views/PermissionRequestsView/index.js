@@ -11,6 +11,7 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
 import MainContainer from '../../components/MainContainer';
+import UserPreviewWrapper from '../../components/UserPreviewWrapper';
 
 import actions from '../../actions';
 
@@ -97,7 +98,7 @@ class PermissionRequestsView extends React.Component {
   render() {
     const { classes } = this.props;
     const { requests, rejected, accepted } = this.state;
-
+    console.log(requests);
     return (
       <>
         <MainContainer />
@@ -133,6 +134,9 @@ class PermissionRequestsView extends React.Component {
                     >
                       Reject
                     </Button> : null}
+                  </Grid>
+                  <Grid item xs={12} sm={12} className={classes.row}>
+                    <UserPreviewWrapper userId={request.userId}/>
                   </Grid>
                 </>))
               }
