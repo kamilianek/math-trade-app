@@ -20,7 +20,6 @@ export function loginWithPassword(username, password) {
       password,
     })
       .then((response) => {
-        console.log(response);
         dispatch({
           type: LOGIN_FINISHED,
           token: response.accessToken,
@@ -46,7 +45,6 @@ export function registerWithPassword(data) {
     console.log('state: ', apiUrl);
     return authApi.standardRegistration(apiUrl, data)
       .then((response) => {
-        console.log('data: ', response);
         dispatch({
           type: REGISTER_WITH_PASSWORD,
           token: response.accessToken,
@@ -66,7 +64,6 @@ export function registerWithPassword(data) {
 export function registerWithFacebook(data) {
   return (dispatch, getState) => {
     const { apiUrl } = getState().auth;
-    console.log('state: ', apiUrl);
     return authApi.facebookRegistration(apiUrl, data)
       .then((response) => {
         console.log('data: ', response);
@@ -80,7 +77,6 @@ export function registerWithFacebook(data) {
           userExists: response.userExists,
         });
       }, (error) => {
-        console.log(error.message);
         throw error;
       });
   };

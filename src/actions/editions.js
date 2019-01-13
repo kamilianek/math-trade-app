@@ -107,7 +107,6 @@ export function createEdition(name, description, endDate, maxParticipants) {
       maxParticipants,
     })
       .then((response) => {
-        console.log(response);
         dispatch({
           type: CREATE_EDITION,
           edition: response,
@@ -145,7 +144,6 @@ export function closeEdition(id) {
     const { apiUrl, token } = getState().auth;
     return editionsApi.resolveEdition(apiUrl, token, id)
       .then((response) => {
-        console.log('response: ', response);
         dispatch({
           type: CLOSE_EDITION,
           id,

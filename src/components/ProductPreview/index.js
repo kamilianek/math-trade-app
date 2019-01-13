@@ -81,7 +81,6 @@ class ProductPreview extends Component {
       showOwnerUser,
       item,
     } = this.props;
-    console.log('item: ', item);
 
     return showOwnerUser && item && item.userId
       ? this.renderWithUserPreview(item.userId) : this.renderItemSection();

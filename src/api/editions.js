@@ -14,7 +14,6 @@ function fetchEditions(apiUrl, token) {
 
 
 function editEdition(apiUrl, token, editionId, editionData) {
-  console.log(editionData);
   return fetch(`${apiUrl}/api/editions/${editionId}`, {
     method: 'PUT',
     headers: {

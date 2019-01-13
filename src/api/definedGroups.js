@@ -13,7 +13,6 @@ function fetchDefinedGroups(apiUrl, token, editionId) {
 
 
 function createDefinedGroup(apiUrl, token, editionId, definedGroupData) {
-  console.log(definedGroupData);
   return fetch(`${apiUrl}/api/editions/${editionId}/defined-groups`, {
     method: 'POST',
     headers: {
@@ -27,7 +26,6 @@ function createDefinedGroup(apiUrl, token, editionId, definedGroupData) {
 
 
 function editDefinedGroup(apiUrl, token, editionId, groupId, definedGroupData) {
-  console.log(definedGroupData);
   return fetch(`${apiUrl}/api/editions/${editionId}/defined-groups/${groupId}`, {
     method: 'PUT',
     headers: {

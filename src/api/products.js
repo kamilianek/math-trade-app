@@ -4,7 +4,6 @@ function createItem(apiUrl, token, editionId, item, files) {
   const formData = new FormData();
   formData.append('item', JSON.stringify(item));
   files.forEach((element, index) => {
-    console.log(`${index + 1}`, typeof element);
     formData.append(`${index + 1}`, element);
   });
 

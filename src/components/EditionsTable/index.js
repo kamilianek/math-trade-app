@@ -145,7 +145,6 @@ class EditionsTable extends Component {
       alert,
     } = this.props;
 
-    //console.log('>>', fetchEditionsIfNeeded());
     fetchEditionsIfNeeded()
       .catch(error => alert.show(error.message, { type: 'error' }));
   }

@@ -92,7 +92,6 @@ class LoginView extends React.Component {
   }
 
   componentDidMount() {
-    console.log('componentDidMount LoginView');
     window.fbAsyncInit = function () {
       console.log('fbAsyncInit...');
       window.FB.init({
@@ -126,7 +125,6 @@ class LoginView extends React.Component {
     const { username, password } = this.state;
 
     if (!this.validateForm()) {
-      console.log('invalid form');
       return;
     }
 
@@ -134,7 +132,6 @@ class LoginView extends React.Component {
 
     loginWithPassword(username, password)
       .then(() => {
-        console.log('successful login with password');
         alert.show('Successful login', { type: 'success' });
       })
       .catch((err) => {
@@ -147,7 +144,6 @@ class LoginView extends React.Component {
     const { alert, loginWithFacebook } = this.props;
     window.FB.login((result) => {
       if (result.authResponse) {
-        console.log('fb login result: ', result.authResponse);
         loginWithFacebook(result.authResponse.accessToken)
           .then((userExists) => {
             console.log('received fb token, user exists: ', userExists);
@@ -298,7 +294,6 @@ LoginView.propTypes = {
 
 const mapStateToProps = state => ({
   isLoggedIn: !!(state.auth && state.auth.token),
-  console: console.log(state),
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

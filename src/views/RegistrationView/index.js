@@ -359,7 +359,6 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mapStateToProps = state => ({
-  con: console.log(state),
   fbToken: state.auth && state.auth.fbToken,
   isLoggedIn: !!(state.auth && state.auth.token),
 });
