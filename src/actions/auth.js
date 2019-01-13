@@ -36,7 +36,6 @@ export function loginWithPassword(username, password) {
   };
 }
 
-// TODO
 export function changePassword(newPassword) {
   return async () => `changedTo:${newPassword}`;
 }
@@ -58,6 +57,50 @@ export function registerWithPassword(data) {
           userExists: true, // TODO: change on response
         });
       }, (error) => {
+        console.log(error.message);
+        throw error;
+      });
+  };
+}
+
+export function registerWithFacebook(data) {
+  return (dispatch, getState) => {
+    const { apiUrl } = getState().auth;
+    console.log('state: ', apiUrl);
+    return authApi.facebookRegistration(apiUrl, data)
+      .then((response) => {
+        console.log('data: ', response);
+        dispatch({
+          type: REGISTER_WITH_PASSWORD,
+          token: response.accessToken,
+          roles: response.roles,
+          loginData: {
+            username: data.username,
+          },
+          userExists: response.userExists,
+        });
+      }, (error) => {
+        console.log(error.message);
+        throw error;
+      });
+  };
+}
+
+export function loginWithFacebook(token) {
+  return (dispatch, getState) => {
+    const { apiUrl } = getState().auth;
+    return authApi.facebookLogin(apiUrl, { token })
+      .then((response) => {
+        dispatch({
+          type: LOGIN_FINISHED,
+          token: response.accessToken,
+          fbToken: token,
+          roles: response.roles,
+          loginData: {},
+          userExists: response.userExists,
+        });
+        return response.userExists;
+      }, (error) => {
         throw error;
       });
   };
@@ -69,4 +112,6 @@ export default {
   loginWithPassword,
   changePassword,
   registerWithPassword,
+  loginWithFacebook,
+  registerWithFacebook,
 };

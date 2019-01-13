@@ -81,15 +81,15 @@ class RegistrationView extends React.Component {
   handleErrorClose = name => (this.state[name] ? null : { [name]: true });
 
   validateForm = () => {
-    const { alert } = this.props;
+    const { alert, fbToken } = this.props;
 
     const isFirstNameValid = this.state.firstName.length >= 2 && this.state.firstName.length < 41;
     const isLastNameValid = this.state.lastName.length >= 2 && this.state.lastName.length < 41;
     const isUsernameValid = this.state.username.length >= 3 && this.state.username.length < 15;
     const isEmailValid = this.state.email.length > 0 && this.state.email.length < 41;
-    const isPasswordValid = this.state.password.length >= 6
-      && this.state.repeatedPassword.length >= 6;
-    const isPasswordValidSame = this.state.password === this.state.repeatedPassword;
+    const isPasswordValid = (this.state.password.length >= 6
+      && this.state.repeatedPassword.length >= 6) || !!fbToken;
+    const isPasswordValidSame = this.state.password === this.state.repeatedPassword || !!fbToken;
     const isAddressValid = this.state.address.length > 0;
     const isCityValid = this.state.city.length > 0;
     const isZipValid = this.state.zip.length > 0;
@@ -100,7 +100,7 @@ class RegistrationView extends React.Component {
       isLastNameValid,
       isUsernameValid,
       isEmailValid,
-      isPasswordValid: isLastNameValid && isPasswordValidSame,
+      isPasswordValid: (isLastNameValid && isPasswordValidSame),
       isAddressValid,
       isCityValid,
       isZipValid,
@@ -116,20 +116,35 @@ class RegistrationView extends React.Component {
   };
 
   onRegisterSubmit = () => {
-    const { registerWithPassword, alert } = this.props;
+    const {
+      registerWithPassword,
+      registerWithFacebook,
+      alert,
+      fbToken,
+    } = this.props;
 
     if (this.validateForm()) {
-      const data = {
+      let data = {
         name: this.state.firstName,
         surname: this.state.lastName,
         username: this.state.username,
         email: this.state.email,
-        password: this.state.password,
         address: this.state.address,
         city: this.state.city,
         postalCode: this.state.zip,
         country: this.state.country,
       };
+
+      if (fbToken) {
+        data = { ...data, token: fbToken };
+        registerWithFacebook(data)
+          .then(() => alert.show('Successfully created account', { type: 'success' }))
+          .catch(error => alert.show(error.message, { type: 'error' }));
+
+        return;
+      }
+
+      data = { ...data, password: this.state.password };
 
       registerWithPassword(data)
         .then(() => alert.show('Successfully created account', { type: 'success' }))
@@ -138,7 +153,7 @@ class RegistrationView extends React.Component {
   };
 
   render() {
-    const { classes, isLoggedIn } = this.props;
+    const { classes, isLoggedIn, fbToken } = this.props;
 
     if (isLoggedIn) {
       return <Redirect to='/' />;
@@ -215,7 +230,7 @@ class RegistrationView extends React.Component {
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
+            {!fbToken && <Grid item xs={12}>
               <TextField
                 required
                 id="password1"
@@ -231,8 +246,8 @@ class RegistrationView extends React.Component {
                 }}
                 helperText="Minimum 6 characters"
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Grid>}
+            {!fbToken && <Grid item xs={12}>
               <TextField
                 required
                 id="password2"
@@ -247,7 +262,7 @@ class RegistrationView extends React.Component {
                   this.setState(this.handleErrorClose('isPasswordValid'));
                 }}
               />
-            </Grid>
+            </Grid>}
             <Grid item xs={12}>
               <TextField
                 id="address"
@@ -340,10 +355,12 @@ RegistrationView.propTypes = {
 
 const mapDispatchToProps = dispatch => ({
   registerWithPassword: data => dispatch(actions.auth.registerWithPassword(data)),
+  registerWithFacebook: data => dispatch(actions.auth.registerWithFacebook(data)),
 });
 
 const mapStateToProps = state => ({
   con: console.log(state),
+  fbToken: state.auth && state.auth.fbToken,
   isLoggedIn: !!(state.auth && state.auth.token),
 });
 
