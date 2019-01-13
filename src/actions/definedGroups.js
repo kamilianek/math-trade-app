@@ -13,21 +13,6 @@ import definedGroupsApi from '../api/definedGroups';
 const VALIDATE_TIME = 1000 * 60 * 5;
 const FETCHING_TIMEOUT = 1000 * 32;
 
-// const myDefinedGroups = [
-//   {
-//     id: 10000,
-//     name: 'Group345',
-//     productsIds: [1003, 1004, 1005],
-//     groupIds: [],
-//   },
-//   {
-//     id: 10001,
-//     name: 'Group567',
-//     productsIds: [1005, 1006, 1007],
-//     groupIds: [10000],
-//   },
-// ];
-
 
 function requestDefinedGroups(editionId) {
   return {

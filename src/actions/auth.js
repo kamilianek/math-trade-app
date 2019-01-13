@@ -27,7 +27,7 @@ export function loginWithPassword(username, password) {
           loginData: {
             username,
           },
-          userExists: true, // TODO: change on response
+          userExists: true,
         });
       }, (error) => {
         throw error;
@@ -52,7 +52,7 @@ export function registerWithPassword(data) {
           loginData: {
             username: data.username,
           },
-          userExists: true, // TODO: change on response
+          userExists: true,
         });
       }, (error) => {
         console.log(error.message);
