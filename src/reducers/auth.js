@@ -1,6 +1,7 @@
 const INITIAL_STATE = {
   apiUrl: 'http://localhost:8081',
   token: null,
+  fbToken: null,
   tokenData: [],
   loginData: {
     username: null,
@@ -47,6 +48,7 @@ export default function authReducer(state = INITIAL_STATE, action) {
         ...state,
         token: action.token,
         roles: action.roles,
+        fbToken: action.fbToken,
         loginData: action.loginData,
         userExists: action.userExists,
       };
@@ -61,6 +63,7 @@ export default function authReducer(state = INITIAL_STATE, action) {
         roles: action.roles,
         loginData: action.loginData,
         userExists: action.userExists,
+        fbToken: null,
       };
     case REQUEST_PERMISSION_REQUEST_STATUS:
       return {

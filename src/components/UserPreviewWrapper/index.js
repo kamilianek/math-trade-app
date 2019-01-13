@@ -28,7 +28,6 @@ class UserPreviewWrapper extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { fetchOtherUser, alert, userId } = this.props;
-    console.log('>>> ', nextProps, userId);
     if (nextProps.userId !== this.props.userId) {
       fetchOtherUser(nextProps.userId)
         .then(response => this.setState({ user: response }))
@@ -50,7 +49,6 @@ UserPreviewWrapper.propTypes = {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  console.log('ownProps: ', ownProps);
   return bindActionCreators({
     fetchOtherUser: userId => (
       actions.user.fetchOtherUser(!userId ? ownProps.userId : userId)

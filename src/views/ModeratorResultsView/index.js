@@ -362,7 +362,6 @@ class ModeratorResultsView extends React.Component {
       return <Redirect to={`/editions/${edition.id}/results`} />;
     }
 
-    console.log('rowToPreview: ', rowToPreview);
 
     return (
       <EditionPanelContainer edition={edition}>

@@ -36,7 +36,6 @@ function fetchRequestsToVerify(apiUrl, token) {
 }
 
 function resolveRequests(apiUrl, token, solutionData) {
-  console.log('solutionData: ', solutionData);
   return fetch(`${apiUrl}/api/moderator-requests/resolve`, {
     method: 'PUT',
     headers: {

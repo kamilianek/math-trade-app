@@ -130,7 +130,6 @@ export function resolveModeratorRequests(acceptedRequestsIds, rejectedRequestsId
       acceptedRequestsIds,
       rejectedRequestsIds,
     };
-    console.log('solution: ', solution);
     return permissionRequestsApi.resolveRequests(apiUrl, token, solution)
       .then(response => response, (error) => {
         throw error;

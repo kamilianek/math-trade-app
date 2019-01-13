@@ -20,7 +20,6 @@ export function loginWithPassword(username, password) {
       password,
     })
       .then((response) => {
-        console.log(response);
         dispatch({
           type: LOGIN_FINISHED,
           token: response.accessToken,
@@ -28,7 +27,7 @@ export function loginWithPassword(username, password) {
           loginData: {
             username,
           },
-          userExists: true, // TODO: change on response
+          userExists: true,
         });
       }, (error) => {
         throw error;
@@ -36,7 +35,6 @@ export function loginWithPassword(username, password) {
   };
 }
 
-// TODO
 export function changePassword(newPassword) {
   return async () => `changedTo:${newPassword}`;
 }
@@ -47,6 +45,27 @@ export function registerWithPassword(data) {
     console.log('state: ', apiUrl);
     return authApi.standardRegistration(apiUrl, data)
       .then((response) => {
+        dispatch({
+          type: REGISTER_WITH_PASSWORD,
+          token: response.accessToken,
+          roles: response.roles,
+          loginData: {
+            username: data.username,
+          },
+          userExists: true,
+        });
+      }, (error) => {
+        console.log(error.message);
+        throw error;
+      });
+  };
+}
+
+export function registerWithFacebook(data) {
+  return (dispatch, getState) => {
+    const { apiUrl } = getState().auth;
+    return authApi.facebookRegistration(apiUrl, data)
+      .then((response) => {
         console.log('data: ', response);
         dispatch({
           type: REGISTER_WITH_PASSWORD,
@@ -55,8 +74,28 @@ export function registerWithPassword(data) {
           loginData: {
             username: data.username,
           },
-          userExists: true, // TODO: change on response
+          userExists: response.userExists,
         });
+      }, (error) => {
+        throw error;
+      });
+  };
+}
+
+export function loginWithFacebook(token) {
+  return (dispatch, getState) => {
+    const { apiUrl } = getState().auth;
+    return authApi.facebookLogin(apiUrl, { token })
+      .then((response) => {
+        dispatch({
+          type: LOGIN_FINISHED,
+          token: response.accessToken,
+          fbToken: token,
+          roles: response.roles,
+          loginData: {},
+          userExists: response.userExists,
+        });
+        return response.userExists;
       }, (error) => {
         throw error;
       });
@@ -69,4 +108,6 @@ export default {
   loginWithPassword,
   changePassword,
   registerWithPassword,
+  loginWithFacebook,
+  registerWithFacebook,
 };

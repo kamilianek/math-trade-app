@@ -108,7 +108,6 @@ export function createProduct(editionId, name, description, images) {
 
     return productsApi.createItem(apiUrl, token, editionId, item, images)
       .then((response) => {
-        console.log(response);
         dispatch({
           type: CREATE_MY_ASSIGNED_PRODUCT,
           editionId: response.editionId,

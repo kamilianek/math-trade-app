@@ -230,7 +230,6 @@ class MyProductsView extends React.Component {
     } = this.state;
 
     if (!this.validateForm()) {
-      console.log('invalid form');
       return;
     }
 
@@ -251,7 +250,6 @@ class MyProductsView extends React.Component {
       return;
     }
 
-    console.log(productCreationMode, editMode, images);
 
     if (editMode) {
       const imagesToSend = images.filter(image => !image.id && image.file)

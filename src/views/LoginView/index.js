@@ -69,7 +69,8 @@ const styles = theme => ({
   },
 });
 
-const FACEBOOK_APP_ID = '164788700874989';
+const FACEBOOK_APP_ID = '724611654538474';
+
 
 class LoginView extends React.Component {
   constructor() {
@@ -91,9 +92,10 @@ class LoginView extends React.Component {
   }
 
   componentDidMount() {
-    window.fbAsyncInit = () => {
+    window.fbAsyncInit = function () {
+      console.log('fbAsyncInit...');
       window.FB.init({
-        appId: '164788700874989',
+        appId: FACEBOOK_APP_ID,
         cookie: true,
         xfbml: true,
         version: 'v2.1',
@@ -101,8 +103,8 @@ class LoginView extends React.Component {
     };
 
     (function (d, s, id) {
-      let js;
-      const fjs = d.getElementsByTagName(s)[0];
+      let js,
+        fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) return;
       js = d.createElement(s); js.id = id;
       js.src = `https://connect.facebook.net/pl_PL/sdk.js#xfbml=1&version=v3.0&appId=${FACEBOOK_APP_ID}&autoLogAppEvents=1`;
@@ -123,7 +125,6 @@ class LoginView extends React.Component {
     const { username, password } = this.state;
 
     if (!this.validateForm()) {
-      console.log('invalid form');
       return;
     }
 
@@ -131,7 +132,6 @@ class LoginView extends React.Component {
 
     loginWithPassword(username, password)
       .then(() => {
-        console.log('successful login with password');
         alert.show('Successful login', { type: 'success' });
       })
       .catch((err) => {
@@ -141,30 +141,20 @@ class LoginView extends React.Component {
   }
 
   fbLogin() {
-    const { apiUrl } = this.props;
+    const { alert, loginWithFacebook } = this.props;
     window.FB.login((result) => {
-      // TODO: move to separate file
-      // if (result.authResponse) {
-      //   fetch(`${apiUrl}/auth/facebook`, {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //       access_token: result.authResponse.accessToken,
-      //     }),
-      //   })
-      //     .then(res => res.json())
-      //     .then((res) => {
-      //       if (res.status === 404) {
-      //         this.props.alert.error('Nie udało się zalogować, spróbuj ponownie :(', { timeout: 5000 });
-      //       }
-      //       this.props.didLogin(res.data);
-      //       this.props.alert.success('Logowanie pomyślne :)');
-      //     }).catch(err => this.props.alert.error(err, { timeout: 5000 }));
-      // } else {
-      //   alert('Error: no auth response');
-      // }
+      if (result.authResponse) {
+        loginWithFacebook(result.authResponse.accessToken)
+          .then((userExists) => {
+            console.log('received fb token, user exists: ', userExists);
+            if (!userExists) {
+              this.setState({ navigateToRegisterView: true });
+            }
+          })
+          .catch(err => alert.show(err.message, { type: 'error' }));
+      } else {
+        alert.error('Error: no auth response', { type: 'error' });
+      }
     }, { scope: 'public_profile,email' });
   }
 
@@ -268,7 +258,7 @@ class LoginView extends React.Component {
             <Grid item xs={6}>
               <Button
                 type="submit"
-                onClick={() => console.log('login with facebook')}
+                onClick={() => this.fbLogin()}
               >
                 <Typography component="p">
                   Login with
@@ -308,6 +298,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => bindActionCreators({
   loginWithPassword: actions.auth.loginWithPassword,
+  loginWithFacebook: actions.auth.loginWithFacebook,
 }, dispatch);
 
 

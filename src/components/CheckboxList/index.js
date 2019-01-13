@@ -27,7 +27,6 @@ class CheckboxList extends Component {
       selectedWithSecondaryId,
       editMode,
     } = this.props;
-    console.log('adad, ', this.props);
     return (
         <List
           className={classes.productListContainer}

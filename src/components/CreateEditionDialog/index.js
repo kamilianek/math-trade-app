@@ -195,7 +195,6 @@ class CreateEditionDialog extends React.Component {
 
     const isClosed = !!(edition && edition.status === 'CLOSED');
 
-    console.log(newEditionEndDate);
     return (
       <CustomDialog
         handleDisagree={this.editionCreationDialogDisagree}

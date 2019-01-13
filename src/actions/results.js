@@ -1,10 +1,3 @@
-// import {
-//   REQUEST_MODERATOR_RESULTS,
-//   RECEIVE_MODERATOR_RESULTS,
-//   RECEIVE_ERROR_MODERATOR_RESULTS,
-//   INVALIDATE_MODERATOR_RESULTS,
-// } from '../reducers/moderatorResults';
-
 import {
   REQUEST_USER_RESULTS,
   RECEIVE_USER_RESULTS,
@@ -17,10 +10,6 @@ import resultsApi from '../api/results';
 
 const VALIDATE_TIME_USER_RESULTS = 1000 * 60 * 10;
 const FETCHING_TIMEOUT_USER_RESULTS = 1000 * 32;
-
-
-// const VALIDATE_TIME_MODERATOR_RESULTS = 1000 * 60 * 10;
-// const FETCHING_TIMEOUT_MODERATOR_RESULTS = 1000 * 32;
 
 
 function requestResults(editionId) {
